@@ -1,0 +1,68 @@
+<resources>
+    <string name="app_name">Weather</string>
+    <string name="little_cloudy">Little cloudy</string>
+    <string name="night">Night</string>
+    <string name="plus_16">+0°</string>
+    <string name="city">City</string>
+    <string name="choose_your_city">Please, enter your city.</string>
+    <string name="enter_the_name_of_the_city">Your city</string>
+    <string name="ok">Ok</string>
+    <string name="settings">Settings</string>
+    <string name="set_on_night_mode">Set on night mode</string>
+    <string name="show_atmosphere_pressure">Show atmosphere pressure</string>
+    <string name="windInfo">wind %1$s m/s</string>
+    <string name="pressureInfo">%1$s mm Hg</string>
+    <string name="or_choose_from_list">Or choose from list.</string>
+    <string name="currTime">11:33</string>
+    <string name="show_temperature_feels_like">Show temperature feels like</string>
+    <string name="feels_like_temp">feels like: %s%2$s°</string>
+    <string name="HintTextInputEditText">Enter the name of the city</string>
+    <string name="setOnBtnOkEnterCityToast">Unacceptable city name</string>
+    <string name="toDeleteCity">To delete city from list click here</string>
+    <string name="delete">Delete</string>
+    <string name="delete_city">Delete city?</string>
+    <string name="cityDeleted">City deleted</string>
+    <string name="pleaseChooseCotyFirst">Please, choose city first</string>
+    <string name="about">About</string>
+    <string name="appName">Weather</string>
+    <string name="version">Version 1.0 17.08.2020</string>
+    <string-array name="cities">
+        <item>Moscow</item>
+        <item>Saint Petersburg</item>
+        <item>Paris</item>
+        <item>London</item>
+        <item>Berlin</item>
+    </string-array>
+    <string-array name="days">
+        <item>Mn</item>
+        <item>Tu</item>
+        <item>Wd</item>
+        <item>Th</item>
+        <item>Fr</item>
+
+    </string-array>
+    <string-array name="daysTemp">
+        <item>+0</item>
+        <item>+0</item>
+        <item>+0</item>
+        <item>+0</item>
+        <item>+0</item>
+
+    </string-array>
+    <string-array name="weatherState">
+        <item>Rain</item>
+        <item>Clear</item>
+        <item>Variable cloudiness</item>
+        <item>Mainly cloudy</item>
+        <item>Cloudy with clearings</item>
+        <item>Storm</item>
+    </string-array>
+    <string-array name="iconsId">
+        <item>cloudy_rainy_not_windy</item>
+        <item>sunny_not_cloudy</item>
+        <item>cloudy_icon</item>
+        <item>cloudy_icon</item>
+        <item>little_cloudy_sunny</item>
+        <item>storm_cloudy</item>
+    </string-array>
+</resources>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="degrees">72sp</dimen>
+    <dimen name="chooseYourCity_textview">17sp</dimen>
+    <dimen name="orChooseFromList_textview">17sp</dimen>
+    <dimen name="enterCity_editText_marginTop">20dp</dimen>
+    <dimen name="orChooseFromList_textview_marginTop">30dp</dimen>
+    <dimen name="citiesRV_textView_paddingBottom">8dp</dimen>
+    <dimen name="citiesRM_textView_paddingTop">8dp</dimen>
+    <dimen name="citiesRV_marginTop_in_fragment_choose_city">10dp</dimen>
+    <dimen name="okEnterCity_btn_textSize">14sp</dimen>
+    <dimen name="citiesRVTextSize">14sp</dimen>
+    <dimen name="citiesRVLayoutHight">100dp</dimen>
+</resources>

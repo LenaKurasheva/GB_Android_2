@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Погода</string>
+    <string name="little_cloudy">Малооблачно</string>
+    <string name="night">Ночь</string>
+    <string name="plus_16">+0°</string>
+    <string name="city">Город</string>
+    <string name="choose_your_city">Пожалуйста, введите название города.</string>
+    <string name="enter_the_name_of_the_city">Ваш город</string>
+    <string name="ok">Ok</string>
+    <string name="settings">Настройки</string>
+    <string name="set_on_night_mode">Включить ночной режим</string>
+    <string name="show_atmosphere_pressure">Показывать атмосферное давление</string>
+    <string name="windInfo">ветер %1$s м/с</string>
+    <string name="or_choose_from_list">Или выберете из списка.</string>
+    <string name="pressureInfo">%1$s мм рт.ст.</string>
+    <string name="currTime">11:33</string>
+    <string name="show_temperature_feels_like">Показать темературу по ощущению</string>
+    <string name="feels_like_temp">ощущается: %s%2$s °</string>
+    <string name="HintTextInputEditText">Введите название города.</string>
+    <string name="setOnBtnOkEnterCityToast">Некорректное имя города</string>
+    <string name="toDeleteCity">Чтобы удалить город, нажмите</string>
+    <string name="cityDeleted">Город удален</string>
+    <string name="pleaseChooseCotyFirst">Пожалуйста, сначала выберите город</string>
+    <string name="about">О приложении</string>
+    <string name="appName">Погода</string>
+    <string name="version">Версия 1.0 17.08.2020</string>
+    <string name="delete_city">Удалить город?</string>
+    <string name="delete">Удалить</string>
+    <string-array name="cities">
+        <item>Москва</item>
+        <item>Санкт Петербург</item>
+        <item>Иваново</item>
+        <item>Челябинск</item>
+        <item>Буй</item>
+    </string-array>
+    <string-array name="days">
+        <item>Пн</item>
+        <item>Вт</item>
+        <item>Ср</item>
+        <item>Чт</item>
+        <item>Пт</item>
+
+    </string-array>
+    <string-array name="daysTemp">
+        <item>+0</item>
+        <item>+0</item>
+        <item>+0</item>
+        <item>+0</item>
+        <item>+0</item>
+
+    </string-array>
+    <string-array name="weatherState">
+        <item>Дождь</item>
+        <item>Ясно</item>
+        <item>Переменная облачность</item>
+        <item>Пасмурно</item>
+        <item>Облачность с прояснениями</item>
+        <item>Гроза</item>
+    </string-array>
+    <string-array name="iconsId">
+        <item>cloudy_rainy_not_windy</item>
+        <item>sunny_not_cloudy</item>
+        <item>cloudy_icon</item>
+        <item>cloudy_icon</item>
+        <item>little_cloudy_sunny</item>
+        <item>storm_cloudy</item>
+    </string-array>
+</resources>

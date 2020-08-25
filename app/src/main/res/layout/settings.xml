@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:layout_columnSpan="2"
+    android:gravity="center"
+    android:paddingTop="60dp"
+    android:orientation="vertical">
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/settings_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/settings"
+            android:textSize="20sp"
+            android:paddingStart="20dp"
+            android:paddingBottom="40dp"
+            />
+
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="15dp">
+
+        <TextView
+            android:id="@+id/feelsLikeTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/show_temperature_feels_like"
+            android:layout_weight="3"
+            android:paddingStart="20dp"/>
+
+        <Switch
+            android:id="@+id/feelsLikeSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingEnd="20dp"/>
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="15dp">
+
+        <TextView
+            android:id="@+id/atmosphere_pressure"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/show_atmosphere_pressure"
+            android:layout_weight="3"
+            android:paddingStart="20dp"/>
+
+        <Switch
+            android:id="@+id/pressure_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingEnd="20dp"/>
+    </TableRow>
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="15dp">
+
+
+        <TextView
+            android:id="@+id/night_mode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/set_on_night_mode"
+            android:layout_weight="3"
+            android:paddingStart="20dp"
+            android:visibility="invisible"/>
+
+        <Switch
+            android:id="@+id/night_mode_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:visibility="invisible"/>
+
+    </TableRow>
+</TableLayout>
