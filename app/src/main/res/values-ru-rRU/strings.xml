@@ -27,6 +27,7 @@
     <string name="version">Версия 1.0 17.08.2020</string>
     <string name="delete_city">Удалить город?</string>
     <string name="delete">Удалить</string>
+
     <string-array name="cities">
         <item>Москва</item>
         <item>Санкт Петербург</item>
@@ -34,22 +35,26 @@
         <item>Челябинск</item>
         <item>Буй</item>
     </string-array>
+
     <string-array name="days">
         <item>Пн</item>
         <item>Вт</item>
         <item>Ср</item>
         <item>Чт</item>
         <item>Пт</item>
-
     </string-array>
+
     <string-array name="daysTemp">
         <item>+0</item>
         <item>+0</item>
         <item>+0</item>
         <item>+0</item>
         <item>+0</item>
-
+        <item>+0</item>
+        <item>+0</item>
+        <item>+0</item>
     </string-array>
+
     <string-array name="weatherState">
         <item>Дождь</item>
         <item>Ясно</item>
@@ -58,6 +63,7 @@
         <item>Облачность с прояснениями</item>
         <item>Гроза</item>
     </string-array>
+
     <string-array name="iconsId">
         <item>cloudy_rainy_not_windy</item>
         <item>sunny_not_cloudy</item>
@@ -65,6 +71,17 @@
         <item>cloudy_icon</item>
         <item>little_cloudy_sunny</item>
         <item>storm_cloudy</item>
+    </string-array>
+
+    <string-array name="hours">
+        <item>00.00</item>
+        <item>03.00</item>
+        <item>06.00</item>
+        <item>09.00</item>
+        <item>12.00</item>
+        <item>15.00</item>
+        <item>18.00</item>
+        <item>21.00</item>
     </string-array>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>

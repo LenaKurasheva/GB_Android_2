@@ -11,7 +11,6 @@ public class CurrentDataContainer implements Serializable {
 
     // Поле для синхронизации
     private static final Object syncObj = new Object();
-
     // Конструктор (вызывать извне его нельзя, поэтому он приватный)
     private CurrentDataContainer(){}
 
@@ -28,9 +27,10 @@ public class CurrentDataContainer implements Serializable {
         }
     }
 
-    public String currCityName = "Saint Petersburg";
+    String currCityName = "Saint Petersburg";
     boolean[] switchSettingsArray;
     ArrayList<WeatherData> weekWeatherData = new ArrayList<>();
+    ArrayList<HourlyWeatherData> hourlyWeatherList;
     ArrayList<String> citiesList = new ArrayList<>();
     static boolean isFirstEnter = true;
     static boolean isNightModeOn;

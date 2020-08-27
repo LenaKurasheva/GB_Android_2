@@ -36,6 +36,7 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
     private CitiesRecyclerDataAdapter adapter;
     private ArrayList<String> citiesList = new ArrayList<>();
     private ArrayList<WeatherData> weekWeatherData = new ArrayList<>();
+    private ArrayList<HourlyWeatherData> hourlyWeatherList = new ArrayList<>();
     final String myLog = "myLog";
     ChooseCityPresenter chooseCityPresenter = ChooseCityPresenter.getInstance();
     private boolean isErrorShown;
@@ -110,7 +111,9 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
                         CurrentDataContainer.getInstance().currCityName = currentCity;
                         Log.d(myLog, "RESPONSE COD = " + ChooseCityPresenter.responseCode + " CURR CITY = " + currentCity);
                         this.weekWeatherData = chooseCityPresenter.getWeekWeatherData();
+                        this.hourlyWeatherList = chooseCityPresenter.getHourlyWeatherData();
                         CurrentDataContainer.getInstance().weekWeatherData = this.weekWeatherData;
+                        CurrentDataContainer.getInstance().hourlyWeatherList = this.hourlyWeatherList;
                     } if (ChooseCityPresenter.responseCode != 200 ){
                         Log.d(myLog, "RESPONSE COD = " + ChooseCityPresenter.responseCode + " CURR CITY = " + currentCity);
                         Toast.makeText(getContext(), "Fail connection", Toast.LENGTH_LONG).show();

@@ -23,6 +23,7 @@ public final class ChooseCityPresenter {
     private static final String TAG = "WEATHER";
     String BASE_URL = "https://api.openweathermap.org/data/2.5/";
     private ArrayList<WeatherData> weekWeatherData;
+    private ArrayList<HourlyWeatherData> hourlyWeatherData;
     public static int responseCode;
 
     //Внутреннее поле, будет хранить единственный экземпляр
@@ -30,7 +31,6 @@ public final class ChooseCityPresenter {
 
     // Поле для синхронизации
     private static final Object syncObj = new Object();
-    private ArrayList<HourlyWeatherData> hourlyWeatherList;
 
     // Конструктор (вызывать извне его нельзя, поэтому он приватный)
     private ChooseCityPresenter(){}
@@ -48,6 +48,7 @@ public final class ChooseCityPresenter {
         }
     }
     public ArrayList<WeatherData> getWeekWeatherData(){return weekWeatherData;}
+    public ArrayList<HourlyWeatherData> getHourlyWeatherData(){return hourlyWeatherData;}
 
        public void getFiveDaysWeatherFromServer(String currentCity, Resources resources){
            try {
@@ -130,7 +131,7 @@ public final class ChooseCityPresenter {
     }
 
     private void getHourlyWeatherData(WeatherRequest weatherRequest) {
-        hourlyWeatherList = new ArrayList<>();
+        hourlyWeatherData = new ArrayList<>();
         for (int i = 0; i < 8; i++) {
             String temperature = Math.round(Float.parseFloat(String.format(Locale.getDefault(),
                     "%.2f", weatherRequest.getList().get(i).getMain().getTemp()))) + "°";
@@ -138,7 +139,7 @@ public final class ChooseCityPresenter {
             String time = String.format(Locale.getDefault(),
                     "%s", weatherRequest.getList().get(i).getDtTxt()).substring(11, 16);
             HourlyWeatherData hourlyForecastData = new HourlyWeatherData(time, weatherId, temperature);
-            hourlyWeatherList.add(hourlyForecastData);
+            hourlyWeatherData.add(hourlyForecastData);
         }
     }
 }

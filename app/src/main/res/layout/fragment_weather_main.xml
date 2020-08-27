@@ -21,14 +21,29 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Center" />
 
-    <!-- Здесь планируется сделать список следующих 10-ти дней с отображением погоды -->
+    <!-- Почасовой прогноз погоды -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/weekWeatherRV"
-        android:layout_width="wrap_content"
+        android:id="@+id/hourlyWeatherRV"
+        android:layout_width="match_parent"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/pressureInfoTextView" />
+
+    <!-- Список 5-ти дней с отображением погоды -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/weekWeatherRV"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/hourlyWeatherRV" />
 
     <ImageView
         android:id="@+id/weatherStatus"

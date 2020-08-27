@@ -34,15 +34,20 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     private TextView feelsLikeTextView, pressureInfoTextView;
     final String myLog = "myLog";
     private RecyclerView weatherRecyclerView;
+    private RecyclerView hourlyRecyclerView;
     private List<Integer> weatherIcon = new ArrayList<>();
     private List<String> days = new ArrayList<>();
     private List<String> daysTemp = new ArrayList<>();
+    private List<String> hourlyTime = new ArrayList<>();
+    private List<Integer> hourlyWeatherIcon = new ArrayList<>();
+    private List<String> hourlyTemperature = new ArrayList<>();
     private TextView windInfoTextView;
     private TextView currTime;
     private TextView weatherStatusTextView;
     private ArrayList<String> citiesListFromRes;
     private ArrayList<String> citiesList;
     private ArrayList<WeatherData> weekWeatherData;
+    private ArrayList<HourlyWeatherData> hourlyWeatherData;
 
 
     static WeatherMainFragment create(CurrentDataContainer container) {
@@ -76,29 +81,18 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         moveViewsIfLandscapeOrientation(view);
         takeCitiesListFromResources(getResources());
         generateDaysList();
-        addDataToWeatherIconsIdFromRes();
+        addDataToWeatherIconsIdFromRes(weatherIcon);
         addDefaultDataToDaysTempFromRes(getResources());
+        addDefaultDataToHourlyWeatherRV(getResources());
         updateWeatherInfo(getResources()); //здесь забрали citiesList
         setupRecyclerView();
+        setupHourlyWeatherRecyclerView();
         super.onViewCreated(view, savedInstanceState);
     }
 
-    // activity создана, можно к ней обращаться. Выполним начальные действия
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        // Определение, можно ли будет расположить рядом выбор города в другом фрагменте
-        isLandscape = getResources().getConfiguration().orientation
-                == Configuration.ORIENTATION_LANDSCAPE;
-        // Если можно нарисовать рядом выбор города, то сделаем это
-        Log.d(myLog, "WeatherMainFragment: onActivityCreated !BEFORE updateChosenCity, currentCity: " + currentCity);
-//        isLandscape = getResources().getConfiguration().orientation
-//                == Configuration.ORIENTATION_LANDSCAPE;
-//        Log.d("myLog", "Orientation land? : " + isLandscape);
-//
-//        if (isLandscape) showChooseCityFragment(getCurrentDataContainer());
-
         Log.d(myLog, "WeatherMainFragment - savedInstanceState exists = " + (savedInstanceState != null));
         updateChosenCity(savedInstanceState);
         takeWeatherInfoForFirstEnter();
@@ -111,9 +105,11 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
             ChooseCityPresenter chooseCityPresenter = ChooseCityPresenter.getInstance();
             chooseCityPresenter.getFiveDaysWeatherFromServer(currentCity, getResources());
             this.weekWeatherData = chooseCityPresenter.getWeekWeatherData();
+            this.hourlyWeatherData = chooseCityPresenter.getHourlyWeatherData();
             updateWeatherInfo(getResources());
             Log.d(myLog, "takeWeatherInfoForFirstEnter - after updateWeatherInfo;  CITIES LIST = "+ citiesList.toString());
             setupRecyclerView();
+            setupHourlyWeatherRecyclerView();
         } else {
             Log.d(myLog, "*NOT FIRST ENTER*");
         }
@@ -140,7 +136,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         degrees = view.findViewById(R.id.degrees);
         feelsLikeTextView = view.findViewById(R.id.feelsLikeTextView);
         pressureInfoTextView = view.findViewById(R.id.pressureInfoTextView);
-
+        hourlyRecyclerView = view.findViewById(R.id.hourlyWeatherRV);
         weatherRecyclerView = view.findViewById(R.id.weekWeatherRV);
         windInfoTextView = view.findViewById(R.id.windSpeed);
         currTime = view.findViewById(R.id.currTime);
@@ -176,10 +172,10 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
                 currTime.setText(timeText);
                 Log.d(myLog, "WEatherMainFragment - updateWeatherInfo - FIRSTENTER; responseCode != 200; CITIES LIST = " + citiesList.toString());
             } else {
-                setNewWeatherData(weekWeatherData);
+                setNewWeatherData(weekWeatherData, hourlyWeatherData);
                 settingsSwitchArray = CurrentDataContainer.getInstance().switchSettingsArray;
                 isSettingsSwitchArrayTransferred(settingsSwitchArray);
-                setNewWeatherData(weekWeatherData);
+                setNewWeatherData(weekWeatherData, hourlyWeatherData);
                 Log.d(myLog, "WEatherMainFragment - updateWeatherInfo - FIRSTENTER; responseCode == 200; CITIES LIST = " + citiesList.toString());
             }
         }
@@ -187,10 +183,11 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
             currentCity = CurrentDataContainer.getInstance().currCityName;
             settingsSwitchArray = CurrentDataContainer.getInstance().switchSettingsArray;
             weekWeatherData = CurrentDataContainer.getInstance().weekWeatherData;
+            hourlyWeatherData = CurrentDataContainer.getInstance().hourlyWeatherList;
             citiesList = CurrentDataContainer.getInstance().citiesList;
 
             isSettingsSwitchArrayTransferred(settingsSwitchArray);
-            setNewWeatherData(weekWeatherData);
+            setNewWeatherData(weekWeatherData, hourlyWeatherData);
         }
     }
 
@@ -210,8 +207,8 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         }
     }
 
-    private void setNewWeatherData(ArrayList<WeatherData> weekWeatherData) {
-        if (weekWeatherData != null && weekWeatherData.size() != 0) {
+    private void setNewWeatherData(ArrayList<WeatherData> weekWeatherData, ArrayList<HourlyWeatherData> hourlyWeatherData) {
+        if (weekWeatherData != null && weekWeatherData.size() != 0 && hourlyWeatherData != null && hourlyWeatherData.size() != 0) {
             WeatherData wd = weekWeatherData.get(0);
             degrees.setText(wd.degrees);
             windInfoTextView.setText(wd.windInfo);
@@ -232,6 +229,14 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
                 Log.d(myLog, "ICON " + i + " " +  imageName);
                 Integer resID = getResources().getIdentifier(imageName , "drawable", requireActivity().getPackageName());
                 weatherIcon.set(i, resID);
+            }
+            for (int i = 0; i < 8 ; i++) {
+                HourlyWeatherData hourlyData = hourlyWeatherData.get(i);
+                hourlyTime.set(i, hourlyData.getTime());
+                String iconName = hourlyData.getStateImage();
+                Integer iconId =  getResources().getIdentifier(iconName , "drawable", requireActivity().getPackageName());
+                hourlyWeatherIcon.set(i,iconId);
+                hourlyTemperature.set(i, hourlyData.getTemperature());
             }
         }
     }
@@ -265,7 +270,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         daysTemp  = Arrays.asList(daysTempStringArr);
     }
 
-    public void addDataToWeatherIconsIdFromRes(){
+    public void addDataToWeatherIconsIdFromRes(List<Integer> weatherIcon){
         weatherIcon.add(R.drawable.clear_sky_day);
         weatherIcon.add(R.drawable.few_clouds_day);
         weatherIcon.add(R.drawable.scattered_clouds);
@@ -277,6 +282,16 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         weatherIcon.add(R.drawable.mist);
     }
 
+    public void addDefaultDataToHourlyWeatherRV(android.content.res.Resources resources){
+        String[] hourlyTempStringArr = resources.getStringArray(R.array.daysTemp);
+        hourlyTemperature  = Arrays.asList(hourlyTempStringArr);
+
+        String[] hoursStringArr = resources.getStringArray(R.array.hours);
+        hourlyTime  = Arrays.asList(hoursStringArr);
+
+        addDataToWeatherIconsIdFromRes(hourlyWeatherIcon);
+    }
+
     @Override
     public void onItemClicked(View view, String itemText) {}
 
@@ -284,10 +299,18 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     public void onItemLongPressed(View itemText) {}
 
     private void setupRecyclerView() {
-        LinearLayoutManager layoutManager = new LinearLayoutManager(requireActivity().getBaseContext(), LinearLayoutManager.HORIZONTAL, false);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(requireActivity().getBaseContext(), LinearLayoutManager.VERTICAL, false);
         WeekWeatherRecyclerDataAdapter weekWeatherAdapter = new WeekWeatherRecyclerDataAdapter(days, daysTemp, weatherIcon, this);
 
         weatherRecyclerView.setLayoutManager(layoutManager);
         weatherRecyclerView.setAdapter(weekWeatherAdapter);
+    }
+
+    private void setupHourlyWeatherRecyclerView() {
+        LinearLayoutManager layoutManager = new LinearLayoutManager(requireActivity().getBaseContext(), LinearLayoutManager.HORIZONTAL, false);
+        HourlyWeatherRecyclerDataAdapter hourlyWeatherRecyclerDataAdapter = new HourlyWeatherRecyclerDataAdapter(hourlyTime, hourlyWeatherIcon, hourlyTemperature, this);
+
+        hourlyRecyclerView.setLayoutManager(layoutManager);
+        hourlyRecyclerView.setAdapter(hourlyWeatherRecyclerDataAdapter);
     }
 }
