@@ -166,7 +166,9 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
         if(ChooseCityPresenter.responseCode == 200) {
             Log.d(myLog, "RESPONSE COD = " + ChooseCityPresenter.responseCode + " CURR CITY = " + currentCity);
             this.weekWeatherData = chooseCityPresenter.getWeekWeatherData();
+            this.hourlyWeatherList = chooseCityPresenter.getHourlyWeatherData();
             CurrentDataContainer.getInstance().weekWeatherData = this.weekWeatherData;
+            CurrentDataContainer.getInstance().hourlyWeatherList = this.hourlyWeatherList;
         } else {
             Log.d(myLog, "RESPONSE COD = " + ChooseCityPresenter.responseCode + " CURR CITY = " + currentCity);
             Toast.makeText(getContext(), "Fail connection", Toast.LENGTH_LONG).show();
