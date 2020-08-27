@@ -73,7 +73,6 @@ public class WeekWeatherRecyclerDataAdapter extends RecyclerView.Adapter<WeekWea
                     onItemClickCallback.onItemClicked(view, day);
                 }
             });
-
         }
     }
 }

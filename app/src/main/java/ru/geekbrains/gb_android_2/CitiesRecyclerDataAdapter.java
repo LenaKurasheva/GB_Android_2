@@ -34,7 +34,7 @@ public class CitiesRecyclerDataAdapter extends RecyclerView.Adapter<CitiesRecycl
         String text = cities.get(position);
 
         holder.setTextToTextView(text);
-        holder.setOnClickForItem(text, position);
+        holder.setOnClickForItem(text);
     }
 
     @Override
@@ -77,23 +77,17 @@ public class CitiesRecyclerDataAdapter extends RecyclerView.Adapter<CitiesRecycl
             cityName.setText(text);
         }
 
-        void setOnClickForItem(final String text, int position) {
-            cityName.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if(onItemClickCallback != null) {
-                        onItemClickCallback.onItemClicked(view, text);
-                    }
+        void setOnClickForItem(final String text) {
+            cityName.setOnClickListener(view -> {
+                if(onItemClickCallback != null) {
+                    onItemClickCallback.onItemClicked(view, text);
                 }
             });
-            cityName.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View view) {
-                    if(onItemClickCallback != null) {
-                        onItemClickCallback.onItemLongPressed(view);
-                    }
-                    return false;
+            cityName.setOnLongClickListener(view -> {
+                if(onItemClickCallback != null) {
+                    onItemClickCallback.onItemLongPressed(view);
                 }
+                return false;
             });
         }
     }
