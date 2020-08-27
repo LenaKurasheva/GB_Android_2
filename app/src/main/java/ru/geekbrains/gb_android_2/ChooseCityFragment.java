@@ -134,12 +134,10 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
     }
 
     private void updateWeatherData(){
-        WeatherMainFragment weatherMainFragment = WeatherMainFragment.create(CurrentDataContainer.getInstance());
-        FragmentTransaction ft = requireFragmentManager().beginTransaction();
-        ft.replace(R.id.fragmentContainer, weatherMainFragment);  // замена фрагмента
-        ft.addToBackStack(WeatherMainFragment.class.getSimpleName());
-        CurrentDataContainer.backStack.addElement(WeatherMainFragment.class.getSimpleName());
-        ft.commit();
+        MainActivity ma = (MainActivity)this.getActivity();
+        assert ma != null;
+        ma.setHomeFragment();
+        ma.navigationView.setCheckedItem(R.id.nav_home);
         }
 
     private void takeCitiesList(){

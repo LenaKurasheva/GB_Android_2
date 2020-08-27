@@ -19,7 +19,7 @@ import androidx.appcompat.widget.Toolbar;
 
 public class MainActivity extends AppCompatActivity {
 
-    private NavigationView navigationView;
+    public NavigationView navigationView;
     private DrawerLayout drawer;
 
     @Override
@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void setHomeFragment() {
+    public void setHomeFragment() {
         setFragment(WeatherMainFragment.create(CurrentDataContainer.getInstance()), WeatherMainFragment.class.getSimpleName());
     }
 
@@ -106,13 +106,14 @@ public class MainActivity extends AppCompatActivity {
         setFragment(SettingsFragment.create(CurrentDataContainer.getInstance()), SettingsFragment.class.getSimpleName());
     }
 
-    private void setFragment(Fragment fragment, String fragmentName) {
+    public void setFragment(Fragment fragment, String fragmentName) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragmentContainer, fragment);
         fragmentTransaction.addToBackStack(fragmentName);
         CurrentDataContainer.backStack.addElement(fragmentName);
         fragmentTransaction.commit();
     }
+
 
     @Override
   public boolean onOptionsItemSelected(@NonNull MenuItem item) {
