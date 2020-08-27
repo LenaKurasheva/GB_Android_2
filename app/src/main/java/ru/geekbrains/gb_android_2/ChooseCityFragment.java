@@ -15,7 +15,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,6 +24,8 @@ import com.google.android.material.textfield.TextInputEditText;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.regex.Pattern;
+
+import ru.geekbrains.gb_android_2.events.OpenWeatherMainFragmentEvent;
 
 
 public class ChooseCityFragment extends Fragment implements RVOnItemClick {
@@ -134,11 +135,8 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
     }
 
     private void updateWeatherData(){
-        MainActivity ma = (MainActivity)this.getActivity();
-        assert ma != null;
-        ma.setHomeFragment();
-        ma.navigationView.setCheckedItem(R.id.nav_home);
-        }
+        EventBus.getBus().post(new OpenWeatherMainFragmentEvent());
+    }
 
     private void takeCitiesList(){
         if(CurrentDataContainer.getInstance().citiesList != null) this.citiesList = CurrentDataContainer.getInstance().citiesList;

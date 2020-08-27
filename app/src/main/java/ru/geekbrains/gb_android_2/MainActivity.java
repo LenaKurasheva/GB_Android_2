@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.view.Menu;
 
 import com.google.android.material.navigation.NavigationView;
+import com.squareup.otto.Subscribe;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -16,6 +17,8 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
+import ru.geekbrains.gb_android_2.events.OpenWeatherMainFragmentEvent;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -64,6 +67,25 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getBus().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getBus().unregister(this);
+        super.onStop();
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onOpenFragmentEvent(OpenWeatherMainFragmentEvent event) {
+        setHomeFragment();
+        navigationView.setCheckedItem(R.id.nav_home);
     }
 
     private void setOnClickForSideMenuItems() {
