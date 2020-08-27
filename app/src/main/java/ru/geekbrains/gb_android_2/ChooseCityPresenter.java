@@ -3,8 +3,6 @@ package ru.geekbrains.gb_android_2;
 import android.content.res.Resources;
 import android.util.Log;
 
-import androidx.fragment.app.FragmentTransaction;
-
 import com.google.gson.Gson;
 
 import java.io.BufferedReader;
@@ -24,14 +22,15 @@ public final class ChooseCityPresenter {
     final String myLog = "myLog";
     private static final String TAG = "WEATHER";
     String BASE_URL = "https://api.openweathermap.org/data/2.5/";
+    private ArrayList<WeatherData> weekWeatherData;
+    public static int responseCode;
 
     //Внутреннее поле, будет хранить единственный экземпляр
     private static ChooseCityPresenter instance = null;
 
     // Поле для синхронизации
     private static final Object syncObj = new Object();
-    private ArrayList<WeatherData> weekWeatherData;
-    public static int responseCode;
+    private ArrayList<HourlyWeatherData> hourlyWeatherList;
 
     // Конструктор (вызывать извне его нельзя, поэтому он приватный)
     private ChooseCityPresenter(){}
@@ -49,21 +48,6 @@ public final class ChooseCityPresenter {
         }
     }
     public ArrayList<WeatherData> getWeekWeatherData(){return weekWeatherData;}
-
-    public void updateWeatherInLandscape(CurrentDataContainer container,
-                                         androidx.fragment.app.FragmentManager fragmentManager) {
-        WeatherMainFragment weatherMainFragment;
-           Log.d(myLog, "ChooseCityFragment update updateWeatherInLandscape");
-           weatherMainFragment = WeatherMainFragment.create(container);
-           // Выполняем транзакцию по замене фрагмента
-           FragmentTransaction ft = fragmentManager.beginTransaction();
-           ft.replace(R.id.weatherMain, weatherMainFragment);  // замена фрагмента
-           // можно добавить анимацию + добавить фрагмент в бэкстек:
-           // ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-           // ft.addToBackStack(null);
-           // ft.addToBackStack("Some_Key");
-           ft.commit();
-       }
 
        public void getFiveDaysWeatherFromServer(String currentCity, Resources resources){
            try {
@@ -83,6 +67,7 @@ public final class ChooseCityPresenter {
                        Gson gson = new Gson();
                        final WeatherRequest weatherRequest = gson.fromJson(result, WeatherRequest.class);
                        getWeatherData(weatherRequest, resources);
+                       getHourlyWeatherData(weatherRequest);
                        Log.d(myLog, "ChooseCityPresenter - getFiveDaysWeatherFromServer - getWeatherData ");
                    } catch (Exception e) {
                        Log.e(TAG, "Fail connection", e);
@@ -130,18 +115,30 @@ public final class ChooseCityPresenter {
 
     public void getWeatherData(WeatherRequest weatherRequest, Resources resources){
         weekWeatherData = new ArrayList<>();
-        for (int i = 0; i < FORECAST_DAYS; i++) {
+        for (int i = 0; i < weatherRequest.getList().size(); i += 8) {
+            Log.d("WEATHER", "List Weather forcast size = " + weatherRequest.getList().size());
             String degrees = String.format(Locale.getDefault(), "%s", Math.round(weatherRequest.getList().get(i).getMain().getTemp()));
             String windInfo = String.format(Locale.getDefault(), "%s", Math.round(weatherRequest.getList().get(i).getWind().getSpeed()));
             String pressure = String.format(Locale.getDefault(), "%s", weatherRequest.getList().get(i).getMain().getPressure());
             String weatherStateInfo = String.format(Locale.getDefault(), "%s", weatherRequest.getList().get(i).getWeather().get(0).getDescription());
             String feelLike = String.format(Locale.getDefault(), "%s", weatherRequest.getList().get(i).getMain().getFeelsLike());
-//            String weatherIcon = String.format(Locale.getDefault(), "%s", weatherRequest.getList().get(i).getWeather().get(0).getId());
             int weatherIcon = weatherRequest.getList().get(i).getWeather().get(0).getId();
-//            String weatherIcon = "cloudy_icon";
             WeatherData weatherData = new WeatherData(resources, degrees, windInfo, pressure, weatherStateInfo, feelLike, weatherIcon);
-            weekWeatherData.add(i, weatherData);
+            weekWeatherData.add(weatherData);
             Log.d(myLog, i + weatherData.toString());
+        }
+    }
+
+    private void getHourlyWeatherData(WeatherRequest weatherRequest) {
+        hourlyWeatherList = new ArrayList<>();
+        for (int i = 0; i < 8; i++) {
+            String temperature = Math.round(Float.parseFloat(String.format(Locale.getDefault(),
+                    "%.2f", weatherRequest.getList().get(i).getMain().getTemp()))) + "°";
+            int weatherId = weatherRequest.getList().get(i).getWeather().get(0).getId();
+            String time = String.format(Locale.getDefault(),
+                    "%s", weatherRequest.getList().get(i).getDtTxt()).substring(11, 16);
+            HourlyWeatherData hourlyForecastData = new HourlyWeatherData(time, weatherId, temperature);
+            hourlyWeatherList.add(hourlyForecastData);
         }
     }
 }

@@ -73,6 +73,8 @@ public class WeatherData implements Serializable {
         weatherIcon = weatherIconsFromRes[weatherStateIndex];
     }
 
+    public WeatherData(){}
+
     @NonNull
     @Override
     public String toString() {
@@ -84,34 +86,52 @@ public class WeatherData implements Serializable {
                 " weatherIcon = " + weatherIcon;
     }
 
-    private void findIconById(int weatherIcon){
+    public String findIconById(int weatherIcon){
         if(weatherIcon >= 200 && weatherIcon <= 232){
             this.weatherIcon = "thunderstorm";
+            return this.weatherIcon;
         }
         if(weatherIcon >= 300 && weatherIcon <= 321){
             this.weatherIcon = "shower_rain";
+            return this.weatherIcon;
+
         }
         if(weatherIcon >= 500 && weatherIcon <= 531){
             this.weatherIcon = "rain_day";
+            return this.weatherIcon;
+
         }
         if(weatherIcon >= 600 && weatherIcon <= 622){
             this.weatherIcon = "snow";
+            return this.weatherIcon;
+
         }
         if(weatherIcon >= 700 && weatherIcon <= 781){
             this.weatherIcon = "mist";
+            return this.weatherIcon;
+
         }
         if(weatherIcon == 800){
             this.weatherIcon = "clear_sky_day";
+            return this.weatherIcon;
+
         }
         if(weatherIcon == 801){
             this.weatherIcon = "few_clouds_day";
+            return this.weatherIcon;
+
         }
         if(weatherIcon == 802){
             this.weatherIcon = "scattered_clouds";
+            return this.weatherIcon;
+
         }
         if(weatherIcon == 803 || weatherIcon == 804 ){
             this.weatherIcon = "broken_clouds";
+            return this.weatherIcon;
+
         }
+        return null;
     }
 
     private void calculateRandomValues(){

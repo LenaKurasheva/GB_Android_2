@@ -6,7 +6,9 @@
     android:id="@+id/choose_city_gridlayout"
     android:paddingTop="20dp"
     android:layout_height="match_parent"
-    android:layout_width="match_parent">
+    android:layout_width="match_parent"
+    tools:context="ru.geekbrains.gb_android_2.ChooseCityFragment">
+
 
     <TextView
         android:id="@+id/chooseYourCity"

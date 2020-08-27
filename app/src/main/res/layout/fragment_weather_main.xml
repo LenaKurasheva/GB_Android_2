@@ -5,8 +5,7 @@
     android:id="@+id/full_screen_constraintlayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
-    tools:context=".MainActivity">
+    tools:context="ru.geekbrains.gb_android_2.WeatherMainFragment">
 <!--    android:background="@color/day"-->
 
     <!-- Center, расположенный посередине; для удобства расположения элементов на экране -->
@@ -35,31 +34,14 @@
         android:id="@+id/weatherStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="70dp"
         android:src="@drawable/cloudy"
         app:layout_constraintBottom_toTopOf="@id/center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@tools:sample/backgrounds/scenic"
-        tools:ignore="ContentDescription" />
-
-    <ImageButton
-        android:id="@+id/settingsBottom"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginBottom="30dp"
-        android:background="@color/no_color"
-        android:clickable="true"
-        android:focusable="true"
-        android:scaleType="fitXY"
-        android:src="@drawable/settings_button"
-        android:tint="@color/dark_grey"
-        android:visibility="visible"
-        app:layout_constraintBottom_toTopOf="@+id/city"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.9"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:ignore="ContentDescription" />
+        tools:ignore="ContentDescription"
+        tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
     <TextView
         android:id="@+id/city"
@@ -76,7 +58,7 @@
         android:id="@+id/degrees"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="50dp"
+        android:layout_marginBottom="90dp"
         android:text="@string/plus_16"
         android:textSize="@dimen/degrees"
         app:layout_constraintBottom_toBottomOf="@+id/center"
@@ -113,41 +95,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/feelsLikeTextView" />
 
-    <ImageButton
-        android:id="@+id/locationButton"
-        android:layout_width="27dp"
-        android:layout_height="27dp"
-        android:layout_marginBottom="30dp"
-        android:background="@color/no_color"
-        android:clickable="true"
-        android:focusable="true"
-        android:scaleType="fitXY"
-        android:src="@drawable/location_button"
-        android:tint="@color/dark_grey"
-        android:visibility="visible"
-        app:layout_constraintBottom_toTopOf="@+id/city"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.1"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:ignore="ContentDescription" />
-
-    <ImageButton
-        android:id="@+id/readMoreButton"
-        android:layout_width="33dp"
-        android:layout_height="33dp"
-        android:layout_marginBottom="25dp"
-        android:background="@color/no_color"
-        android:clickable="true"
-        android:focusable="true"
-        android:scaleType="fitXY"
-        android:src="@drawable/book"
-        android:tint="@color/dark_grey"
-        android:visibility="visible"
-        app:layout_constraintBottom_toTopOf="@+id/city"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:ignore="ContentDescription" />
-
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
         android:layout_width="0dp"
@@ -161,7 +108,9 @@
         android:layout_height="wrap_content"
         android:text="@string/currTime"
         app:layout_constraintBottom_toBottomOf="@+id/degrees"
-        app:layout_constraintStart_toStartOf="@+id/locationButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.1"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/degrees" />
 
     <TextView
@@ -170,7 +119,9 @@
         android:layout_height="wrap_content"
         android:text="@string/windInfo"
         app:layout_constraintBottom_toBottomOf="@+id/degrees"
-        app:layout_constraintEnd_toEndOf="@+id/settingsBottom"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.9"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/degrees" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
