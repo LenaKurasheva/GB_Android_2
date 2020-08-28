@@ -15,7 +15,9 @@ import java.util.Locale;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import ru.geekbrains.gb_android_2.model.WeatherRequest;
+import ru.geekbrains.gb_android_2.model.HourlyWeatherData;
+import ru.geekbrains.gb_android_2.model.WeatherData;
+import ru.geekbrains.gb_android_2.model.weather.WeatherRequest;
 
 public final class ChooseCityPresenter {
     public static final int FORECAST_DAYS = 5;

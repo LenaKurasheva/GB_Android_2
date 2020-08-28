@@ -1,4 +1,4 @@
-package ru.geekbrains.gb_android_2;
+package ru.geekbrains.gb_android_2.rvDataAdapters;
 
 import android.view.View;
 

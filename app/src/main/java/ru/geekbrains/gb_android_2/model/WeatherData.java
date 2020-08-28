@@ -1,4 +1,4 @@
-package ru.geekbrains.gb_android_2;
+package ru.geekbrains.gb_android_2.model;
 
 import android.content.res.Resources;
 import android.util.Log;
@@ -7,18 +7,27 @@ import androidx.annotation.NonNull;
 
 import java.io.Serializable;
 
+import ru.geekbrains.gb_android_2.R;
+
 
 public class WeatherData implements Serializable {
-    String degrees;
-    String windInfo;
-    String pressure;
-    String weatherStateInfo;
-    String feelLike;
-    String weatherIcon;
+    private String degrees;
+    private String windInfo;
+    private String pressure;
+    private String weatherStateInfo;
+    private String feelLike;
+    private String weatherIcon;
 
     int tempRandom;
     int windRandom;
     int pressureRandom;
+
+    public String getDegrees(){return degrees;}
+    public String getWindInfo(){return windInfo;}
+    public String getPressure(){return pressure;}
+    public String getWeatherStateInfo(){return weatherStateInfo;}
+    public String getFeelLike(){return feelLike;}
+    public String getWeatherIcon(){return weatherIcon;}
 
     public WeatherData(Resources resources, String degrees, String windInfo, String pressure, String weatherStateInfo, String feelLike, int weatherIcon){
         String tempSign;

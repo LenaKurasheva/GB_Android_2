@@ -1,4 +1,4 @@
-package ru.geekbrains.gb_android_2;
+package ru.geekbrains.gb_android_2.rvDataAdapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
+
+import ru.geekbrains.gb_android_2.R;
 
 public class WeekWeatherRecyclerDataAdapter extends RecyclerView.Adapter<WeekWeatherRecyclerDataAdapter.ViewHolder> {
     private List<Integer> weatherIcons ;

@@ -26,6 +26,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import ru.geekbrains.gb_android_2.model.HourlyWeatherData;
+import ru.geekbrains.gb_android_2.model.WeatherData;
+import ru.geekbrains.gb_android_2.rvDataAdapters.HourlyWeatherRecyclerDataAdapter;
+import ru.geekbrains.gb_android_2.rvDataAdapters.RVOnItemClick;
+import ru.geekbrains.gb_android_2.rvDataAdapters.WeekWeatherRecyclerDataAdapter;
+
 public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     private boolean isLandscape;  // Можно ли расположить рядом фрагмент с выбором города
     public static String currentCity = "";
@@ -210,22 +216,22 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     private void setNewWeatherData(ArrayList<WeatherData> weekWeatherData, ArrayList<HourlyWeatherData> hourlyWeatherData) {
         if (weekWeatherData != null && weekWeatherData.size() != 0 && hourlyWeatherData != null && hourlyWeatherData.size() != 0) {
             WeatherData wd = weekWeatherData.get(0);
-            degrees.setText(wd.degrees);
-            windInfoTextView.setText(wd.windInfo);
+            degrees.setText(wd.getDegrees());
+            windInfoTextView.setText(wd.getWindInfo());
 
             Date currentDate = new Date();
             DateFormat timeFormat = new SimpleDateFormat("E, HH:mm", Locale.getDefault());
             String timeText = timeFormat.format(currentDate);
             currTime.setText(timeText);
 
-            weatherStatusTextView.setText(wd.weatherStateInfo);
-            pressureInfoTextView.setText(wd.pressure);
-            feelsLikeTextView.setText(wd.feelLike);
+            weatherStatusTextView.setText(wd.getWeatherStateInfo());
+            pressureInfoTextView.setText(wd.getPressure());
+            feelsLikeTextView.setText(wd.getFeelLike());
 
             for (int i = 0; i < ChooseCityPresenter.FORECAST_DAYS; i++) {
                WeatherData weatherData = weekWeatherData.get(i);
-               daysTemp.set(i, weatherData.degrees);
-                String imageName =weatherData.weatherIcon;
+               daysTemp.set(i, weatherData.getDegrees());
+                String imageName =weatherData.getWeatherIcon();
                 Log.d(myLog, "ICON " + i + " " +  imageName);
                 Integer resID = getResources().getIdentifier(imageName , "drawable", requireActivity().getPackageName());
                 weatherIcon.set(i, resID);

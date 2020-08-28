@@ -1,6 +1,8 @@
-package ru.geekbrains.gb_android_2;
+package ru.geekbrains.gb_android_2.model;
 
 import java.io.Serializable;
+
+import ru.geekbrains.gb_android_2.model.WeatherData;
 
 public class HourlyWeatherData implements Serializable {
     private String time;

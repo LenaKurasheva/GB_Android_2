@@ -1,8 +1,8 @@
 package ru.geekbrains.gb_android_2;
 
-public class SettingsActivityPresenter {
+public class SettingsPresenter {
     //Внутреннее поле, будет хранить единственный экземпляр
-    private static SettingsActivityPresenter instance = null;
+    private static SettingsPresenter instance = null;
 
     // Поле для синхронизации
     private static final Object syncObj = new Object();
@@ -11,7 +11,7 @@ public class SettingsActivityPresenter {
     private boolean isFeelsLikeSwitchOn;
     private boolean[] settingsArray;
 
-    private SettingsActivityPresenter(){}
+    private SettingsPresenter(){}
 
     public boolean[] getSettingsArray(){return settingsArray;}
 
@@ -36,12 +36,12 @@ public class SettingsActivityPresenter {
 
     // Метод, который возвращает экземпляр объекта.
     // Если объекта нет, то создаем его.
-    public static SettingsActivityPresenter getInstance(){
+    public static SettingsPresenter getInstance(){
         // Здесь реализована «ленивая» инициализация объекта,
         // то есть, пока объект не нужен, не создаем его.
         synchronized (syncObj) {
             if (instance == null) {
-                instance = new SettingsActivityPresenter();
+                instance = new SettingsPresenter();
             }
             return instance;
         }

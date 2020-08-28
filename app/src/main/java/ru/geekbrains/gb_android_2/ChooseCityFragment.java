@@ -26,6 +26,10 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 import ru.geekbrains.gb_android_2.events.OpenWeatherMainFragmentEvent;
+import ru.geekbrains.gb_android_2.model.HourlyWeatherData;
+import ru.geekbrains.gb_android_2.model.WeatherData;
+import ru.geekbrains.gb_android_2.rvDataAdapters.CitiesRecyclerDataAdapter;
+import ru.geekbrains.gb_android_2.rvDataAdapters.RVOnItemClick;
 
 
 public class ChooseCityFragment extends Fragment implements RVOnItemClick {
