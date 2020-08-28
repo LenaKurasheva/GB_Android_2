@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -34,7 +35,6 @@ import ru.geekbrains.gb_android_2.rvDataAdapters.RVOnItemClick;
 import ru.geekbrains.gb_android_2.rvDataAdapters.WeekWeatherRecyclerDataAdapter;
 
 public class WeatherMainFragment extends Fragment implements RVOnItemClick {
-    private boolean isLandscape;  // Можно ли расположить рядом фрагмент с выбором города
     public static String currentCity = "";
     private TextView cityTextView;
     private TextView degrees;
@@ -45,6 +45,9 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     private List<Integer> weatherIcon = new ArrayList<>();
     private List<String> days = new ArrayList<>();
     private List<String> daysTemp = new ArrayList<>();
+    private List<String> tempMax = new ArrayList<>();
+    private List<String> tempMin = new ArrayList<>();
+    private List<String> weatherStateInfo = new ArrayList<>();
     private List<String> hourlyTime = new ArrayList<>();
     private List<Integer> hourlyWeatherIcon = new ArrayList<>();
     private List<String> hourlyTemperature = new ArrayList<>();
@@ -91,6 +94,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         addDataToWeatherIconsIdFromRes(weatherIcon);
         addDefaultDataToDaysTempFromRes(getResources());
         addDefaultDataToHourlyWeatherRV(getResources());
+        addDefaultDataToWeatherStateInfo();
         updateWeatherInfo(getResources()); //здесь забрали citiesList
         setupRecyclerView();
         setupHourlyWeatherRecyclerView();
@@ -126,7 +130,8 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
 
     private void moveViewsIfLandscapeOrientation( View view){
         // Проверяем ориентацию экрана и в случае альбомной, меняем расположение элементов:
-        isLandscape = getResources().getConfiguration().orientation
+        // Можно ли расположить рядом фрагмент с выбором города
+        boolean isLandscape = getResources().getConfiguration().orientation
                 == Configuration.ORIENTATION_LANDSCAPE;
         if (isLandscape) {
             ConstraintLayout constraintLayout = view.findViewById(R.id.full_screen_constraintlayout);
@@ -153,15 +158,12 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     }
 
     private void setOnCityTextViewClickListener(){
-        cityTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                BottomSheetDialogChooseCityFragment dialogFragment =
-                        BottomSheetDialogChooseCityFragment.newInstance();
+        cityTextView.setOnClickListener(view -> {
+            BottomSheetDialogChooseCityFragment dialogFragment =
+                    BottomSheetDialogChooseCityFragment.newInstance();
 //                dialogFragment.setOnDialogListener(dialogListener);
-                dialogFragment.show(getChildFragmentManager(),
-                        "dialog_fragment");
-            }
+            dialogFragment.show(getChildFragmentManager(),
+                    "dialog_fragment");
         });
     }
 
@@ -194,7 +196,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
                 currTime.setText(timeText);
                 Log.d(myLog, "WEatherMainFragment - updateWeatherInfo - FIRSTENTER; responseCode != 200; CITIES LIST = " + citiesList.toString());
             } else {
-                setNewWeatherData(weekWeatherData, hourlyWeatherData);
+//                setNewWeatherData(weekWeatherData, hourlyWeatherData);
                 settingsSwitchArray = CurrentDataContainer.getInstance().switchSettingsArray;
                 isSettingsSwitchArrayTransferred(settingsSwitchArray);
                 setNewWeatherData(weekWeatherData, hourlyWeatherData);
@@ -244,11 +246,18 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
             pressureInfoTextView.setText(wd.getPressure());
             feelsLikeTextView.setText(wd.getFeelLike());
 
+            tempMax = new ArrayList<>();
+            tempMin = new ArrayList<>();
+            weatherStateInfo = new ArrayList<>();
+
             for (int i = 0; i < ChooseCityPresenter.FORECAST_DAYS; i++) {
-               WeatherData weatherData = weekWeatherData.get(i);
-               daysTemp.set(i, weatherData.getDegrees());
+                WeatherData weatherData = weekWeatherData.get(i);
+                Log.d("tempM", "weatherData - "+ i+ weatherData.toString());
+                daysTemp.set(i, weatherData.getDegrees());
+                tempMax.add(weatherData.getTempMax());
+                tempMin.add(weatherData.getTempMin());
+                weatherStateInfo.add(weatherData.getWeatherStateInfo());
                 String imageName =weatherData.getWeatherIcon();
-                Log.d(myLog, "ICON " + i + " " +  imageName);
                 Integer resID = getResources().getIdentifier(imageName , "drawable", requireActivity().getPackageName());
                 weatherIcon.set(i, resID);
             }
@@ -307,6 +316,14 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     public void addDefaultDataToDaysTempFromRes(android.content.res.Resources resources){
         String[] daysTempStringArr = resources.getStringArray(R.array.daysTemp);
         daysTemp  = Arrays.asList(daysTempStringArr);
+        tempMax = daysTemp;
+        tempMin = daysTemp;
+    }
+
+    private void addDefaultDataToWeatherStateInfo(){
+        for (int i = 0; i <ChooseCityPresenter.FORECAST_DAYS ; i++) {
+           weatherStateInfo.add("not found");
+        }
     }
 
     public void addDataToWeatherIconsIdFromRes(List<Integer> weatherIcon){
@@ -338,8 +355,15 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     public void onItemLongPressed(View itemText) {}
 
     private void setupRecyclerView() {
+        // Заменяем среднюю температуру из daysTemp на наибольшую/наименьшую темперутуру из tempMax и tempMin:
+        daysTemp = new ArrayList<>();
+        for (int i = 0; i < ChooseCityPresenter.FORECAST_DAYS ; i++) {
+            daysTemp.add(tempMax.get(i) + "/" + tempMin.get(i));
+        }
+
+        Log.d("tempMax-min in RV", daysTemp.toString());
         LinearLayoutManager layoutManager = new LinearLayoutManager(requireActivity().getBaseContext(), LinearLayoutManager.VERTICAL, false);
-        WeekWeatherRecyclerDataAdapter weekWeatherAdapter = new WeekWeatherRecyclerDataAdapter(days, daysTemp, weatherIcon, this);
+        WeekWeatherRecyclerDataAdapter weekWeatherAdapter = new WeekWeatherRecyclerDataAdapter(days, daysTemp, weatherIcon, weatherStateInfo, this);
 
         weatherRecyclerView.setLayoutManager(layoutManager);
         weatherRecyclerView.setAdapter(weekWeatherAdapter);

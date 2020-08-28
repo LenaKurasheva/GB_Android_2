@@ -11,6 +11,8 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Locale;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -124,6 +126,37 @@ public final class ChooseCityPresenter {
 
     public void getWeatherData(WeatherRequest weatherRequest, Resources resources){
         weekWeatherData = new ArrayList<>();
+        String tempMax;
+        String tempMin;
+        ArrayList<String> fiveDaysTempMax = new ArrayList<>();
+        ArrayList<String> fourDayTempMin = new ArrayList<>();
+        // Для текущего дня устанавливаем нули, т.к. у нас недостаточно информации
+        // для вычисления наиболшей и наименьшей температуры дня
+        fiveDaysTempMax.add("0");
+        fourDayTempMin.add("0");
+        int days = 0;
+        // Проходим весь список погоды (40 элементов, первая запись соответвует времени, предшествующему текущему времени суток)
+        for (int i = 0; i < weatherRequest.getList().size(); i++) {
+            String time = String.format(Locale.getDefault(),
+                    "%s", weatherRequest.getList().get(i).getDtTxt()).substring(11, 16);
+            // Ищем начало следующего дня и собираем информацию на 4 след. дня:
+            if (time.equals("00:00") && days <= 3){
+                ArrayList<Float> dayMaxTemp = new ArrayList<>();
+                ArrayList<Float> dayMinTemp = new ArrayList<>();
+                // 8 раз берем инф., т.к. прогноз выдается на каждые 3 часа (8 * 3 = 24):
+                for (int j = i; j < i + 8 ; j++) {
+                    dayMaxTemp.add(weatherRequest.getList().get(j).getMain().getTempMax());
+                    dayMinTemp.add(weatherRequest.getList().get(j).getMain().getTempMin());
+                }
+                float currDayMaxTemp = Collections.max(dayMaxTemp);
+                float currDayMinTemp = Collections.min(dayMinTemp);
+                days++;
+                fiveDaysTempMax.add(String.format(Locale.getDefault(), "%s", currDayMaxTemp));
+                fourDayTempMin.add(String.format(Locale.getDefault(), "%s", currDayMinTemp));
+            }
+            Log.d("tempM fiveDaysTempMax", fiveDaysTempMax.toString());
+        }
+        int index = 0;
         for (int i = 0; i < weatherRequest.getList().size(); i += 8) {
             Log.d("WEATHER", "List Weather forcast size = " + weatherRequest.getList().size());
             String degrees = String.format(Locale.getDefault(), "%s", Math.round(weatherRequest.getList().get(i).getMain().getTemp()));
@@ -132,15 +165,19 @@ public final class ChooseCityPresenter {
             String weatherStateInfo = String.format(Locale.getDefault(), "%s", weatherRequest.getList().get(i).getWeather().get(0).getDescription());
             String feelLike = String.format(Locale.getDefault(), "%s", weatherRequest.getList().get(i).getMain().getFeelsLike());
             int weatherIcon = weatherRequest.getList().get(i).getWeather().get(0).getId();
-            WeatherData weatherData = new WeatherData(resources, degrees, windInfo, pressure, weatherStateInfo, feelLike, weatherIcon);
+            // Кладем в списоки tempMax и tempMin полученные выше средние результаты:
+            tempMax = fiveDaysTempMax.get(index);
+            tempMin = fourDayTempMin.get(index);
+            index++;
+            WeatherData weatherData = new WeatherData(resources, degrees, windInfo, pressure, weatherStateInfo, feelLike, weatherIcon, tempMax, tempMin);
             weekWeatherData.add(weatherData);
-            Log.d(myLog, i + weatherData.toString());
+            Log.d("tempMaxMin from int= ", tempMax + " " + tempMin);
         }
     }
 
     private void getHourlyWeatherData(WeatherRequest weatherRequest) {
         hourlyWeatherData = new ArrayList<>();
-        for (int i = 0; i < 8; i++) {
+        for (int i = 1; i < 9; i++) {
             String temperature = String.format(Locale.getDefault(), "%s", Math.round(weatherRequest.getList().get(i).getMain().getTemp()));
             int weatherId = weatherRequest.getList().get(i).getWeather().get(0).getId();
             String time = String.format(Locale.getDefault(),

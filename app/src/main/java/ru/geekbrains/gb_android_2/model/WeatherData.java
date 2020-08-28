@@ -17,6 +17,8 @@ public class WeatherData implements Serializable {
     private String weatherStateInfo;
     private String feelLike;
     private String weatherIcon;
+    private String tempMax;
+    private String tempMin;
 
     int tempRandom;
     int windRandom;
@@ -28,14 +30,23 @@ public class WeatherData implements Serializable {
     public String getWeatherStateInfo(){return weatherStateInfo;}
     public String getFeelLike(){return feelLike;}
     public String getWeatherIcon(){return weatherIcon;}
+    public String getTempMax(){return tempMax;}
+    public String getTempMin(){return tempMin;}
 
-    public WeatherData(Resources resources, String degrees, String windInfo, String pressure, String weatherStateInfo, String feelLike, int weatherIcon){
-        String tempSign;
-        float t = Float.parseFloat(degrees.trim());
-        Log.d("myLog", "Degrees float from internet = " + t);
-        if(t > 0) {tempSign = "+";} else {tempSign = "";}
-        String stringTemperature = String.valueOf(Math.round(t));
-        this.degrees = tempSign + stringTemperature +  "°";
+    public WeatherData(Resources resources, String degrees, String windInfo, String pressure,
+                       String weatherStateInfo, String feelLike, int weatherIcon, String tempMax, String tempMin){
+//        String tempSign;
+//        float t = Float.parseFloat(degrees.trim());
+//        Log.d("myLog", "Degrees float from internet = " + t);
+//        if(t > 0) {tempSign = "+";} else {tempSign = "";}
+//        String stringTemperature = String.valueOf(Math.round(t));
+//        this.degrees = tempSign + stringTemperature +  "°";
+        this.degrees = prepareDegreesDisplay(degrees);
+        this.tempMax = prepareDegreesDisplay(tempMax);
+        Log.d("tempMax in WeatherData", this.tempMax);
+        this.tempMin = prepareDegreesDisplay(tempMin);
+        Log.d("tempMIN in WeatherData", this.tempMin);
+
 
         String windInfoFromRes = resources.getString(R.string.windInfo);
         this.windInfo = String.format(windInfoFromRes, windInfo);
@@ -58,6 +69,19 @@ public class WeatherData implements Serializable {
         this.feelLike = String.format(feelsLikeInfoFromRes, sign, stringFeelLike);
 
         findIconById(weatherIcon);
+    }
+
+    private String prepareDegreesDisplay(String degrees){
+        String tempSign;
+        float t = Float.parseFloat(degrees.trim());
+        if(t > 0) {tempSign = "+";} else {tempSign = "";}
+        return tempSign + roundDegreesValue(t) + "°";
+    }
+
+    private String roundDegreesValue(float degrees){
+        String deg =  String.valueOf(Math.round(degrees));
+        Log.d("tempM after roundDEgree", deg);
+        return deg;
     }
 
     // Контруктор для создания рандомных данных погоды:
@@ -92,7 +116,9 @@ public class WeatherData implements Serializable {
                 " pressure = " + pressure +
                 " weatherStateInfo = " + weatherStateInfo +
                 " feelLike = " + feelLike +
-                " weatherIcon = " + weatherIcon;
+                " weatherIcon = " + weatherIcon +
+                "tempMax = " + tempMax +
+                "tempMin = " + tempMin;
     }
 
     public String findIconById(int weatherIcon){
