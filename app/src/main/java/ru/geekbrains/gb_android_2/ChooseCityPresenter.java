@@ -61,7 +61,13 @@ public final class ChooseCityPresenter {
                        urlConnection = (HttpsURLConnection) uri.openConnection();
                        urlConnection.setRequestMethod("GET"); // установка метода получения данных -GET
                        urlConnection.setReadTimeout(10000); // установка таймаута - 10 000 миллисекунд
-                       responseCode = urlConnection.getResponseCode();
+                       // Получаем ответ от сервера, если соединение невозможно, то обнуляем значение responseCode,
+                       // чтобы не использовать устаревшее значение и отображалось уведомление об ошибке соединения:
+                       try{
+                           responseCode = urlConnection.getResponseCode();
+                       } catch (Exception e){
+                           responseCode = 0;
+                       }
                        Log.d(myLog, "###getFiveDaysWeatherFromServer responseCod = " + responseCode);
                        Log.d(myLog, "###getFiveDaysWeatherFromServer currentCity = " + currentCity);
                        BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream())); // читаем  данные в поток
@@ -135,8 +141,7 @@ public final class ChooseCityPresenter {
     private void getHourlyWeatherData(WeatherRequest weatherRequest) {
         hourlyWeatherData = new ArrayList<>();
         for (int i = 0; i < 8; i++) {
-            String temperature = Math.round(Float.parseFloat(String.format(Locale.getDefault(),
-                    "%.2f", weatherRequest.getList().get(i).getMain().getTemp()))) + "°";
+            String temperature = String.format(Locale.getDefault(), "%s", Math.round(weatherRequest.getList().get(i).getMain().getTemp()));
             int weatherId = weatherRequest.getList().get(i).getWeather().get(0).getId();
             String time = String.format(Locale.getDefault(),
                     "%s", weatherRequest.getList().get(i).getDtTxt()).substring(11, 16);

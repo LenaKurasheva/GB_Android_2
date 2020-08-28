@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
@@ -93,6 +94,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         updateWeatherInfo(getResources()); //здесь забрали citiesList
         setupRecyclerView();
         setupHourlyWeatherRecyclerView();
+        setOnCityTextViewClickListener();
         super.onViewCreated(view, savedInstanceState);
     }
 
@@ -113,6 +115,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
             this.weekWeatherData = chooseCityPresenter.getWeekWeatherData();
             this.hourlyWeatherData = chooseCityPresenter.getHourlyWeatherData();
             updateWeatherInfo(getResources());
+            if(ChooseCityPresenter.responseCode != 200) showAlertDialog(R.string.connection_failed);
             Log.d(myLog, "takeWeatherInfoForFirstEnter - after updateWeatherInfo;  CITIES LIST = "+ citiesList.toString());
             setupRecyclerView();
             setupHourlyWeatherRecyclerView();
@@ -147,6 +150,19 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         windInfoTextView = view.findViewById(R.id.windSpeed);
         currTime = view.findViewById(R.id.currTime);
         weatherStatusTextView = view.findViewById(R.id.cloudyInfoTextView);
+    }
+
+    private void setOnCityTextViewClickListener(){
+        cityTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                BottomSheetDialogChooseCityFragment dialogFragment =
+                        BottomSheetDialogChooseCityFragment.newInstance();
+//                dialogFragment.setOnDialogListener(dialogListener);
+                dialogFragment.show(getChildFragmentManager(),
+                        "dialog_fragment");
+            }
+        });
     }
 
     private String getCityName() {
@@ -245,6 +261,23 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
                 hourlyTemperature.set(i, hourlyData.getTemperature());
             }
         }
+    }
+
+    private void showAlertDialog(int messageId){
+        // Создаем билдер и передаем контекст приложения
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        // в билдере указываем заголовок окна (можно указывать как ресурс, так и строку)
+        builder.setTitle(R.string.sorry_alert_dialog)
+                // указываем сообщение в окне (также есть вариант со строковым параметром)
+                .setMessage(messageId)
+                // можно указать и пиктограмму
+                .setIcon(R.drawable.ic_baseline_sentiment_dissatisfied_24)
+                // устанавливаем кнопку (название кнопки также можно задавать строкой)
+                .setPositiveButton(R.string.ok,
+                        // Ставим слушатель, нажатие будем обрабатывать
+                        (dialog, id) -> {});
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     public void takeCitiesListFromResources(android.content.res.Resources resources){

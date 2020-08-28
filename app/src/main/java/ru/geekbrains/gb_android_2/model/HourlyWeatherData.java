@@ -1,5 +1,7 @@
 package ru.geekbrains.gb_android_2.model;
 
+import android.util.Log;
+
 import java.io.Serializable;
 
 import ru.geekbrains.gb_android_2.model.WeatherData;
@@ -15,7 +17,13 @@ public class HourlyWeatherData implements Serializable {
         WeatherData weatherData = new WeatherData();
         this.stateImage = weatherData.findIconById(weatherId);
 
-        this.temperature = temperature;
+
+        String tempSign = "";
+        float t = Float.parseFloat(temperature.trim());
+        Log.d("myLog", "Degrees float from internet = " + t);
+        if(t > 0) {temperature = "+";} else {tempSign = "";}
+        String stringTemperature = String.valueOf(Math.round(t));
+        this.temperature = tempSign + stringTemperature +  "°";
     }
 
     public String getTime() {

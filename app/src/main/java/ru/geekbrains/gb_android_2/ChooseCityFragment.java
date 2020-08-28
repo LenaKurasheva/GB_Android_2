@@ -2,8 +2,10 @@ package ru.geekbrains.gb_android_2;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +16,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -35,7 +38,6 @@ import ru.geekbrains.gb_android_2.rvDataAdapters.RVOnItemClick;
 public class ChooseCityFragment extends Fragment implements RVOnItemClick {
 
     private TextInputEditText enterCity;
-    private Button okEnterCity;
     static String currentCity = "";
     private RecyclerView recyclerView;
     private CitiesRecyclerDataAdapter adapter;
@@ -81,61 +83,82 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
         checkEnterCityField();
         takeCitiesList();
         setupRecyclerView();// тут создается адаптер на основании citiesList из этого класса ChooseCityFragment (адаптер берет список городов из этого класса)
-        setOnBtnOkEnterCityClickListener();
+        setOnEnterCityEnterKeyListener();
     }
 
     private void initViews(View view) {
         enterCity = view.findViewById(R.id.enterCity);
-        okEnterCity = view.findViewById(R.id.okEnterCity);
         recyclerView = view.findViewById(R.id.cities);
     }
 
-    private void setOnBtnOkEnterCityClickListener() {
-        View.OnClickListener btnOkClickListener = view -> {
-            // "Выклчаем" editText, чтобы убрать с него фокус и дать возмоность показать ошибку:
-            enterCity.setEnabled(false);
-            // Если ошибка показалась, "включаем" его обратно, чтобы дать поьзователю исправить ошибку:
-            if(isErrorShown) {
-                enterCity.setEnabled(true);
-                Toast.makeText(requireActivity(), R.string.setOnBtnOkEnterCityToast, Toast.LENGTH_SHORT).show();
-            }
-            if(!isErrorShown) {
-                enterCity.setEnabled(true);
-                if (!Objects.requireNonNull(enterCity.getText()).toString().equals("")) {
-                    String previousCity = CurrentDataContainer.getInstance().currCityName;
-                    currentCity = enterCity.getText().toString();
-                    //Создаем прогноз погоды на неделю для нового выбранного города:
-                    takeWeatherInfoForFiveDays();
-                    if (ChooseCityPresenter.responseCode == 404) {
-                        Log.d(myLog, "RESPONSE COD = " + ChooseCityPresenter.responseCode + " CURR CITY = " + currentCity);
-                        Toast.makeText(getContext(), "City not found", Toast.LENGTH_LONG).show();
-                        currentCity = previousCity;
-                        return;
-                    }
-                    if(ChooseCityPresenter.responseCode == 200) {
-                        CurrentDataContainer.getInstance().currCityName = currentCity;
-                        Log.d(myLog, "RESPONSE COD = " + ChooseCityPresenter.responseCode + " CURR CITY = " + currentCity);
-                        this.weekWeatherData = chooseCityPresenter.getWeekWeatherData();
-                        this.hourlyWeatherList = chooseCityPresenter.getHourlyWeatherData();
-                        CurrentDataContainer.getInstance().weekWeatherData = this.weekWeatherData;
-                        CurrentDataContainer.getInstance().hourlyWeatherList = this.hourlyWeatherList;
-                    } if (ChooseCityPresenter.responseCode != 200 ){
-                        Log.d(myLog, "RESPONSE COD = " + ChooseCityPresenter.responseCode + " CURR CITY = " + currentCity);
-                        Toast.makeText(getContext(), "Fail connection", Toast.LENGTH_LONG).show();
-                        currentCity = previousCity;
-                        return;
-                    }
-                    Log.d(myLog, "ChooseCityFragment - setOnBtnOkEnterCityClickListener -> BEFORE flag");
-                    //Добавляем новый город в RV
-                    adapter.addNewCity(currentCity);
-                    Toast.makeText(requireActivity(), currentCity, Toast.LENGTH_SHORT).show();
-                    //Обновляем данные погоды, если положение горизонтальное или открываем новое активити, если вертикальное
-                    updateWeatherData();
+    private void setOnEnterCityEnterKeyListener() {
+        enterCity.setOnKeyListener((view, keyCode, keyEvent) -> {
+            if ((keyEvent.getAction() == KeyEvent.ACTION_DOWN) &&
+                    (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                // Perform action on key press
+                // "Выклчаем" editText, чтобы убрать с него фокус и дать возмоность показать ошибку:
+                enterCity.setEnabled(false);
+                // Если ошибка показалась, "включаем" его обратно, чтобы дать поьзователю исправить ошибку:
+                if (isErrorShown) {
+                    enterCity.setEnabled(true);
+                    Toast.makeText(requireActivity(), R.string.setOnBtnOkEnterCityToast, Toast.LENGTH_SHORT).show();
                 }
-                enterCity.setText("");
+                if (!isErrorShown) {
+                    enterCity.setEnabled(true);
+                    if (!Objects.requireNonNull(enterCity.getText()).toString().equals("")) {
+                        String previousCity = CurrentDataContainer.getInstance().currCityName;
+                        currentCity = enterCity.getText().toString();
+                        //Создаем прогноз погоды на неделю для нового выбранного города:
+                        takeWeatherInfoForFiveDays();
+                        if (ChooseCityPresenter.responseCode == 404) {
+                            Log.d(myLog, "RESPONSE COD = " + ChooseCityPresenter.responseCode + " CURR CITY = " + currentCity);
+//                        Toast.makeText(getContext(), R.string.city_not_found, Toast.LENGTH_LONG).show();
+                            showAlertDialog(R.string.city_not_found);
+                            currentCity = previousCity;
+                        }
+                        if (ChooseCityPresenter.responseCode == 200) {
+                            CurrentDataContainer.getInstance().currCityName = currentCity;
+                            Log.d(myLog, "RESPONSE COD = " + ChooseCityPresenter.responseCode + " CURR CITY = " + currentCity);
+                            weekWeatherData = chooseCityPresenter.getWeekWeatherData();
+                            hourlyWeatherList = chooseCityPresenter.getHourlyWeatherData();
+                            CurrentDataContainer.getInstance().weekWeatherData = weekWeatherData;
+                            CurrentDataContainer.getInstance().hourlyWeatherList = hourlyWeatherList;
+                            //Добавляем новый город в RV
+                            adapter.addNewCity(currentCity);
+                            Toast.makeText(requireActivity(), currentCity, Toast.LENGTH_SHORT).show();
+                            updateWeatherData();
+                            enterCity.setText("");
+                        }
+                        if (ChooseCityPresenter.responseCode != 200 && ChooseCityPresenter.responseCode != 404) {
+                            Log.d(myLog, "RESPONSE COD = " + ChooseCityPresenter.responseCode + " CURR CITY = " + currentCity);
+//                        Toast.makeText(getContext(), R.string.connection_failed, Toast.LENGTH_LONG).show();
+                            showAlertDialog(R.string.connection_failed);
+                            currentCity = previousCity;
+                        }
+                        Log.d(myLog, "ChooseCityFragment - setOnBtnOkEnterCityClickListener -> BEFORE flag");
+                    }
+                }
+                return true;
             }
-        };
-        okEnterCity.setOnClickListener(btnOkClickListener);
+            return false;
+        });
+    }
+
+    private void showAlertDialog(int messageId){
+        // Создаем билдер и передаем контекст приложения
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        // в билдере указываем заголовок окна (можно указывать как ресурс, так и строку)
+        builder.setTitle(R.string.sorry_alert_dialog)
+                // указываем сообщение в окне (также есть вариант со строковым параметром)
+                .setMessage(messageId)
+                // можно указать и пиктограмму
+                .setIcon(R.drawable.ic_baseline_sentiment_dissatisfied_24)
+                // устанавливаем кнопку (название кнопки также можно задавать строкой)
+                .setPositiveButton(R.string.ok,
+                        // Ставим слушатель, нажатие будем обрабатывать
+                        (dialog, id) -> enterCity.setText(""));
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     private void updateWeatherData(){
@@ -149,7 +172,6 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
     // Обработчик нажатий на город из списка RV
     @Override
     public void onItemClicked(View view, String itemText) {
-        Toast.makeText(requireActivity().getBaseContext(), itemText, Toast.LENGTH_SHORT).show();
         currentCity = itemText;
         CurrentDataContainer.getInstance().currCityName = currentCity;
 
@@ -158,11 +180,6 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
 
         //Создаем прогноз погоды на неделю для нового выбранного города:
         takeWeatherInfoForFiveDays();
-        if (ChooseCityPresenter.responseCode == 404) {
-            Log.d(myLog, "RESPONSE COD = " + ChooseCityPresenter.responseCode + " CURR CITY = " + currentCity);
-            Toast.makeText(getContext(), "City not found", Toast.LENGTH_LONG).show();
-            return;
-        }
         if(ChooseCityPresenter.responseCode == 200) {
             Log.d(myLog, "RESPONSE COD = " + ChooseCityPresenter.responseCode + " CURR CITY = " + currentCity);
             this.weekWeatherData = chooseCityPresenter.getWeekWeatherData();
@@ -171,7 +188,8 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
             CurrentDataContainer.getInstance().hourlyWeatherList = this.hourlyWeatherList;
         } else {
             Log.d(myLog, "RESPONSE COD = " + ChooseCityPresenter.responseCode + " CURR CITY = " + currentCity);
-            Toast.makeText(getContext(), "Fail connection", Toast.LENGTH_LONG).show();
+//            Toast.makeText(getContext(), "Fail connection", Toast.LENGTH_LONG).show();
+            showAlertDialog(R.string.connection_failed);
             return;
         }
         Log.d(myLog, "ChooseCityFragment - setOnBtnOkEnterCityClickListener -> BEFORE flag");
