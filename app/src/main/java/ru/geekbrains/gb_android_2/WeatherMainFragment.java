@@ -23,7 +23,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -119,7 +118,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
             this.weekWeatherData = chooseCityPresenter.getWeekWeatherData();
             this.hourlyWeatherData = chooseCityPresenter.getHourlyWeatherData();
             updateWeatherInfo(getResources());
-            if(ChooseCityPresenter.responseCode != 200) showAlertDialog(R.string.connection_failed);
+            if(ChooseCityPresenter.responseCode != 200) showAlertDialog();
             Log.d(myLog, "takeWeatherInfoForFirstEnter - after updateWeatherInfo;  CITIES LIST = "+ citiesList.toString());
             setupRecyclerView();
             setupHourlyWeatherRecyclerView();
@@ -196,7 +195,6 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
                 currTime.setText(timeText);
                 Log.d(myLog, "WEatherMainFragment - updateWeatherInfo - FIRSTENTER; responseCode != 200; CITIES LIST = " + citiesList.toString());
             } else {
-//                setNewWeatherData(weekWeatherData, hourlyWeatherData);
                 settingsSwitchArray = CurrentDataContainer.getInstance().switchSettingsArray;
                 isSettingsSwitchArrayTransferred(settingsSwitchArray);
                 setNewWeatherData(weekWeatherData, hourlyWeatherData);
@@ -235,6 +233,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         if (weekWeatherData != null && weekWeatherData.size() != 0 && hourlyWeatherData != null && hourlyWeatherData.size() != 0) {
             WeatherData wd = weekWeatherData.get(0);
             degrees.setText(wd.getDegrees());
+            ThermometerView.level = findDegreesLevel(wd.getIntDegrees());
             windInfoTextView.setText(wd.getWindInfo());
 
             Date currentDate = new Date();
@@ -272,13 +271,28 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         }
     }
 
-    private void showAlertDialog(int messageId){
+    private int findDegreesLevel(int degrees){
+        if(degrees <= -30) return 0;
+        if(degrees <= -20) return 7;
+        if(degrees <= -10) return 13;
+        if(degrees <= 0) return 20;
+        if(degrees <= 10) return 28;
+        if(degrees <= 15) return 38;
+        if(degrees <= 20) return 48;
+        if(degrees <= 25) return 58;
+        if(degrees <= 30) return 68;
+        if(degrees <= 40) return 78;
+        if(degrees <= 50) return 95;
+        return 100;
+    }
+
+    private void showAlertDialog(){
         // Создаем билдер и передаем контекст приложения
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         // в билдере указываем заголовок окна (можно указывать как ресурс, так и строку)
         builder.setTitle(R.string.sorry_alert_dialog)
                 // указываем сообщение в окне (также есть вариант со строковым параметром)
-                .setMessage(messageId)
+                .setMessage(R.string.connection_failed)
                 // можно указать и пиктограмму
                 .setIcon(R.drawable.ic_baseline_sentiment_dissatisfied_24)
                 // устанавливаем кнопку (название кнопки также можно задавать строкой)

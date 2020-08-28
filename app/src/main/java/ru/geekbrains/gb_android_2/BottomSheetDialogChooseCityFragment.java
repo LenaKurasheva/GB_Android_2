@@ -2,7 +2,6 @@ package ru.geekbrains.gb_android_2;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +18,6 @@ import ru.geekbrains.gb_android_2.events.OpenWeatherMainFragmentEvent;
 
 public class BottomSheetDialogChooseCityFragment extends BottomSheetDialogFragment {
     private EditText enterCityEditText;
-    private TextView prompt;
     private TextView chooseCityTextView;
 
     static BottomSheetDialogChooseCityFragment newInstance() {
@@ -31,9 +29,8 @@ public class BottomSheetDialogChooseCityFragment extends BottomSheetDialogFragme
     public View onCreateView(LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_bottom_dialog, container,
+        return inflater.inflate(R.layout.fragment_bottom_dialog, container,
                 false);
-        return view;
     }
 
     @Override
@@ -44,19 +41,16 @@ public class BottomSheetDialogChooseCityFragment extends BottomSheetDialogFragme
 
         chooseCityTextView = view.findViewById(R.id.choose_city_textView);
         enterCityEditText = view.findViewById(R.id.enter_city_editText);
-        enterCityEditText.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {
-                if ((keyEvent.getAction() == KeyEvent.ACTION_DOWN) &&
-                        (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    // Perform action on key press
-                    if (enterCityEditText.getText().toString().length() != 0) {
-                        checkIsShowingWeatherPossible(enterCityEditText.getText().toString().trim());
-                    }
-                    return true;
+        enterCityEditText.setOnKeyListener((view1, keyCode, keyEvent) -> {
+            if ((keyEvent.getAction() == KeyEvent.ACTION_DOWN) &&
+                    (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                // Perform action on key press
+                if (enterCityEditText.getText().toString().length() != 0) {
+                    checkIsShowingWeatherPossible(enterCityEditText.getText().toString().trim());
                 }
-                return false;
+                return true;
             }
+            return false;
         });
 
     }

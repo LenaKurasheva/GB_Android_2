@@ -11,7 +11,6 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Locale;
 
@@ -131,7 +130,8 @@ public final class ChooseCityPresenter {
         ArrayList<String> fiveDaysTempMax = new ArrayList<>();
         ArrayList<String> fourDayTempMin = new ArrayList<>();
         // Для текущего дня устанавливаем нули, т.к. у нас недостаточно информации
-        // для вычисления наиболшей и наименьшей температуры дня
+        // для вычисления наиболшей и наименьшей температуры дня, т.к. входящие данные содержат инфомацию
+        // только с текущего момента, а не с начала текущего дня
         fiveDaysTempMax.add("0");
         fourDayTempMin.add("0");
         int days = 0;

@@ -19,6 +19,7 @@ public class WeatherData implements Serializable {
     private String weatherIcon;
     private String tempMax;
     private String tempMin;
+    private int intDegrees;
 
     int tempRandom;
     int windRandom;
@@ -32,15 +33,11 @@ public class WeatherData implements Serializable {
     public String getWeatherIcon(){return weatherIcon;}
     public String getTempMax(){return tempMax;}
     public String getTempMin(){return tempMin;}
+    public int getIntDegrees(){return intDegrees;}
 
     public WeatherData(Resources resources, String degrees, String windInfo, String pressure,
                        String weatherStateInfo, String feelLike, int weatherIcon, String tempMax, String tempMin){
-//        String tempSign;
-//        float t = Float.parseFloat(degrees.trim());
-//        Log.d("myLog", "Degrees float from internet = " + t);
-//        if(t > 0) {tempSign = "+";} else {tempSign = "";}
-//        String stringTemperature = String.valueOf(Math.round(t));
-//        this.degrees = tempSign + stringTemperature +  "°";
+        intDegrees = (int) Float.parseFloat(degrees.trim());
         this.degrees = prepareDegreesDisplay(degrees);
         this.tempMax = prepareDegreesDisplay(tempMax);
         Log.d("tempMax in WeatherData", this.tempMax);
@@ -54,7 +51,7 @@ public class WeatherData implements Serializable {
         String pressureInfoFromRes = resources.getString(R.string.pressureInfo);
         float p = Float.parseFloat(pressure.trim());
         float pressureHpaToMmHgDivider = 1.33322387415f;
-        float pressureInMmHg = (float) (p / pressureHpaToMmHgDivider);
+        float pressureInMmHg = p / pressureHpaToMmHgDivider;
         String stringPressure = String.valueOf(Math.round(pressureInMmHg));
         this.pressure = String.format(pressureInfoFromRes, stringPressure);
 

@@ -13,7 +13,7 @@
     <string name="windInfo">wind %1$s m/s</string>
     <string name="pressureInfo">%1$s mm Hg</string>
     <string name="or_choose_from_list">Or choose from list.</string>
-    <string name="currTime">11:33</string>
+    <string name="currTime">00:00</string>
     <string name="show_temperature_feels_like">Show temperature feels like</string>
     <string name="feels_like_temp">feels like: %s%2$s°</string>
     <string name="HintTextInputEditText">Enter the name of the city</string>

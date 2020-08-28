@@ -77,7 +77,7 @@
         android:textSize="@dimen/degrees"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.518"
+        app:layout_constraintHorizontal_bias="0.22"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.18" />
@@ -88,6 +88,7 @@
         android:layout_height="wrap_content"
         android:text="@string/little_cloudy"
         android:visibility="visible"
+        android:layout_marginTop="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/degrees" />
@@ -121,24 +122,37 @@
 
     <TextView
         android:id="@+id/currTime"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
+        android:layout_marginStart="20dp"
         android:layout_height="wrap_content"
         android:text="@string/currTime"
         app:layout_constraintBottom_toBottomOf="@+id/degrees"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.1"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/degrees" />
+        app:layout_constraintHorizontal_bias="0.51"
+        app:layout_constraintStart_toEndOf="@id/thermometerView"
+        app:layout_constraintTop_toTopOf="@+id/degrees"
+        app:layout_constraintVertical_bias="0.4" />
 
     <TextView
         android:id="@+id/windSpeed"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="3dp"
         android:layout_height="wrap_content"
         android:text="@string/windInfo"
-        app:layout_constraintBottom_toBottomOf="@+id/degrees"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.9"
+        app:layout_constraintStart_toEndOf="@id/thermometerView"
+        app:layout_constraintTop_toBottomOf="@+id/currTime" />
+
+    <ru.geekbrains.gb_android_2.ThermometerView
+        android:id="@+id/thermometerView"
+        android:layout_width="27dp"
+        android:layout_height="81dp"
+        app:layout_constraintBottom_toBottomOf="@id/degrees"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.63"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/degrees" />
+        app:layout_constraintTop_toTopOf="@+id/degrees"
+        app:level="40" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
