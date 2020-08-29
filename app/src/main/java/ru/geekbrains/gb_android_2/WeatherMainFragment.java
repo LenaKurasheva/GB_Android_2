@@ -14,7 +14,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -26,6 +28,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import ru.geekbrains.gb_android_2.model.HourlyWeatherData;
 import ru.geekbrains.gb_android_2.model.WeatherData;
@@ -378,6 +381,12 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         Log.d("tempMax-min in RV", daysTemp.toString());
         LinearLayoutManager layoutManager = new LinearLayoutManager(requireActivity().getBaseContext(), LinearLayoutManager.VERTICAL, false);
         WeekWeatherRecyclerDataAdapter weekWeatherAdapter = new WeekWeatherRecyclerDataAdapter(days, daysTemp, weatherIcon, weatherStateInfo, this);
+
+        DividerItemDecoration itemDecoration = new DividerItemDecoration(requireActivity().getBaseContext(),
+                LinearLayoutManager.VERTICAL);
+        itemDecoration.setDrawable(Objects.requireNonNull(
+                ContextCompat.getDrawable(requireActivity().getBaseContext(), R.drawable.decorator_item)));
+        weatherRecyclerView.addItemDecoration(itemDecoration);
 
         weatherRecyclerView.setLayoutManager(layoutManager);
         weatherRecyclerView.setAdapter(weekWeatherAdapter);
