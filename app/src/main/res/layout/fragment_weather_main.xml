@@ -76,8 +76,8 @@
         android:text="@string/plus_16"
         android:textSize="@dimen/degrees"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.22"
+        app:layout_constraintEnd_toStartOf="@+id/thermometerView"
+        app:layout_constraintHorizontal_bias="0.75"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.18" />
@@ -146,13 +146,14 @@
 
     <ru.geekbrains.gb_android_2.ThermometerView
         android:id="@+id/thermometerView"
-        android:layout_width="27dp"
-        android:layout_height="81dp"
+        android:layout_width="@dimen/thermometer_width"
+        android:layout_height="@dimen/thermometer_height"
         app:layout_constraintBottom_toBottomOf="@id/degrees"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.63"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/degrees"
-        app:level="40" />
+        app:level="40"
+        app:padding = "@integer/thermometer_padding"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

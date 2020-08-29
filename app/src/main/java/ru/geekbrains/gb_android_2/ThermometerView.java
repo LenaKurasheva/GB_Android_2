@@ -53,7 +53,7 @@ public class ThermometerView extends View {
 
     // Константы
     // Отступ элементов
-    private final static int padding = 10;
+    private static int padding = 10;
     // Скругление углов градуника
     private final static int round = 5;
     // Скругление углов градуника
@@ -115,6 +115,7 @@ public class ThermometerView extends View {
         // следующее слово имя атрибута
         // <attr name="level" format="integer" />
         level = typedArray.getInteger(R.styleable.ThermometerView_level, 100);
+        padding = typedArray.getInteger(R.styleable.ThermometerView_padding, 10);
 
         // В конце работы дадим сигнал,
         // что нам больше массив со значениями атрибутов не нужен
