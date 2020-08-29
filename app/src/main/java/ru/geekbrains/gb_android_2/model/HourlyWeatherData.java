@@ -14,9 +14,7 @@ public class HourlyWeatherData implements Serializable {
     public HourlyWeatherData(String time, int weatherId, String temperature) {
         this.time = time;
 
-        WeatherData weatherData = new WeatherData();
-        this.stateImage = weatherData.findIconById(weatherId);
-
+        this.stateImage = findIconById(weatherId, time);
 
         String tempSign = "";
         float t = Float.parseFloat(temperature.trim());
@@ -24,6 +22,56 @@ public class HourlyWeatherData implements Serializable {
         if(t > 0) {temperature = "+";} else {tempSign = "";}
         String stringTemperature = String.valueOf(Math.round(t));
         this.temperature = tempSign + stringTemperature +  "°";
+    }
+
+    public String findIconById(int weatherIcon, String time){
+        if(weatherIcon >= 200 && weatherIcon <= 232){
+            this.stateImage = "thunderstorm";
+            return this.stateImage;
+        }
+        if(weatherIcon >= 300 && weatherIcon <= 321){
+            this.stateImage = "shower_rain";
+            return this.stateImage;
+        }
+        if(weatherIcon >= 500 && weatherIcon <= 531){
+            this.stateImage = "rain_day";
+            return this.stateImage;
+        }
+        if(weatherIcon >= 600 && weatherIcon <= 622){
+            this.stateImage = "snow";
+            return this.stateImage;
+        }
+        if(weatherIcon >= 700 && weatherIcon <= 781){
+            this.stateImage = "mist";
+            return this.stateImage;
+        }
+        if(weatherIcon == 800){
+            if(time.equals("00:00") || time.equals("03:00")){
+                this.stateImage = "clear_sky_night";
+                return this.stateImage;
+            } else {
+                this.stateImage = "clear_sky_day";
+                return this.stateImage;
+            }
+        }
+        if(weatherIcon == 801){
+            if(time.equals("00:00") || time.equals("03:00")){
+                this.stateImage = "few_clouds_night";
+                return this.stateImage;
+            } else {
+                this.stateImage = "few_clouds_day";
+                return this.stateImage;
+            }
+        }
+        if(weatherIcon == 802){
+            this.stateImage = "scattered_clouds";
+            return this.stateImage;
+        }
+        if(weatherIcon == 803 || weatherIcon == 804 ){
+            this.stateImage = "broken_clouds";
+            return this.stateImage;
+        }
+        return null;
     }
 
     public String getTime() {
