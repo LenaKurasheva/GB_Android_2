@@ -129,18 +129,34 @@ public final class ChooseCityPresenter {
         String tempMin;
         ArrayList<String> fiveDaysTempMax = new ArrayList<>();
         ArrayList<String> fourDayTempMin = new ArrayList<>();
+        ArrayList<String> weatherStateInfoArrayList = new ArrayList<>();
+        ArrayList<Integer> weatherIconsArrayList  = new ArrayList<>();
+        ArrayList<String> degreesArrayList  = new ArrayList<>();
+        ArrayList<String> windInfoArrayList  = new ArrayList<>();
+        ArrayList<String> pressureArrayList  = new ArrayList<>();
+        ArrayList<String> feelLikeArrayList  = new ArrayList<>();
+        // Добавляем данные для текущего времени
+
         // Для текущего дня устанавливаем нули, т.к. у нас недостаточно информации
         // для вычисления наиболшей и наименьшей температуры дня, т.к. входящие данные содержат инфомацию
         // только с текущего момента, а не с начала текущего дня
         fiveDaysTempMax.add("0");
         fourDayTempMin.add("0");
+        // Текущие данные:
+        weatherStateInfoArrayList.add(String.format(Locale.getDefault(), "%s", weatherRequest.getList().get(0).getWeather().get(0).getDescription()));
+        weatherIconsArrayList.add(weatherRequest.getList().get(0).getWeather().get(0).getId());
+        degreesArrayList.add(String.format(Locale.getDefault(), "%s", Math.round(weatherRequest.getList().get(0).getMain().getTemp())));
+        windInfoArrayList.add(String.format(Locale.getDefault(), "%s", Math.round(weatherRequest.getList().get(0).getWind().getSpeed())));
+        pressureArrayList.add(String.format(Locale.getDefault(), "%s", weatherRequest.getList().get(0).getMain().getPressure()));
+        feelLikeArrayList.add(String.format(Locale.getDefault(), "%s", weatherRequest.getList().get(0).getMain().getFeelsLike()));
         int days = 0;
+        // Добавим данные для следующих 4 дней
         // Проходим весь список погоды (40 элементов, первая запись соответвует времени, предшествующему текущему времени суток)
         for (int i = 0; i < weatherRequest.getList().size(); i++) {
             String time = String.format(Locale.getDefault(),
                     "%s", weatherRequest.getList().get(i).getDtTxt()).substring(11, 16);
             // Ищем начало следующего дня и собираем информацию на 4 след. дня:
-            if (time.equals("00:00") && days <= 3){
+            if (time.equals("00:00") && days <= ChooseCityPresenter.FORECAST_DAYS - 2){
                 ArrayList<Float> dayMaxTemp = new ArrayList<>();
                 ArrayList<Float> dayMinTemp = new ArrayList<>();
                 // 8 раз берем инф., т.к. прогноз выдается на каждые 3 часа (8 * 3 = 24):
@@ -148,28 +164,34 @@ public final class ChooseCityPresenter {
                     dayMaxTemp.add(weatherRequest.getList().get(j).getMain().getTempMax());
                     dayMinTemp.add(weatherRequest.getList().get(j).getMain().getTempMin());
                 }
+                // Считаем самую теплую и самую холодную температуру в течение одного дня:
                 float currDayMaxTemp = Collections.max(dayMaxTemp);
                 float currDayMinTemp = Collections.min(dayMinTemp);
                 days++;
                 fiveDaysTempMax.add(String.format(Locale.getDefault(), "%s", currDayMaxTemp));
                 fourDayTempMin.add(String.format(Locale.getDefault(), "%s", currDayMinTemp));
+
+                // Забираем информацию, соответсвующую 12:00, поэтому индекс = i + 4 (00.00->03.00->06.00->09.00->12.00)
+                weatherStateInfoArrayList.add(String.format(Locale.getDefault(), "%s", weatherRequest.getList().get(i+4).getWeather().get(0).getDescription()));
+                weatherIconsArrayList.add(weatherRequest.getList().get(i+4).getWeather().get(0).getId());
+                degreesArrayList.add(String.format(Locale.getDefault(), "%s", Math.round(weatherRequest.getList().get(i+4).getMain().getTemp())));
+                windInfoArrayList.add(String.format(Locale.getDefault(), "%s", Math.round(weatherRequest.getList().get(i+4).getWind().getSpeed())));
+                pressureArrayList.add(String.format(Locale.getDefault(), "%s", weatherRequest.getList().get(i+4).getMain().getPressure()));
+                feelLikeArrayList.add(String.format(Locale.getDefault(), "%s", weatherRequest.getList().get(i+4).getMain().getFeelsLike()));
             }
-            Log.d("tempM fiveDaysTempMax", fiveDaysTempMax.toString());
         }
-        int index = 0;
-        for (int i = 0; i < weatherRequest.getList().size(); i += 8) {
+        for (int i = 0; i < ChooseCityPresenter.FORECAST_DAYS; i++) {
             Log.d("WEATHER", "List Weather forcast size = " + weatherRequest.getList().size());
-            String degrees = String.format(Locale.getDefault(), "%s", Math.round(weatherRequest.getList().get(i).getMain().getTemp()));
-            String windInfo = String.format(Locale.getDefault(), "%s", Math.round(weatherRequest.getList().get(i).getWind().getSpeed()));
-            String pressure = String.format(Locale.getDefault(), "%s", weatherRequest.getList().get(i).getMain().getPressure());
-            String weatherStateInfo = String.format(Locale.getDefault(), "%s", weatherRequest.getList().get(i).getWeather().get(0).getDescription());
-            String feelLike = String.format(Locale.getDefault(), "%s", weatherRequest.getList().get(i).getMain().getFeelsLike());
-            int weatherIcon = weatherRequest.getList().get(i).getWeather().get(0).getId();
-            // Кладем в списоки tempMax и tempMin полученные выше средние результаты:
-            tempMax = fiveDaysTempMax.get(index);
-            tempMin = fourDayTempMin.get(index);
-            index++;
-            WeatherData weatherData = new WeatherData(resources, degrees, windInfo, pressure, weatherStateInfo, feelLike, weatherIcon, tempMax, tempMin);
+            String degrees = degreesArrayList.get(i);
+            String windInfo = windInfoArrayList.get(i);
+            String pressure = pressureArrayList.get(i);
+            String weatherStateInfo = weatherStateInfoArrayList.get(i);
+            String feelLike = feelLikeArrayList.get(i);
+            int weatherIcon = weatherIconsArrayList.get(i);
+            // Кладем в списоки tempMax и tempMin полученные выше результаты:
+            tempMax = fiveDaysTempMax.get(i);
+            tempMin = fourDayTempMin.get(i);
+                        WeatherData weatherData = new WeatherData(resources, degrees, windInfo, pressure, weatherStateInfo, feelLike, weatherIcon, tempMax, tempMin);
             weekWeatherData.add(weatherData);
             Log.d("tempMaxMin from int= ", tempMax + " " + tempMin);
         }
