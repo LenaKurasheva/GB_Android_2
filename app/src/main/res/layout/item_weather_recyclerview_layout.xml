@@ -33,4 +33,13 @@
         android:layout_gravity="center"
         />
 
+    <TextView
+        android:id="@+id/weatherStateInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:textSize="12sp"
+        android:layout_gravity="center"
+        />
+
 </LinearLayout>

@@ -1,4 +1,4 @@
-package ru.geekbrains.gb_android_2;
+package ru.geekbrains.gb_android_2.model;
 
 import android.content.res.Resources;
 import android.util.Log;
@@ -7,26 +7,43 @@ import androidx.annotation.NonNull;
 
 import java.io.Serializable;
 
+import ru.geekbrains.gb_android_2.R;
+
 
 public class WeatherData implements Serializable {
-    String degrees;
-    String windInfo;
-    String pressure;
-    String weatherStateInfo;
-    String feelLike;
-    String weatherIcon;
+    private String degrees;
+    private String windInfo;
+    private String pressure;
+    private String weatherStateInfo;
+    private String feelLike;
+    private String weatherIcon;
+    private String tempMax;
+    private String tempMin;
+    private int intDegrees;
 
     int tempRandom;
     int windRandom;
     int pressureRandom;
 
-    public WeatherData(Resources resources, String degrees, String windInfo, String pressure, String weatherStateInfo, String feelLike, int weatherIcon){
-        String tempSign;
-        float t = Float.parseFloat(degrees.trim());
-        Log.d("myLog", "Degrees float from internet = " + t);
-        if(t > 0) {tempSign = "+";} else {tempSign = "";}
-        String stringTemperature = String.valueOf(Math.round(t));
-        this.degrees = tempSign + stringTemperature +  "°";
+    public String getDegrees(){return degrees;}
+    public String getWindInfo(){return windInfo;}
+    public String getPressure(){return pressure;}
+    public String getWeatherStateInfo(){return weatherStateInfo;}
+    public String getFeelLike(){return feelLike;}
+    public String getWeatherIcon(){return weatherIcon;}
+    public String getTempMax(){return tempMax;}
+    public String getTempMin(){return tempMin;}
+    public int getIntDegrees(){return intDegrees;}
+
+    public WeatherData(Resources resources, String degrees, String windInfo, String pressure,
+                       String weatherStateInfo, String feelLike, int weatherIcon, String tempMax, String tempMin){
+        intDegrees = (int) Float.parseFloat(degrees.trim());
+        this.degrees = prepareDegreesDisplay(degrees);
+        this.tempMax = prepareDegreesDisplay(tempMax);
+        Log.d("tempMax in WeatherData", this.tempMax);
+        this.tempMin = prepareDegreesDisplay(tempMin);
+        Log.d("tempMIN in WeatherData", this.tempMin);
+
 
         String windInfoFromRes = resources.getString(R.string.windInfo);
         this.windInfo = String.format(windInfoFromRes, windInfo);
@@ -34,7 +51,7 @@ public class WeatherData implements Serializable {
         String pressureInfoFromRes = resources.getString(R.string.pressureInfo);
         float p = Float.parseFloat(pressure.trim());
         float pressureHpaToMmHgDivider = 1.33322387415f;
-        float pressureInMmHg = (float) (p / pressureHpaToMmHgDivider);
+        float pressureInMmHg = p / pressureHpaToMmHgDivider;
         String stringPressure = String.valueOf(Math.round(pressureInMmHg));
         this.pressure = String.format(pressureInfoFromRes, stringPressure);
 
@@ -49,6 +66,19 @@ public class WeatherData implements Serializable {
         this.feelLike = String.format(feelsLikeInfoFromRes, sign, stringFeelLike);
 
         findIconById(weatherIcon);
+    }
+
+    private String prepareDegreesDisplay(String degrees){
+        String tempSign;
+        float t = Float.parseFloat(degrees.trim());
+        if(t > 0) {tempSign = "+";} else {tempSign = "";}
+        return tempSign + roundDegreesValue(t) + "°";
+    }
+
+    private String roundDegreesValue(float degrees){
+        String deg =  String.valueOf(Math.round(degrees));
+        Log.d("tempM after roundDEgree", deg);
+        return deg;
     }
 
     // Контруктор для создания рандомных данных погоды:
@@ -83,7 +113,9 @@ public class WeatherData implements Serializable {
                 " pressure = " + pressure +
                 " weatherStateInfo = " + weatherStateInfo +
                 " feelLike = " + feelLike +
-                " weatherIcon = " + weatherIcon;
+                " weatherIcon = " + weatherIcon +
+                "tempMax = " + tempMax +
+                "tempMin = " + tempMin;
     }
 
     public String findIconById(int weatherIcon){

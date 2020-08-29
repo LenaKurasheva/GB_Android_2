@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Stack;
 
+import ru.geekbrains.gb_android_2.model.HourlyWeatherData;
+import ru.geekbrains.gb_android_2.model.WeatherData;
+
 public class CurrentDataContainer implements Serializable {
 
     //Внутреннее поле, будет хранить единственный экземпляр

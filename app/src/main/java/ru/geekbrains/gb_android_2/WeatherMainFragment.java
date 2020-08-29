@@ -11,9 +11,12 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,9 +28,15 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
+
+import ru.geekbrains.gb_android_2.model.HourlyWeatherData;
+import ru.geekbrains.gb_android_2.model.WeatherData;
+import ru.geekbrains.gb_android_2.rvDataAdapters.HourlyWeatherRecyclerDataAdapter;
+import ru.geekbrains.gb_android_2.rvDataAdapters.RVOnItemClick;
+import ru.geekbrains.gb_android_2.rvDataAdapters.WeekWeatherRecyclerDataAdapter;
 
 public class WeatherMainFragment extends Fragment implements RVOnItemClick {
-    private boolean isLandscape;  // Можно ли расположить рядом фрагмент с выбором города
     public static String currentCity = "";
     private TextView cityTextView;
     private TextView degrees;
@@ -38,6 +47,9 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     private List<Integer> weatherIcon = new ArrayList<>();
     private List<String> days = new ArrayList<>();
     private List<String> daysTemp = new ArrayList<>();
+    private List<String> tempMax = new ArrayList<>();
+    private List<String> tempMin = new ArrayList<>();
+    private List<String> weatherStateInfo = new ArrayList<>();
     private List<String> hourlyTime = new ArrayList<>();
     private List<Integer> hourlyWeatherIcon = new ArrayList<>();
     private List<String> hourlyTemperature = new ArrayList<>();
@@ -84,9 +96,11 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         addDataToWeatherIconsIdFromRes(weatherIcon);
         addDefaultDataToDaysTempFromRes(getResources());
         addDefaultDataToHourlyWeatherRV(getResources());
+        addDefaultDataToWeatherStateInfo();
         updateWeatherInfo(getResources()); //здесь забрали citiesList
         setupRecyclerView();
         setupHourlyWeatherRecyclerView();
+        setOnCityTextViewClickListener();
         super.onViewCreated(view, savedInstanceState);
     }
 
@@ -107,6 +121,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
             this.weekWeatherData = chooseCityPresenter.getWeekWeatherData();
             this.hourlyWeatherData = chooseCityPresenter.getHourlyWeatherData();
             updateWeatherInfo(getResources());
+            if(ChooseCityPresenter.responseCode != 200) showAlertDialog();
             Log.d(myLog, "takeWeatherInfoForFirstEnter - after updateWeatherInfo;  CITIES LIST = "+ citiesList.toString());
             setupRecyclerView();
             setupHourlyWeatherRecyclerView();
@@ -117,7 +132,8 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
 
     private void moveViewsIfLandscapeOrientation( View view){
         // Проверяем ориентацию экрана и в случае альбомной, меняем расположение элементов:
-        isLandscape = getResources().getConfiguration().orientation
+        // Можно ли расположить рядом фрагмент с выбором города
+        boolean isLandscape = getResources().getConfiguration().orientation
                 == Configuration.ORIENTATION_LANDSCAPE;
         if (isLandscape) {
             ConstraintLayout constraintLayout = view.findViewById(R.id.full_screen_constraintlayout);
@@ -141,6 +157,16 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         windInfoTextView = view.findViewById(R.id.windSpeed);
         currTime = view.findViewById(R.id.currTime);
         weatherStatusTextView = view.findViewById(R.id.cloudyInfoTextView);
+    }
+
+    private void setOnCityTextViewClickListener(){
+        cityTextView.setOnClickListener(view -> {
+            BottomSheetDialogChooseCityFragment dialogFragment =
+                    BottomSheetDialogChooseCityFragment.newInstance();
+//                dialogFragment.setOnDialogListener(dialogListener);
+            dialogFragment.show(getChildFragmentManager(),
+                    "dialog_fragment");
+        });
     }
 
     private String getCityName() {
@@ -172,7 +198,6 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
                 currTime.setText(timeText);
                 Log.d(myLog, "WEatherMainFragment - updateWeatherInfo - FIRSTENTER; responseCode != 200; CITIES LIST = " + citiesList.toString());
             } else {
-                setNewWeatherData(weekWeatherData, hourlyWeatherData);
                 settingsSwitchArray = CurrentDataContainer.getInstance().switchSettingsArray;
                 isSettingsSwitchArrayTransferred(settingsSwitchArray);
                 setNewWeatherData(weekWeatherData, hourlyWeatherData);
@@ -210,23 +235,31 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     private void setNewWeatherData(ArrayList<WeatherData> weekWeatherData, ArrayList<HourlyWeatherData> hourlyWeatherData) {
         if (weekWeatherData != null && weekWeatherData.size() != 0 && hourlyWeatherData != null && hourlyWeatherData.size() != 0) {
             WeatherData wd = weekWeatherData.get(0);
-            degrees.setText(wd.degrees);
-            windInfoTextView.setText(wd.windInfo);
+            degrees.setText(wd.getDegrees());
+            ThermometerView.level = findDegreesLevel(wd.getIntDegrees());
+            windInfoTextView.setText(wd.getWindInfo());
 
             Date currentDate = new Date();
             DateFormat timeFormat = new SimpleDateFormat("E, HH:mm", Locale.getDefault());
             String timeText = timeFormat.format(currentDate);
             currTime.setText(timeText);
 
-            weatherStatusTextView.setText(wd.weatherStateInfo);
-            pressureInfoTextView.setText(wd.pressure);
-            feelsLikeTextView.setText(wd.feelLike);
+            weatherStatusTextView.setText(wd.getWeatherStateInfo());
+            pressureInfoTextView.setText(wd.getPressure());
+            feelsLikeTextView.setText(wd.getFeelLike());
+
+            tempMax = new ArrayList<>();
+            tempMin = new ArrayList<>();
+            weatherStateInfo = new ArrayList<>();
 
             for (int i = 0; i < ChooseCityPresenter.FORECAST_DAYS; i++) {
-               WeatherData weatherData = weekWeatherData.get(i);
-               daysTemp.set(i, weatherData.degrees);
-                String imageName =weatherData.weatherIcon;
-                Log.d(myLog, "ICON " + i + " " +  imageName);
+                WeatherData weatherData = weekWeatherData.get(i);
+                Log.d("tempM", "weatherData - "+ i+ weatherData.toString());
+                daysTemp.set(i, weatherData.getDegrees());
+                tempMax.add(weatherData.getTempMax());
+                tempMin.add(weatherData.getTempMin());
+                weatherStateInfo.add(weatherData.getWeatherStateInfo());
+                String imageName =weatherData.getWeatherIcon();
                 Integer resID = getResources().getIdentifier(imageName , "drawable", requireActivity().getPackageName());
                 weatherIcon.set(i, resID);
             }
@@ -239,6 +272,38 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
                 hourlyTemperature.set(i, hourlyData.getTemperature());
             }
         }
+    }
+
+    private int findDegreesLevel(int degrees){
+        if(degrees <= -30) return 0;
+        if(degrees <= -20) return 7;
+        if(degrees <= -10) return 13;
+        if(degrees <= 0) return 20;
+        if(degrees <= 10) return 28;
+        if(degrees <= 15) return 38;
+        if(degrees <= 20) return 48;
+        if(degrees <= 25) return 58;
+        if(degrees <= 30) return 68;
+        if(degrees <= 40) return 78;
+        if(degrees <= 50) return 95;
+        return 100;
+    }
+
+    private void showAlertDialog(){
+        // Создаем билдер и передаем контекст приложения
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        // в билдере указываем заголовок окна (можно указывать как ресурс, так и строку)
+        builder.setTitle(R.string.sorry_alert_dialog)
+                // указываем сообщение в окне (также есть вариант со строковым параметром)
+                .setMessage(R.string.connection_failed)
+                // можно указать и пиктограмму
+                .setIcon(R.drawable.ic_baseline_sentiment_dissatisfied_24)
+                // устанавливаем кнопку (название кнопки также можно задавать строкой)
+                .setPositiveButton(R.string.ok,
+                        // Ставим слушатель, нажатие будем обрабатывать
+                        (dialog, id) -> {});
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     public void takeCitiesListFromResources(android.content.res.Resources resources){
@@ -268,6 +333,14 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     public void addDefaultDataToDaysTempFromRes(android.content.res.Resources resources){
         String[] daysTempStringArr = resources.getStringArray(R.array.daysTemp);
         daysTemp  = Arrays.asList(daysTempStringArr);
+        tempMax = daysTemp;
+        tempMin = daysTemp;
+    }
+
+    private void addDefaultDataToWeatherStateInfo(){
+        for (int i = 0; i <ChooseCityPresenter.FORECAST_DAYS ; i++) {
+           weatherStateInfo.add("not found");
+        }
     }
 
     public void addDataToWeatherIconsIdFromRes(List<Integer> weatherIcon){
@@ -299,8 +372,21 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     public void onItemLongPressed(View itemText) {}
 
     private void setupRecyclerView() {
+        // Заменяем среднюю температуру из daysTemp на наибольшую/наименьшую темперутуру из tempMax и tempMin:
+        daysTemp = new ArrayList<>();
+        for (int i = 0; i < ChooseCityPresenter.FORECAST_DAYS ; i++) {
+            daysTemp.add(tempMax.get(i) + "/" + tempMin.get(i));
+        }
+
+        Log.d("tempMax-min in RV", daysTemp.toString());
         LinearLayoutManager layoutManager = new LinearLayoutManager(requireActivity().getBaseContext(), LinearLayoutManager.VERTICAL, false);
-        WeekWeatherRecyclerDataAdapter weekWeatherAdapter = new WeekWeatherRecyclerDataAdapter(days, daysTemp, weatherIcon, this);
+        WeekWeatherRecyclerDataAdapter weekWeatherAdapter = new WeekWeatherRecyclerDataAdapter(days, daysTemp, weatherIcon, weatherStateInfo, this);
+
+        DividerItemDecoration itemDecoration = new DividerItemDecoration(requireActivity().getBaseContext(),
+                LinearLayoutManager.VERTICAL);
+        itemDecoration.setDrawable(Objects.requireNonNull(
+                ContextCompat.getDrawable(requireActivity().getBaseContext(), R.drawable.decorator_item)));
+        weatherRecyclerView.addItemDecoration(itemDecoration);
 
         weatherRecyclerView.setLayoutManager(layoutManager);
         weatherRecyclerView.setAdapter(weekWeatherAdapter);

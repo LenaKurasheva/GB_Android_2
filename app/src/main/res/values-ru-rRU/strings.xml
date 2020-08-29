@@ -14,7 +14,7 @@
     <string name="windInfo">ветер %1$s м/с</string>
     <string name="or_choose_from_list">Или выберете из списка.</string>
     <string name="pressureInfo">%1$s мм рт.ст.</string>
-    <string name="currTime">11:33</string>
+    <string name="currTime">00:00</string>
     <string name="show_temperature_feels_like">Показать темературу по ощущению</string>
     <string name="feels_like_temp">ощущается: %s%2$s °</string>
     <string name="HintTextInputEditText">Введите название города.</string>
@@ -96,4 +96,7 @@
     <string name="menu_about">О приложении</string>
     <string name="read_wiki">Википедия</string>
     <string name="elena_kurasheva_2020">© Елена Курашева, 2020</string>
+    <string name="city_not_found">Город не найден, попробуйте еще раз.</string>
+    <string name="connection_failed">Ошибка интернет соединения.</string>
+    <string name="sorry_alert_dialog">Извините, я не могу найти прогноз.</string>
 </resources>

@@ -1,4 +1,4 @@
-package ru.geekbrains.gb_android_2;
+package ru.geekbrains.gb_android_2.rvDataAdapters;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,6 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+
+import ru.geekbrains.gb_android_2.R;
 
 
 public class CitiesRecyclerDataAdapter extends RecyclerView.Adapter<CitiesRecyclerDataAdapter.ViewHolder> {

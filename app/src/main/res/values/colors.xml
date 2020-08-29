@@ -7,4 +7,6 @@
     <color name="no_color">#00000000</color>
     <color name="night">#0D47A1</color>
     <color name="dark_grey">#424242</color>
+    <color name="color_green">#1DE9B6</color>
+    <color name="grey">#607D8B</color>
 </resources>

@@ -1,5 +1,5 @@
 
-package ru.geekbrains.gb_android_2.model;
+package ru.geekbrains.gb_android_2.model.weather;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
