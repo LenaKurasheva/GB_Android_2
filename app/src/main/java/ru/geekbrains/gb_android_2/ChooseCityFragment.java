@@ -120,8 +120,8 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
                         if (ForecastRequest.responseCode == 200) {
                             CurrentDataContainer.getInstance().currCityName = currentCity;
                             Log.d(myLog, "RESPONSE COD = " + ForecastRequest.responseCode + " CURR CITY = " + currentCity);
-                            weekWeatherData = openWeatherMap.getWeekWeatherData(getResources());
-                            hourlyWeatherList = openWeatherMap.getHourlyWeatherData();
+                            this.hourlyWeatherList = openWeatherMap.getHourlyWeatherData();
+                            this.weekWeatherData = openWeatherMap.getWeekWeatherData(getResources());
                             CurrentDataContainer.getInstance().weekWeatherData = weekWeatherData;
                             CurrentDataContainer.getInstance().hourlyWeatherList = hourlyWeatherList;
                             //Добавляем новый город в RV
@@ -216,7 +216,7 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
 
     private void takeWeatherInfoForFiveDays(){
         try {
-            ForecastRequest.getForecastFromServer(currentCity, openWeatherMap.getWeatherUrl(currentCity));
+            ForecastRequest.getInstance().getForecastFromServer(currentCity, openWeatherMap.getWeatherUrl(currentCity));
         } catch (MalformedURLException e) {
             Log.e(myLog, "Fail URI", e);
             e.printStackTrace();

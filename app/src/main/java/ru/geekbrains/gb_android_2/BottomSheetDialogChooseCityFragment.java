@@ -63,7 +63,7 @@ public class BottomSheetDialogChooseCityFragment extends BottomSheetDialogFragme
     private void checkIsShowingWeatherPossible(String cityName){
         OpenWeatherMap openWeatherMap = OpenWeatherMap.getInstance();
         try {
-            ForecastRequest.getForecastFromServer(cityName, OpenWeatherMap.getInstance().getWeatherUrl(cityName));
+            ForecastRequest.getInstance().getForecastFromServer(cityName, openWeatherMap.getWeatherUrl(cityName));
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }

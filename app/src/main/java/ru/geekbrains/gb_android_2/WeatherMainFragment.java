@@ -122,7 +122,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
             Log.d(myLog, "*FIRST ENTER*");
             OpenWeatherMap openWeatherMap = OpenWeatherMap.getInstance();
             try {
-                ForecastRequest.getForecastFromServer(currentCity, OpenWeatherMap.getInstance().getWeatherUrl(currentCity));
+                ForecastRequest.getInstance().getForecastFromServer(currentCity, openWeatherMap.getWeatherUrl(currentCity));
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }

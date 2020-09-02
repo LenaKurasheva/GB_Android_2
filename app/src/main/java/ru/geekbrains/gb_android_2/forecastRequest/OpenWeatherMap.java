@@ -18,14 +18,14 @@ public final class OpenWeatherMap {
     String BASE_URL = "https://api.openweathermap.org/data/2.5/";
     private WeatherRequest weatherRequest = new WeatherRequest();
 
-    ArrayList<String> fiveDaysTempMax = new ArrayList<>();
-    ArrayList<String> fourDayTempMin = new ArrayList<>();
-    ArrayList<String> weatherStateInfoArrayList = new ArrayList<>();
-    ArrayList<Integer> weatherIconsArrayList = new ArrayList<>();
-    ArrayList<String> degreesArrayList = new ArrayList<>();
-    ArrayList<String> windInfoArrayList = new ArrayList<>();
-    ArrayList<String> pressureArrayList = new ArrayList<>();
-    ArrayList<String> feelLikeArrayList = new ArrayList<>();
+    ArrayList<String> fiveDaysTempMax;
+    ArrayList<String> fourDayTempMin;
+    ArrayList<String> weatherStateInfoArrayList;
+    ArrayList<Integer> weatherIconsArrayList;
+    ArrayList<String> degreesArrayList;
+    ArrayList<String> windInfoArrayList;
+    ArrayList<String> pressureArrayList;
+    ArrayList<String> feelLikeArrayList;
 
     //Внутреннее поле, будет хранить единственный экземпляр
     private static OpenWeatherMap instance = null;
@@ -54,9 +54,18 @@ public final class OpenWeatherMap {
     }
 
     public ArrayList<WeatherData> getWeekWeatherData( Resources resources) {
-        weatherRequest = ForecastRequest.getWeatherRequest();
+        fiveDaysTempMax = new ArrayList<>();
+        fourDayTempMin = new ArrayList<>();
+        weatherStateInfoArrayList = new ArrayList<>();
+        weatherIconsArrayList = new ArrayList<>();
+        degreesArrayList = new ArrayList<>();
+        windInfoArrayList = new ArrayList<>();
+        pressureArrayList = new ArrayList<>();
+        feelLikeArrayList = new ArrayList<>();
+        ArrayList<WeatherData> weekWeatherData = new ArrayList<>();
+        weatherRequest = ForecastRequest.getInstance().getWeatherRequest();
         if(weatherRequest != null) {
-            ArrayList<WeatherData> weekWeatherData = new ArrayList<>();
+            Log.d("Threads","getWeekWeatherData -> weatherRequest != null" );
             Thread weekData = new Thread(() -> {
                 String tempMax;
                 String tempMin;
@@ -144,7 +153,7 @@ public final class OpenWeatherMap {
 
     public ArrayList<HourlyWeatherData> getHourlyWeatherData() {
         ArrayList<HourlyWeatherData> hourlyWeatherData = new ArrayList<>();
-        weatherRequest = ForecastRequest.getWeatherRequest();
+        weatherRequest = ForecastRequest.getInstance().getWeatherRequest();
         if (weatherRequest != null) {
             Thread dayData = new Thread(() -> {
                 for (int i = 1; i < 9; i++) {
