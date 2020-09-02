@@ -122,17 +122,21 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
             Log.d(myLog, "*FIRST ENTER*");
             OpenWeatherMap openWeatherMap = OpenWeatherMap.getInstance();
             try {
-                ForecastRequest.getInstance().getForecastFromServer(currentCity, openWeatherMap.getWeatherUrl(currentCity));
+                ForecastRequest.getForecastFromServer(currentCity, openWeatherMap.getWeatherUrl(currentCity));
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }
-            this.weekWeatherData = openWeatherMap.getWeekWeatherData(getResources());
-            this.hourlyWeatherData = openWeatherMap.getHourlyWeatherData();
-            updateWeatherInfo(getResources());
-            if(ForecastRequest.responseCode != 200) showAlertDialog();
-            Log.d(myLog, "takeWeatherInfoForFirstEnter - after updateWeatherInfo;  CITIES LIST = "+ citiesList.toString());
-            setupRecyclerView();
-            setupHourlyWeatherRecyclerView();
+            new Thread(() -> {
+                weekWeatherData = openWeatherMap.getWeekWeatherData(getResources());
+                hourlyWeatherData = openWeatherMap.getHourlyWeatherData();
+                requireActivity().runOnUiThread(() -> {
+                    updateWeatherInfo(getResources());
+                    if(ForecastRequest.responseCode != 200) showAlertDialog();
+                    Log.d(myLog, "takeWeatherInfoForFirstEnter - after updateWeatherInfo;  CITIES LIST = "+ citiesList.toString());
+                    setupRecyclerView();
+                    setupHourlyWeatherRecyclerView();
+                });
+            }).start();
         } else {
             Log.d(myLog, "*NOT FIRST ENTER*");
         }
@@ -283,8 +287,8 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
 
     private int findDegreesLevel(int degrees){
         if(degrees <= -30) return 0;
-        if(degrees <= -20) return 7;
-        if(degrees <= -10) return 13;
+        if(degrees <= -20) return 10;
+        if(degrees <= -10) return 15;
         if(degrees <= 0) return 20;
         if(degrees <= 10) return 28;
         if(degrees <= 15) return 38;

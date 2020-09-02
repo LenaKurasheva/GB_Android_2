@@ -63,18 +63,22 @@ public class BottomSheetDialogChooseCityFragment extends BottomSheetDialogFragme
     private void checkIsShowingWeatherPossible(String cityName){
         OpenWeatherMap openWeatherMap = OpenWeatherMap.getInstance();
         try {
-            ForecastRequest.getInstance().getForecastFromServer(cityName, openWeatherMap.getWeatherUrl(cityName));
+            ForecastRequest.getForecastFromServer(cityName, openWeatherMap.getWeatherUrl(cityName));
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
         if(ForecastRequest.responseCode == 200){
             CurrentDataContainer.isFirstEnter = false;
-            CurrentDataContainer.getInstance().weekWeatherData = openWeatherMap.getWeekWeatherData(getResources());
-            CurrentDataContainer.getInstance().hourlyWeatherList = openWeatherMap.getHourlyWeatherData();
-            CurrentDataContainer.getInstance().currCityName = cityName;
-            CurrentDataContainer.getInstance().citiesList.add(0, cityName);
-            dismiss();
-            EventBus.getBus().post(new OpenWeatherMainFragmentEvent());
+            new Thread(() -> {
+                CurrentDataContainer.getInstance().weekWeatherData = openWeatherMap.getWeekWeatherData(getResources());
+                CurrentDataContainer.getInstance().hourlyWeatherList = openWeatherMap.getHourlyWeatherData();
+                CurrentDataContainer.getInstance().currCityName = cityName;
+                CurrentDataContainer.getInstance().citiesList.add(0, cityName);
+                requireActivity().runOnUiThread(() -> {
+                    dismiss();
+                    EventBus.getBus().post(new OpenWeatherMainFragmentEvent());
+                });
+            }).start();
         }
         if(ForecastRequest.responseCode == 404){
             enterCityEditText.setText("");
@@ -86,6 +90,5 @@ public class BottomSheetDialogChooseCityFragment extends BottomSheetDialogFragme
             chooseCityTextView.setText(R.string.connection_failed);
             chooseCityTextView.setTextColor(R.color.colorPrimary);
         }
-
     }
 }

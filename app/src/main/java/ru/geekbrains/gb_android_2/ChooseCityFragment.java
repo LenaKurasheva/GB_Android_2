@@ -120,15 +120,19 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
                         if (ForecastRequest.responseCode == 200) {
                             CurrentDataContainer.getInstance().currCityName = currentCity;
                             Log.d(myLog, "RESPONSE COD = " + ForecastRequest.responseCode + " CURR CITY = " + currentCity);
-                            this.hourlyWeatherList = openWeatherMap.getHourlyWeatherData();
-                            this.weekWeatherData = openWeatherMap.getWeekWeatherData(getResources());
-                            CurrentDataContainer.getInstance().weekWeatherData = weekWeatherData;
-                            CurrentDataContainer.getInstance().hourlyWeatherList = hourlyWeatherList;
-                            //Добавляем новый город в RV
-                            adapter.addNewCity(currentCity);
-                            Toast.makeText(requireActivity(), currentCity, Toast.LENGTH_SHORT).show();
-                            updateWeatherData();
-                            enterCity.setText("");
+                            new Thread(() -> {
+                                weekWeatherData = openWeatherMap.getWeekWeatherData(getResources());
+                                hourlyWeatherList = openWeatherMap.getHourlyWeatherData();
+                                requireActivity().runOnUiThread(() -> {
+                                    CurrentDataContainer.getInstance().weekWeatherData = weekWeatherData;
+                                    CurrentDataContainer.getInstance().hourlyWeatherList = hourlyWeatherList;
+                                    //Добавляем новый город в RV
+                                    adapter.addNewCity(currentCity);
+                                    Toast.makeText(requireActivity(), currentCity, Toast.LENGTH_SHORT).show();
+                                    updateWeatherData();
+                                    enterCity.setText("");
+                                });
+                            }).start();
                         }
                         if (ForecastRequest.responseCode != 200 && ForecastRequest.responseCode != 404) {
                             Log.d(myLog, "RESPONSE COD = " + ForecastRequest.responseCode + " CURR CITY = " + currentCity);
@@ -183,10 +187,14 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
         takeWeatherInfoForFiveDays();
         if(ForecastRequest.responseCode == 200) {
             Log.d(myLog, "RESPONSE COD = " + ForecastRequest.responseCode + " CURR CITY = " + currentCity);
-            this.weekWeatherData = openWeatherMap.getWeekWeatherData(getResources());
-            this.hourlyWeatherList = openWeatherMap.getHourlyWeatherData();
-            CurrentDataContainer.getInstance().weekWeatherData = this.weekWeatherData;
-            CurrentDataContainer.getInstance().hourlyWeatherList = this.hourlyWeatherList;
+            new Thread(() -> {
+                weekWeatherData = openWeatherMap.getWeekWeatherData(getResources());
+                hourlyWeatherList = openWeatherMap.getHourlyWeatherData();
+                requireActivity().runOnUiThread(() -> {
+                    CurrentDataContainer.getInstance().weekWeatherData = weekWeatherData;
+                    CurrentDataContainer.getInstance().hourlyWeatherList = hourlyWeatherList;
+                });
+            }).start();
         } else {
             Log.d(myLog, "RESPONSE COD = " + ForecastRequest.responseCode + " CURR CITY = " + currentCity);
 //            Toast.makeText(getContext(), "Fail connection", Toast.LENGTH_LONG).show();
@@ -216,7 +224,7 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
 
     private void takeWeatherInfoForFiveDays(){
         try {
-            ForecastRequest.getInstance().getForecastFromServer(currentCity, openWeatherMap.getWeatherUrl(currentCity));
+            ForecastRequest.getForecastFromServer(currentCity, openWeatherMap.getWeatherUrl(currentCity));
         } catch (MalformedURLException e) {
             Log.e(myLog, "Fail URI", e);
             e.printStackTrace();

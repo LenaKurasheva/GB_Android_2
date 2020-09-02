@@ -14,36 +14,15 @@ import javax.net.ssl.HttpsURLConnection;
 import ru.geekbrains.gb_android_2.model.weather.WeatherRequest;
 
 public class ForecastRequest {
-    //Внутреннее поле, будет хранить единственный экземпляр
-    private static ForecastRequest instance = null;
-
-    // Поле для синхронизации
-    private static final Object syncObj = new Object();
-
-    // Конструктор (вызывать извне его нельзя, поэтому он приватный)
-    private ForecastRequest(){}
-
-    // Метод, который возвращает экземпляр объекта.
-    // Если объекта нет, то создаем его.
-    public static ForecastRequest getInstance(){
-        // Здесь реализована «ленивая» инициализация объекта,
-        // то есть, пока объект не нужен, не создаем его.
-        synchronized (syncObj) {
-            if (instance == null) {
-                instance = new ForecastRequest();
-            }
-            return instance;
-        }
-    }
 
     final static String myLog = "myLog";
     private static final String TAG = "WEATHER";
     public static int responseCode;
-    private WeatherRequest weatherRequest;
+    private static WeatherRequest weatherRequest;
 
-    public WeatherRequest getWeatherRequest(){return weatherRequest;}
+    public static WeatherRequest getWeatherRequest(){return weatherRequest;}
 
-    public void getForecastFromServer(String currentCity, URL forecastSourceUrl){
+    public static void getForecastFromServer(String currentCity, URL forecastSourceUrl){
         try {
             final URL uri = forecastSourceUrl;
             Thread t1 = new Thread(() -> {

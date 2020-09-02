@@ -63,7 +63,7 @@ public final class OpenWeatherMap {
         pressureArrayList = new ArrayList<>();
         feelLikeArrayList = new ArrayList<>();
         ArrayList<WeatherData> weekWeatherData = new ArrayList<>();
-        weatherRequest = ForecastRequest.getInstance().getWeatherRequest();
+        weatherRequest = ForecastRequest.getWeatherRequest();
         if(weatherRequest != null) {
             Log.d("Threads","getWeekWeatherData -> weatherRequest != null" );
             Thread weekData = new Thread(() -> {
@@ -153,7 +153,7 @@ public final class OpenWeatherMap {
 
     public ArrayList<HourlyWeatherData> getHourlyWeatherData() {
         ArrayList<HourlyWeatherData> hourlyWeatherData = new ArrayList<>();
-        weatherRequest = ForecastRequest.getInstance().getWeatherRequest();
+        weatherRequest = ForecastRequest.getWeatherRequest();
         if (weatherRequest != null) {
             Thread dayData = new Thread(() -> {
                 for (int i = 1; i < 9; i++) {
