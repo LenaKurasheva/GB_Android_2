@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.net.MalformedURLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,6 +31,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
+import ru.geekbrains.gb_android_2.customViews.ThermometerView;
+import ru.geekbrains.gb_android_2.forecastRequest.ForecastRequest;
+import ru.geekbrains.gb_android_2.forecastRequest.OpenWeatherMap;
 import ru.geekbrains.gb_android_2.model.HourlyWeatherData;
 import ru.geekbrains.gb_android_2.model.WeatherData;
 import ru.geekbrains.gb_android_2.rvDataAdapters.HourlyWeatherRecyclerDataAdapter;
@@ -116,12 +120,16 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     private void takeWeatherInfoForFirstEnter(){
         if(CurrentDataContainer.isFirstEnter){
             Log.d(myLog, "*FIRST ENTER*");
-            ChooseCityPresenter chooseCityPresenter = ChooseCityPresenter.getInstance();
-            chooseCityPresenter.getFiveDaysWeatherFromServer(currentCity, getResources());
-            this.weekWeatherData = chooseCityPresenter.getWeekWeatherData();
-            this.hourlyWeatherData = chooseCityPresenter.getHourlyWeatherData();
+            OpenWeatherMap openWeatherMap = OpenWeatherMap.getInstance();
+            try {
+                ForecastRequest.getForecastFromServer(currentCity, OpenWeatherMap.getInstance().getWeatherUrl(currentCity));
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            this.weekWeatherData = openWeatherMap.getWeekWeatherData(getResources());
+            this.hourlyWeatherData = openWeatherMap.getHourlyWeatherData();
             updateWeatherInfo(getResources());
-            if(ChooseCityPresenter.responseCode != 200) showAlertDialog();
+            if(ForecastRequest.responseCode != 200) showAlertDialog();
             Log.d(myLog, "takeWeatherInfoForFirstEnter - after updateWeatherInfo;  CITIES LIST = "+ citiesList.toString());
             setupRecyclerView();
             setupHourlyWeatherRecyclerView();
@@ -147,7 +155,6 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     }
 
     private void initViews(View view) {
-
         cityTextView = view.findViewById(R.id.city);
         degrees = view.findViewById(R.id.degrees);
         feelsLikeTextView = view.findViewById(R.id.feelsLikeTextView);
@@ -184,7 +191,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         this.citiesList = citiesListFromRes;
         if(CurrentDataContainer.isFirstEnter) {
             CurrentDataContainer.getInstance().citiesList = citiesListFromRes;
-            if(ChooseCityPresenter.responseCode != 200) {
+            if(ForecastRequest.responseCode != 200) {
                 Log.d(myLog, "updateWeatherInfo from resources");
 
                 degrees.setText("+0°");
@@ -252,7 +259,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
             tempMin = new ArrayList<>();
             weatherStateInfo = new ArrayList<>();
 
-            for (int i = 0; i < ChooseCityPresenter.FORECAST_DAYS; i++) {
+            for (int i = 0; i < OpenWeatherMap.FORECAST_DAYS; i++) {
                 WeatherData weatherData = weekWeatherData.get(i);
                 Log.d("tempM", "weatherData - "+ i+ weatherData.toString());
                 daysTemp.set(i, weatherData.getDegrees());
@@ -319,7 +326,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         Log.d(myLog, "CURDAY = " + curDay);
         ArrayList<String> daysList = new ArrayList<>();
         daysList.add(curDay);
-        for (int i = 1; i <ChooseCityPresenter.FORECAST_DAYS ; i++) {
+        for (int i = 1; i < OpenWeatherMap.FORECAST_DAYS ; i++) {
             Calendar instance = Calendar.getInstance(Locale.getDefault());
             instance.add(Calendar.DAY_OF_MONTH, i); // прибавляем 1 день к установленной дате
             Date nextDate = instance.getTime(); // получаем измененную дату
@@ -338,7 +345,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     }
 
     private void addDefaultDataToWeatherStateInfo(){
-        for (int i = 0; i <ChooseCityPresenter.FORECAST_DAYS ; i++) {
+        for (int i = 0; i < OpenWeatherMap.FORECAST_DAYS ; i++) {
            weatherStateInfo.add("not found");
         }
     }
@@ -374,7 +381,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     private void setupRecyclerView() {
         // Заменяем среднюю температуру из daysTemp на наибольшую/наименьшую темперутуру из tempMax и tempMin:
         daysTemp = new ArrayList<>();
-        for (int i = 0; i < ChooseCityPresenter.FORECAST_DAYS ; i++) {
+        for (int i = 0; i < OpenWeatherMap.FORECAST_DAYS ; i++) {
             daysTemp.add(tempMax.get(i) + "/" + tempMin.get(i));
         }
 

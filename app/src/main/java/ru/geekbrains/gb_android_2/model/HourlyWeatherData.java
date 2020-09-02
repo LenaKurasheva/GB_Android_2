@@ -4,8 +4,6 @@ import android.util.Log;
 
 import java.io.Serializable;
 
-import ru.geekbrains.gb_android_2.model.WeatherData;
-
 public class HourlyWeatherData implements Serializable {
     private String time;
     private String stateImage;

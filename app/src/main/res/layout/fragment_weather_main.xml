@@ -144,7 +144,7 @@
         app:layout_constraintStart_toEndOf="@id/thermometerView"
         app:layout_constraintTop_toBottomOf="@+id/currTime" />
 
-    <ru.geekbrains.gb_android_2.ThermometerView
+    <ru.geekbrains.gb_android_2.customViews.ThermometerView
         android:id="@+id/thermometerView"
         android:layout_width="@dimen/thermometer_width"
         android:layout_height="@dimen/thermometer_height"
