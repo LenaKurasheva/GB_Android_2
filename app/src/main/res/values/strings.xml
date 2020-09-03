@@ -10,7 +10,7 @@
     <string name="settings">Settings</string>
     <string name="set_on_night_mode">Set on night mode</string>
     <string name="show_atmosphere_pressure">Show atmosphere pressure</string>
-    <string name="windInfo">wind %1$s m/s</string>
+    <string name="windInfo">wind: %1$s m/s</string>
     <string name="pressureInfo">%1$s mm Hg</string>
     <string name="or_choose_from_list">Or choose from list.</string>
     <string name="currTime">00:00</string>
@@ -98,4 +98,5 @@
     <string name="city_not_found" >City not found, please try again.</string>
     <string name="connection_failed">Connection failed, please check your connection.</string>
     <string name="sorry_alert_dialog">Sorry, I can\'t find weather forecast.</string>
+    <string name="update">update: %1$s</string>
 </resources>

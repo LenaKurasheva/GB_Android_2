@@ -26,7 +26,7 @@
         android:id="@+id/hourlyWeatherRV"
         android:layout_width="match_parent"
         android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
+        android:layout_marginEnd="20dp"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -157,5 +157,18 @@
         app:padding = "@integer/thermometer_padding"
         app:level_color="@color/color_green"
         app:thermometer_color="@color/grey"/>
+
+    <TextView
+        android:id="@+id/update_time"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="22dp"
+        android:layout_marginEnd="10dp"
+        android:textSize="10sp"
+        android:text="@string/update"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/hourlyWeatherRV"
+        tools:layout_editor_absoluteY="266dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

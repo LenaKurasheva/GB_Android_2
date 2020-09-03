@@ -44,7 +44,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     public static String currentCity = "";
     private TextView cityTextView;
     private TextView degrees;
-    private TextView feelsLikeTextView, pressureInfoTextView;
+    private TextView feelsLikeTextView, pressureInfoTextView, updateTimeTextView;
     final String myLog = "myLog";
     private RecyclerView weatherRecyclerView;
     private RecyclerView hourlyRecyclerView;
@@ -168,6 +168,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         windInfoTextView = view.findViewById(R.id.windSpeed);
         currTime = view.findViewById(R.id.currTime);
         weatherStatusTextView = view.findViewById(R.id.cloudyInfoTextView);
+        updateTimeTextView = view.findViewById(R.id.update_time);
     }
 
     private void setOnCityTextViewClickListener(){
@@ -204,9 +205,15 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
                 windInfoTextView.setText(String.format(windInfoFromRes, "0"));
 
                 Date currentDate = new Date();
-                DateFormat timeFormat = new SimpleDateFormat("E, HH:mm", Locale.getDefault());
-                String timeText = timeFormat.format(currentDate);
-                currTime.setText(timeText);
+                DateFormat dateFormat = new SimpleDateFormat("E, dd mmm", Locale.getDefault());
+                String dateText = dateFormat.format(currentDate);
+                currTime.setText(dateText);
+
+                DateFormat updateTimeFormat = new SimpleDateFormat("hh:mm", Locale.getDefault());
+                String timeText = updateTimeFormat.format(currentDate);
+                String upateTimeFromRes = resources.getString(R.string.update);
+                updateTimeTextView.setText(String.format(upateTimeFromRes, timeText));
+
                 Log.d(myLog, "WEatherMainFragment - updateWeatherInfo - FIRSTENTER; responseCode != 200; CITIES LIST = " + citiesList.toString());
             } else {
                 settingsSwitchArray = CurrentDataContainer.getInstance().switchSettingsArray;
@@ -251,9 +258,15 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
             windInfoTextView.setText(wd.getWindInfo());
 
             Date currentDate = new Date();
-            DateFormat timeFormat = new SimpleDateFormat("E, HH:mm", Locale.getDefault());
-            String timeText = timeFormat.format(currentDate);
-            currTime.setText(timeText);
+            DateFormat timeFormat = new SimpleDateFormat("E, dd MMM", Locale.getDefault());
+            String dateText = timeFormat.format(currentDate);
+            currTime.setText(dateText);
+
+
+            DateFormat updateTimeFormat = new SimpleDateFormat("hh:mm", Locale.getDefault());
+            String timeText = updateTimeFormat.format(currentDate);
+            String upateTimeFromRes = getResources().getString(R.string.update);
+            updateTimeTextView.setText(String.format(upateTimeFromRes, timeText));
 
             weatherStatusTextView.setText(wd.getWeatherStateInfo());
             pressureInfoTextView.setText(wd.getPressure());
@@ -287,10 +300,10 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
 
     private int findDegreesLevel(int degrees){
         if(degrees <= -30) return 0;
-        if(degrees <= -20) return 10;
-        if(degrees <= -10) return 15;
-        if(degrees <= 0) return 20;
-        if(degrees <= 10) return 28;
+        if(degrees <= -20) return 15;
+        if(degrees <= -10) return 20;
+        if(degrees <= 0) return 25;
+        if(degrees <= 10) return 30;
         if(degrees <= 15) return 38;
         if(degrees <= 20) return 48;
         if(degrees <= 25) return 58;
