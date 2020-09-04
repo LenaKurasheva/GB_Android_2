@@ -209,7 +209,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
                 String dateText = dateFormat.format(currentDate);
                 currTime.setText(dateText);
 
-                DateFormat updateTimeFormat = new SimpleDateFormat("hh:mm", Locale.getDefault());
+                DateFormat updateTimeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
                 String timeText = updateTimeFormat.format(currentDate);
                 String upateTimeFromRes = resources.getString(R.string.update);
                 updateTimeTextView.setText(String.format(upateTimeFromRes, timeText));
@@ -262,8 +262,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
             String dateText = timeFormat.format(currentDate);
             currTime.setText(dateText);
 
-
-            DateFormat updateTimeFormat = new SimpleDateFormat("hh:mm", Locale.getDefault());
+            DateFormat updateTimeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
             String timeText = updateTimeFormat.format(currentDate);
             String upateTimeFromRes = getResources().getString(R.string.update);
             updateTimeTextView.setText(String.format(upateTimeFromRes, timeText));

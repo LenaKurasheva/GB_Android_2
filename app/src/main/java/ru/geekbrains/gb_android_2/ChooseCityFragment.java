@@ -63,7 +63,6 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-//        Log.d("Theme", "onCreate - fragment WeatherMainFragment");
         Log.d("myLog", "onCreate - fragment SettingsFragment");
         super.onCreate(savedInstanceState);
     }
@@ -113,7 +112,6 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
                         takeWeatherInfoForFiveDays();
                         if (ForecastRequest.responseCode == 404) {
                             Log.d(myLog, "RESPONSE COD = " + ForecastRequest.responseCode + " CURR CITY = " + currentCity);
-//                        Toast.makeText(getContext(), R.string.city_not_found, Toast.LENGTH_LONG).show();
                             showAlertDialog(R.string.city_not_found);
                             currentCity = previousCity;
                         }
@@ -136,7 +134,6 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
                         }
                         if (ForecastRequest.responseCode != 200 && ForecastRequest.responseCode != 404) {
                             Log.d(myLog, "RESPONSE COD = " + ForecastRequest.responseCode + " CURR CITY = " + currentCity);
-//                        Toast.makeText(getContext(), R.string.connection_failed, Toast.LENGTH_LONG).show();
                             showAlertDialog(R.string.connection_failed);
                             currentCity = previousCity;
                         }
@@ -199,7 +196,6 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
             }).start();
         } else {
             Log.d(myLog, "RESPONSE COD = " + ForecastRequest.responseCode + " CURR CITY = " + currentCity);
-//            Toast.makeText(getContext(), "Fail connection", Toast.LENGTH_LONG).show();
             showAlertDialog(R.string.connection_failed);
             return;
         }
