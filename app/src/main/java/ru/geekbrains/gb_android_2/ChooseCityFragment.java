@@ -193,6 +193,8 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
                 requireActivity().runOnUiThread(() -> {
                     CurrentDataContainer.getInstance().weekWeatherData = weekWeatherData;
                     CurrentDataContainer.getInstance().hourlyWeatherList = hourlyWeatherList;
+                    //Обновляем данные погоды, если положение горизонтальное или открываем новое активити, если вертикальное
+                    updateWeatherData();
                 });
             }).start();
         } else {
@@ -202,9 +204,6 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
             return;
         }
         Log.d(myLog, "ChooseCityFragment - setOnBtnOkEnterCityClickListener -> BEFORE flag");
-
-        //Обновляем данные погоды, если положение горизонтальное или открываем новое активити, если вертикальное
-        updateWeatherData();
     }
 
     @Override
