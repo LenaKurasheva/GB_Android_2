@@ -7,6 +7,10 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.Menu;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.core.ImagePipelineConfig;
+import com.facebook.imagepipeline.core.ImageTranscoderType;
+import com.facebook.imagepipeline.core.MemoryChunkType;
 import com.google.android.material.navigation.NavigationView;
 import com.squareup.otto.Subscribe;
 
@@ -41,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
 
         setHomeFragment();
         setOnClickForSideMenuItems();
+        // Инициализируем библиотеку для работы с картинками:
+        Fresco.initialize(this);
     }
 
     @Override

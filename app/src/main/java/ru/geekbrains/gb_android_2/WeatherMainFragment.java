@@ -2,6 +2,8 @@ package ru.geekbrains.gb_android_2;
 
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,6 +21,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.facebook.drawee.view.SimpleDraweeView;
+
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -63,6 +68,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     private ArrayList<String> citiesList;
     private ArrayList<WeatherData> weekWeatherData;
     private ArrayList<HourlyWeatherData> hourlyWeatherData;
+    private SimpleDraweeView weatherStatusImage;
 
 
     static WeatherMainFragment create(CurrentDataContainer container) {
@@ -175,6 +181,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         currTime = view.findViewById(R.id.currTime);
         weatherStatusTextView = view.findViewById(R.id.cloudyInfoTextView);
         updateTimeTextView = view.findViewById(R.id.update_time);
+        weatherStatusImage = view.findViewById(R.id.weatherStatus);
     }
 
     private void setOnCityTextViewClickListener(){
@@ -277,6 +284,8 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
             pressureInfoTextView.setText(wd.getPressure());
             feelsLikeTextView.setText(wd.getFeelLike());
 
+            setWeatherStatusImage(wd.getWeatherIcon());
+
             tempMax = new ArrayList<>();
             tempMin = new ArrayList<>();
             weatherStateInfo = new ArrayList<>();
@@ -301,6 +310,43 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
                 hourlyTemperature.set(i, hourlyData.getTemperature());
             }
         }
+    }
+
+    private void setWeatherStatusImage(String weatherIconId){
+        if (weatherIconId.equals("thunderstorm")){
+            Uri uri = Uri.parse("http://192.168.1.35/users-images/thumbs/user_id/ffffffffffff1f1f.png");
+            weatherStatusImage.setImageURI(uri);
+        }
+         if (weatherIconId.equals("shower_rain")) {
+             weatherStatusImage.setImageResource(R.drawable.rain_weather_status_3);
+         }
+         if (weatherIconId.equals("rain_day")) {
+             weatherStatusImage.setImageResource(R.drawable.rain_weather_status_3);
+         }
+         if (weatherIconId.equals("snow")) {
+             weatherStatusImage.setImageResource(R.drawable.snow_weather_status_2);
+//             Uri uri = Uri.parse("https://www.vhv.rs/file/max/33/332714_snow-falling-png.png"); // второй вариант
+//             weatherStatusImage.setImageURI(uri);
+         }
+         if (weatherIconId.equals("mist")) {
+             weatherStatusImage.setColorFilter(Color.WHITE);
+             weatherStatusImage.setImageResource(R.drawable.mist_weather_status);
+         }
+         if (weatherIconId.equals("clear_sky_day")) {
+             Uri uri = Uri.parse("https://www.nicepng.com/png/full/389-3899694_beach-illustration-sunshine-rays-white-cinematic-bars-png.png");
+             weatherStatusImage.setImageURI(uri);
+         }
+         if (weatherIconId.equals("few_clouds_day")) {
+             weatherStatusImage.setImageResource(R.drawable.little_cloudy_weater_status);
+         }
+         if (weatherIconId.equals("scattered_clouds")) {
+             Uri uri = Uri.parse("https://cdn.clipart.email/ebf7869a3ef385ffb67b8a2a0dcba02a_cartoon-clouds-png-transparent-without-background-image-free-png-_1000-824.png");
+             weatherStatusImage.setImageURI(uri);
+         }
+         if (weatherIconId.equals("broken_clouds")) {
+             Uri uri = Uri.parse("https://cdn.clipart.email/ebf7869a3ef385ffb67b8a2a0dcba02a_cartoon-clouds-png-transparent-without-background-image-free-png-_1000-824.png");
+             weatherStatusImage.setImageURI(uri);
+         }
     }
 
     private int findDegreesLevel(int degrees){

@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
-
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    >
+
+<androidx.constraintlayout.widget.ConstraintLayout
     android:id="@+id/full_screen_constraintlayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -35,18 +37,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/hourlyWeatherRV" />
 
-    <ImageView
+    <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/weatherStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/cloudy"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/hourlyWeatherRV"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/city"
-        app:layout_constraintBottom_toBottomOf="@id/city"
+        app:layout_constraintTop_toTopOf="parent"
         tools:ignore="ContentDescription"
-        android:visibility="gone"
-        tools:srcCompat="@tools:sample/backgrounds/scenic" />
+        tools:srcCompat="@tools:sample/backgrounds/scenic"
+        android:tint="#4FC3F7"
+    />
 
     <TextView
         android:id="@+id/city"
