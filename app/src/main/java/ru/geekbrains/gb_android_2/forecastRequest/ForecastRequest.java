@@ -1,85 +1,61 @@
 package ru.geekbrains.gb_android_2.forecastRequest;
 
 import android.util.Log;
+import androidx.annotation.NonNull;
 
-import com.google.gson.Gson;
+import java.util.concurrent.CountDownLatch;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-
-import javax.net.ssl.HttpsURLConnection;
-
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import ru.geekbrains.gb_android_2.model.weather.WeatherRequest;
 
 public class ForecastRequest {
 
-    final static String myLog = "myLog";
-    private static final String TAG = "WEATHER";
     public static int responseCode;
     private static WeatherRequest weatherRequest;
+    private static CountDownLatch forecastResponseReceived;
 
     public static WeatherRequest getWeatherRequest(){return weatherRequest;}
 
-    public static void getForecastFromServer(String currentCity, URL forecastSourceUrl){
-        try {
-            final URL uri = forecastSourceUrl;
-            Thread t1 = new Thread(() -> {
-                HttpsURLConnection urlConnection = null;
-                try {
-                    urlConnection = (HttpsURLConnection) uri.openConnection();
-                    urlConnection.setRequestMethod("GET"); // установка метода получения данных -GET
-                    urlConnection.setReadTimeout(10000); // установка таймаута - 10 000 миллисекунд
-                    // Получаем ответ от сервера, если соединение невозможно, то обнуляем значение responseCode,
-                    // чтобы не использовать устаревшее значение и отображалось уведомление об ошибке соединения:
-                    try{
-                        responseCode = urlConnection.getResponseCode();
-                    } catch (Exception e){
-                        responseCode = 0;
+    public static CountDownLatch getForecastResponseReceived(){return forecastResponseReceived;}
+
+    public static void getForecastFromServer(String currentCity) {
+        forecastResponseReceived = new CountDownLatch(1);
+        Log.d("retrofit", "countDounLatch = " + forecastResponseReceived.getCount());
+       OpenWeatherRepo.getInstance().getAPI().loadWeather(currentCity,"metric",
+                "2a72f5f940375d439b4598c5184c5e82").enqueue(new Callback<WeatherRequest>() {
+            @Override
+            public void onResponse(@NonNull Call<WeatherRequest> call,
+                                   @NonNull Response<WeatherRequest> response) {
+                if (response.body() != null && response.isSuccessful()) {
+                    responseCode = 200;
+                    weatherRequest = response.body();
+                    forecastResponseReceived.countDown();
+                    Log.d("retrofit", "countDown");
+
+                } else {
+                    //Похоже, код у нас не в диапазоне [200..300) и случилась ошибка
+                    //обрабатываем ее
+                    if (response.code() == 404) {
+                        responseCode = 404;
+                        forecastResponseReceived.countDown();
+                        return;
                     }
-                    Log.d(myLog, "###getFiveDaysWeatherFromServer responseCod = " + responseCode);
-                    Log.d(myLog, "###getFiveDaysWeatherFromServer currentCity = " + currentCity);
-                    BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream())); // читаем  данные в поток
-                    String result = getLines(in);
-                    // преобразование данных запроса в модель
-                    Gson gson = new Gson();
-                    weatherRequest = gson.fromJson(result, WeatherRequest.class);
-                    Log.d(myLog, "ChooseCityPresenter - getFiveDaysWeatherFromServer - getWeatherData ");
-                } catch (Exception e) {
-                    Log.e(TAG, "Fail connection", e);
-                    e.printStackTrace();
-                } finally {
-                    if (null != urlConnection) {
-                        urlConnection.disconnect();
-                    }
+                    responseCode = 0;
+                    forecastResponseReceived.countDown();
                 }
-            });
-            t1.start();
-            t1.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static String getLines(BufferedReader reader) {
-        StringBuilder rawData = new StringBuilder(1024);
-        String tempVariable;
-
-        while (true) {
-            try {
-                tempVariable = reader.readLine();
-                if (tempVariable == null) break;
-                rawData.append(tempVariable).append("\n");
-            } catch (IOException e) {
-                e.printStackTrace();
+                Log.d("retrofit", "response.code = " + responseCode);
+                Log.d("retrofit", "weatherRequest is null: " + (weatherRequest == null));
             }
-        }
-        try {
-            reader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return rawData.toString();
+
+            //сбой при интернет подключении
+            @SuppressWarnings("NullableProblems")
+            @Override
+            public void onFailure(Call<WeatherRequest> call, Throwable t) {
+                forecastResponseReceived.countDown();
+                responseCode = 0;
+            }
+       });
     }
 }

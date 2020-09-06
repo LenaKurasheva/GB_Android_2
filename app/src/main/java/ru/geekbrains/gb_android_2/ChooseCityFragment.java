@@ -3,6 +3,7 @@ package ru.geekbrains.gb_android_2;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -22,7 +23,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -110,18 +110,26 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
                         currentCity = enterCity.getText().toString();
                         //Создаем прогноз погоды на неделю для нового выбранного города:
                         takeWeatherInfoForFiveDays();
-                        if (ForecastRequest.responseCode == 404) {
-                            Log.d(myLog, "RESPONSE COD = " + ForecastRequest.responseCode + " CURR CITY = " + currentCity);
-                            showAlertDialog(R.string.city_not_found);
-                            currentCity = previousCity;
-                        }
-                        if (ForecastRequest.responseCode == 200) {
-                            CurrentDataContainer.getInstance().currCityName = currentCity;
-                            Log.d(myLog, "RESPONSE COD = " + ForecastRequest.responseCode + " CURR CITY = " + currentCity);
-                            new Thread(() -> {
-                                weekWeatherData = openWeatherMap.getWeekWeatherData(getResources());
-                                hourlyWeatherList = openWeatherMap.getHourlyWeatherData();
-                                requireActivity().runOnUiThread(() -> {
+                        Handler handler = new Handler();
+                        new Thread(() -> {
+                                try {
+                                    // Ждем, пока не получим актуальный response code:
+                                    ForecastRequest.getForecastResponseReceived().await();
+
+                                if (ForecastRequest.responseCode == 404) {
+                                    Log.d(myLog, "RESPONSE COD = " + ForecastRequest.responseCode + " CURR CITY = " + currentCity);
+                                    handler.post(()->{
+                                        showAlertDialog(R.string.city_not_found);
+                                        currentCity = previousCity;
+                                    });
+                                }
+                                if (ForecastRequest.responseCode == 200) {
+                                    CurrentDataContainer.isFirstEnter = false;
+                                    CurrentDataContainer.getInstance().currCityName = currentCity;
+                                    Log.d(myLog, "RESPONSE COD = " + ForecastRequest.responseCode + " CURR CITY = " + currentCity);
+                                    weekWeatherData = openWeatherMap.getWeekWeatherData(getResources());
+                                    hourlyWeatherList = openWeatherMap.getHourlyWeatherData();
+                                    requireActivity().runOnUiThread(() -> {
                                     CurrentDataContainer.getInstance().weekWeatherData = weekWeatherData;
                                     CurrentDataContainer.getInstance().hourlyWeatherList = hourlyWeatherList;
                                     //Добавляем новый город в RV
@@ -129,17 +137,22 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
                                     Toast.makeText(requireActivity(), currentCity, Toast.LENGTH_SHORT).show();
                                     updateWeatherData();
                                     enterCity.setText("");
-                                });
-                            }).start();
-                        }
-                        if (ForecastRequest.responseCode != 200 && ForecastRequest.responseCode != 404) {
-                            Log.d(myLog, "RESPONSE COD = " + ForecastRequest.responseCode + " CURR CITY = " + currentCity);
-                            showAlertDialog(R.string.connection_failed);
-                            currentCity = previousCity;
-                        }
-                        Log.d(myLog, "ChooseCityFragment - setOnBtnOkEnterCityClickListener -> BEFORE flag");
+                                    });
+                                }
+                                if (ForecastRequest.responseCode != 200 && ForecastRequest.responseCode != 404) {
+                                    Log.d(myLog, "RESPONSE COD = " + ForecastRequest.responseCode + " CURR CITY = " + currentCity);
+                                    handler.post(()-> {
+                                        showAlertDialog(R.string.connection_failed);
+                                        currentCity = previousCity;
+                                    });
+                                }
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                                }).start();
+                            }
+                    Log.d(myLog, "ChooseCityFragment - setOnBtnOkEnterCityClickListener -> BEFORE flag");
                     }
-                }
                 return true;
             }
             return false;
@@ -182,9 +195,18 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
 
         //Создаем прогноз погоды на неделю для нового выбранного города:
         takeWeatherInfoForFiveDays();
-        if(ForecastRequest.responseCode == 200) {
-            Log.d(myLog, "RESPONSE COD = " + ForecastRequest.responseCode + " CURR CITY = " + currentCity);
-            new Thread(() -> {
+        Handler handler = new Handler();
+        new Thread(() -> {
+            try {
+                // Ждем, пока не получим актуальный response code:
+                ForecastRequest.getForecastResponseReceived().await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if(ForecastRequest.responseCode == 200) {
+                CurrentDataContainer.isFirstEnter = false;
+                Log.d(myLog, "RESPONSE COD = " + ForecastRequest.responseCode + " CURR CITY = " + currentCity);
+
                 weekWeatherData = openWeatherMap.getWeekWeatherData(getResources());
                 hourlyWeatherList = openWeatherMap.getHourlyWeatherData();
                 requireActivity().runOnUiThread(() -> {
@@ -193,12 +215,11 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
                     //Обновляем данные погоды, если положение горизонтальное или открываем новое активити, если вертикальное
                     updateWeatherData();
                 });
-            }).start();
-        } else {
-            Log.d(myLog, "RESPONSE COD = " + ForecastRequest.responseCode + " CURR CITY = " + currentCity);
-            showAlertDialog(R.string.connection_failed);
-            return;
-        }
+            } else {
+                Log.d(myLog, "RESPONSE COD = " + ForecastRequest.responseCode + " CURR CITY = " + currentCity);
+                handler.post(()->showAlertDialog(R.string.connection_failed));
+            }
+        }).start();
         Log.d(myLog, "ChooseCityFragment - setOnBtnOkEnterCityClickListener -> BEFORE flag");
     }
 
@@ -218,13 +239,13 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
     }
 
     private void takeWeatherInfoForFiveDays(){
-        try {
-            ForecastRequest.getForecastFromServer(currentCity, openWeatherMap.getWeatherUrl(currentCity));
-        } catch (MalformedURLException e) {
-            Log.e(myLog, "Fail URI", e);
-            e.printStackTrace();
-        }
-        if(ForecastRequest.responseCode == 200) CurrentDataContainer.isFirstEnter = false;
+
+        ForecastRequest.getForecastFromServer(currentCity);
+
+        Log.d("retrofit", "ChooseCityFragment - countDownLatch = " + ForecastRequest.getForecastResponseReceived().getCount());
+
+
+
     }
 
     private void setupRecyclerView() {

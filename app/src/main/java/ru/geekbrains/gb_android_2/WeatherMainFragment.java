@@ -20,7 +20,6 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.net.MalformedURLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -121,21 +120,28 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         if(CurrentDataContainer.isFirstEnter){
             Log.d(myLog, "*FIRST ENTER*");
             OpenWeatherMap openWeatherMap = OpenWeatherMap.getInstance();
-            try {
-                ForecastRequest.getForecastFromServer(currentCity, openWeatherMap.getWeatherUrl(currentCity));
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
+
+            ForecastRequest.getForecastFromServer(currentCity);
+            Log.d("retrofit", "WeatherMain - countDownLatch = " + ForecastRequest.getForecastResponseReceived().getCount());
+
             new Thread(() -> {
-                weekWeatherData = openWeatherMap.getWeekWeatherData(getResources());
-                hourlyWeatherData = openWeatherMap.getHourlyWeatherData();
-                requireActivity().runOnUiThread(() -> {
-                    updateWeatherInfo(getResources());
-                    if(ForecastRequest.responseCode != 200) showAlertDialog();
-                    Log.d(myLog, "takeWeatherInfoForFirstEnter - after updateWeatherInfo;  CITIES LIST = "+ citiesList.toString());
-                    setupRecyclerView();
-                    setupHourlyWeatherRecyclerView();
-                });
+                try {
+                    // Ждем, пока не получим актуальный response code:
+                    ForecastRequest.getForecastResponseReceived().await();
+
+                    Log.d("retrofit", "response code for first enter = " + ForecastRequest.responseCode);
+                    weekWeatherData = openWeatherMap.getWeekWeatherData(getResources());
+                    hourlyWeatherData = openWeatherMap.getHourlyWeatherData();
+                    requireActivity().runOnUiThread(() -> {
+                        updateWeatherInfo(getResources());
+                        if(ForecastRequest.responseCode != 200) showAlertDialog();
+                        Log.d(myLog, "takeWeatherInfoForFirstEnter - after updateWeatherInfo;  CITIES LIST = "+ citiesList.toString());
+                        setupRecyclerView();
+                        setupHourlyWeatherRecyclerView();
+                    });
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }).start();
         } else {
             Log.d(myLog, "*NOT FIRST ENTER*");

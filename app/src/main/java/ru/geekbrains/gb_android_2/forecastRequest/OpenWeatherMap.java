@@ -3,8 +3,6 @@ package ru.geekbrains.gb_android_2.forecastRequest;
 import android.content.res.Resources;
 import android.util.Log;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
@@ -15,7 +13,6 @@ import ru.geekbrains.gb_android_2.model.weather.WeatherRequest;
 
 public final class OpenWeatherMap {
     public static final int FORECAST_DAYS = 5;
-    String BASE_URL = "https://api.openweathermap.org/data/2.5/";
     private WeatherRequest weatherRequest = new WeatherRequest();
 
     ArrayList<String> fiveDaysTempMax;
@@ -47,10 +44,6 @@ public final class OpenWeatherMap {
             }
             return instance;
         }
-    }
-
-    public URL getWeatherUrl(String cityName) throws MalformedURLException {
-        return new URL(BASE_URL + "forecast?q=" + cityName + "&units=metric&appid=" + "2a72f5f940375d439b4598c5184c5e82");
     }
 
     public ArrayList<WeatherData> getWeekWeatherData( Resources resources) {
