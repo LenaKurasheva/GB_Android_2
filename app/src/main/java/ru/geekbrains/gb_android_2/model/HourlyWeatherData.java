@@ -2,9 +2,9 @@ package ru.geekbrains.gb_android_2.model;
 
 import android.util.Log;
 
-import java.io.Serializable;
+import androidx.annotation.NonNull;
 
-import ru.geekbrains.gb_android_2.model.WeatherData;
+import java.io.Serializable;
 
 public class HourlyWeatherData implements Serializable {
     private String time;
@@ -22,6 +22,13 @@ public class HourlyWeatherData implements Serializable {
         if(t > 0) {temperature = "+";} else {tempSign = "";}
         String stringTemperature = String.valueOf(Math.round(t));
         this.temperature = tempSign + stringTemperature +  "°";
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "HourlyWeatherData: temperature = " + temperature + "stateImage = " + stateImage;
+
     }
 
     public String findIconById(int weatherIcon, String time){

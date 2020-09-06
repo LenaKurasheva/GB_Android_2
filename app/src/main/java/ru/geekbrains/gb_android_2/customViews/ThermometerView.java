@@ -1,4 +1,4 @@
-package ru.geekbrains.gb_android_2;
+package ru.geekbrains.gb_android_2.customViews;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -13,6 +13,8 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.Nullable;
+
+import ru.geekbrains.gb_android_2.R;
 
 public class ThermometerView extends View {
     private static final String TAG = "BatteryView";

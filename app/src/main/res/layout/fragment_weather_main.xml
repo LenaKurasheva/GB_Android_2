@@ -1,32 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/full_screen_constraintlayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:context="ru.geekbrains.gb_android_2.WeatherMainFragment">
 <!--    android:background="@color/day"-->
-
-    <!-- Center, расположенный посередине; для удобства расположения элементов на экране -->
-    <TextView
-        android:id="@+id/center"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Center" />
 
     <!-- Почасовой прогноз погоды -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/hourlyWeatherRV"
         android:layout_width="match_parent"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -36,11 +25,11 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/weekWeatherRV"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:layout_marginTop="10dp"
-        android:layout_marginBottom="1dp"
+        android:layout_marginBottom="40dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -56,6 +45,7 @@
         app:layout_constraintTop_toTopOf="@id/city"
         app:layout_constraintBottom_toBottomOf="@id/city"
         tools:ignore="ContentDescription"
+        android:visibility="gone"
         tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
     <TextView
@@ -144,7 +134,7 @@
         app:layout_constraintStart_toEndOf="@id/thermometerView"
         app:layout_constraintTop_toBottomOf="@+id/currTime" />
 
-    <ru.geekbrains.gb_android_2.ThermometerView
+    <ru.geekbrains.gb_android_2.customViews.ThermometerView
         android:id="@+id/thermometerView"
         android:layout_width="@dimen/thermometer_width"
         android:layout_height="@dimen/thermometer_height"
@@ -158,4 +148,18 @@
         app:level_color="@color/color_green"
         app:thermometer_color="@color/grey"/>
 
+    <TextView
+        android:id="@+id/update_time"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="18dp"
+        android:layout_marginEnd="10dp"
+        android:textSize="10sp"
+        android:text="@string/update"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/hourlyWeatherRV"
+        tools:layout_editor_absoluteY="266dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

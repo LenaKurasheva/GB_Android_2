@@ -14,7 +14,11 @@ import androidx.annotation.Nullable;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
+import java.net.MalformedURLException;
+
 import ru.geekbrains.gb_android_2.events.OpenWeatherMainFragmentEvent;
+import ru.geekbrains.gb_android_2.forecastRequest.ForecastRequest;
+import ru.geekbrains.gb_android_2.forecastRequest.OpenWeatherMap;
 
 public class BottomSheetDialogChooseCityFragment extends BottomSheetDialogFragment {
     private EditText enterCityEditText;
@@ -57,27 +61,34 @@ public class BottomSheetDialogChooseCityFragment extends BottomSheetDialogFragme
 
     @SuppressLint("ResourceAsColor")
     private void checkIsShowingWeatherPossible(String cityName){
-        ChooseCityPresenter chooseCityPresenter = ChooseCityPresenter.getInstance();
-        chooseCityPresenter.getFiveDaysWeatherFromServer(cityName, getResources());
-        if(ChooseCityPresenter.responseCode == 200){
-            CurrentDataContainer.isFirstEnter = false;
-            CurrentDataContainer.getInstance().weekWeatherData = chooseCityPresenter.getWeekWeatherData();
-            CurrentDataContainer.getInstance().hourlyWeatherList = chooseCityPresenter.getHourlyWeatherData();
-            CurrentDataContainer.getInstance().currCityName = cityName;
-            CurrentDataContainer.getInstance().citiesList.add(0, cityName);
-            dismiss();
-            EventBus.getBus().post(new OpenWeatherMainFragmentEvent());
+        OpenWeatherMap openWeatherMap = OpenWeatherMap.getInstance();
+        try {
+            ForecastRequest.getForecastFromServer(cityName, openWeatherMap.getWeatherUrl(cityName));
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
         }
-        if(ChooseCityPresenter.responseCode == 404){
+        if(ForecastRequest.responseCode == 200){
+            CurrentDataContainer.isFirstEnter = false;
+            new Thread(() -> {
+                CurrentDataContainer.getInstance().weekWeatherData = openWeatherMap.getWeekWeatherData(getResources());
+                CurrentDataContainer.getInstance().hourlyWeatherList = openWeatherMap.getHourlyWeatherData();
+                CurrentDataContainer.getInstance().currCityName = cityName;
+                CurrentDataContainer.getInstance().citiesList.add(0, cityName);
+                requireActivity().runOnUiThread(() -> {
+                    dismiss();
+                    EventBus.getBus().post(new OpenWeatherMainFragmentEvent());
+                });
+            }).start();
+        }
+        if(ForecastRequest.responseCode == 404){
             enterCityEditText.setText("");
             chooseCityTextView.setText(R.string.city_not_found);
             chooseCityTextView.setTextColor(R.color.colorPrimary);
         }
-        if(ChooseCityPresenter.responseCode != 404 && ChooseCityPresenter.responseCode != 200){
+        if(ForecastRequest.responseCode != 404 && ForecastRequest.responseCode != 200){
             enterCityEditText.setText("");
             chooseCityTextView.setText(R.string.connection_failed);
             chooseCityTextView.setTextColor(R.color.colorPrimary);
         }
-
     }
 }
