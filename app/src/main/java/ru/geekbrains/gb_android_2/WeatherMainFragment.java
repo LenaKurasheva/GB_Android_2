@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,6 +22,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
@@ -36,6 +38,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 import ru.geekbrains.gb_android_2.customViews.ThermometerView;
+import ru.geekbrains.gb_android_2.events.OpenWeatherMainFragmentEvent;
 import ru.geekbrains.gb_android_2.forecastRequest.ForecastRequest;
 import ru.geekbrains.gb_android_2.forecastRequest.OpenWeatherMap;
 import ru.geekbrains.gb_android_2.model.HourlyWeatherData;
@@ -69,6 +72,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     private ArrayList<WeatherData> weekWeatherData;
     private ArrayList<HourlyWeatherData> hourlyWeatherData;
     private SimpleDraweeView weatherStatusImage;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
 
     static WeatherMainFragment create(CurrentDataContainer container) {
@@ -110,6 +114,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         setupRecyclerView();
         setupHourlyWeatherRecyclerView();
         setOnCityTextViewClickListener();
+        setOnSwipeRefreshListener();
         super.onViewCreated(view, savedInstanceState);
     }
 
@@ -120,6 +125,12 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         updateChosenCity(savedInstanceState);
         takeWeatherInfoForFirstEnter();
         Log.d(myLog, "WeatherMainFragment: onActivityCreated !AFTER updateChosenCity, currentCity: " + currentCity);
+    }
+
+    private void setOnSwipeRefreshListener() {
+        swipeRefreshLayout.setOnRefreshListener(()-> {
+            EventBus.getBus().post(new OpenWeatherMainFragmentEvent());
+        });
     }
 
     private void takeWeatherInfoForFirstEnter(){
@@ -182,6 +193,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         weatherStatusTextView = view.findViewById(R.id.cloudyInfoTextView);
         updateTimeTextView = view.findViewById(R.id.update_time);
         weatherStatusImage = view.findViewById(R.id.weatherStatus);
+        swipeRefreshLayout = view.findViewById(R.id.swiperefresh);
     }
 
     private void setOnCityTextViewClickListener(){
