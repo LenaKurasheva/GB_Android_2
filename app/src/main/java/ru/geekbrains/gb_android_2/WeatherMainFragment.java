@@ -73,6 +73,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     private ArrayList<HourlyWeatherData> hourlyWeatherData;
     private SimpleDraweeView weatherStatusImage;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private boolean isRefreshed;
 
 
     static WeatherMainFragment create(CurrentDataContainer container) {
@@ -129,8 +130,37 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
 
     private void setOnSwipeRefreshListener() {
         swipeRefreshLayout.setOnRefreshListener(()-> {
-            EventBus.getBus().post(new OpenWeatherMainFragmentEvent());
+            CurrentDataContainer.isFirstEnter = false;
+//            EventBus.getBus().post(new OpenWeatherMainFragmentEvent());
+            OpenWeatherMap openWeatherMap = OpenWeatherMap.getInstance();
+
+            ForecastRequest.getForecastFromServer(currentCity);
+            Log.d("retrofit", "WeatherMain - countDownLatch = " + ForecastRequest.getForecastResponseReceived().getCount());
+
+            new Thread(() -> {
+                try {
+                    // Ждем, пока не получим актуальные данные:
+                    ForecastRequest.getForecastResponseReceived().await();
+
+                    weekWeatherData = openWeatherMap.getWeekWeatherData(getResources());
+                    hourlyWeatherData = openWeatherMap.getHourlyWeatherData();
+                    CurrentDataContainer.getInstance().weekWeatherData = weekWeatherData;
+                    CurrentDataContainer.getInstance().hourlyWeatherList = hourlyWeatherData;
+
+                    requireActivity().runOnUiThread(() -> {
+                        updateWeatherInfo(getResources());
+                        Log.d("swipe", "setOnSwipeRefreshListener -> weather updated");
+                        if(ForecastRequest.responseCode != 200) showAlertDialog();
+                        setupRecyclerView();
+                        setupHourlyWeatherRecyclerView();
+                        swipeRefreshLayout.setRefreshing(false);
+                    });
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }).start();
         });
+        isRefreshed = true;
     }
 
     private void takeWeatherInfoForFirstEnter(){
@@ -225,6 +255,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
                 Log.d(myLog, "updateWeatherInfo from resources");
 
                 degrees.setText("+0°");
+                Log.d("swipe", "new degrees = " + degrees.getText().toString());
 
                 String windInfoFromRes = resources.getString(R.string.windInfo);
                 windInfoTextView.setText(String.format(windInfoFromRes, "0"));
@@ -279,6 +310,8 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         if (weekWeatherData != null && weekWeatherData.size() != 0 && hourlyWeatherData != null && hourlyWeatherData.size() != 0) {
             WeatherData wd = weekWeatherData.get(0);
             degrees.setText(wd.getDegrees());
+            Log.d("swipe", "new degrees = " + degrees.getText().toString());
+
             ThermometerView.level = findDegreesLevel(wd.getIntDegrees());
             windInfoTextView.setText(wd.getWindInfo());
 
@@ -469,11 +502,11 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         LinearLayoutManager layoutManager = new LinearLayoutManager(requireActivity().getBaseContext(), LinearLayoutManager.VERTICAL, false);
         WeekWeatherRecyclerDataAdapter weekWeatherAdapter = new WeekWeatherRecyclerDataAdapter(days, daysTemp, weatherIcon, weatherStateInfo, this);
 
-        DividerItemDecoration itemDecoration = new DividerItemDecoration(requireActivity().getBaseContext(),
-                LinearLayoutManager.VERTICAL);
-        itemDecoration.setDrawable(Objects.requireNonNull(
-                ContextCompat.getDrawable(requireActivity().getBaseContext(), R.drawable.decorator_item)));
-        weatherRecyclerView.addItemDecoration(itemDecoration);
+        if (!isRefreshed) {
+            DividerItemDecoration itemDecoration = new DividerItemDecoration(requireActivity().getBaseContext(), LinearLayoutManager.VERTICAL);
+            itemDecoration.setDrawable(Objects.requireNonNull(ContextCompat.getDrawable(requireActivity().getBaseContext(), R.drawable.decorator_item)));
+            weatherRecyclerView.addItemDecoration(itemDecoration);
+        }
 
         weatherRecyclerView.setLayoutManager(layoutManager);
         weatherRecyclerView.setAdapter(weekWeatherAdapter);
