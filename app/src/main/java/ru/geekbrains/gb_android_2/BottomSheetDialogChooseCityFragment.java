@@ -1,6 +1,7 @@
 package ru.geekbrains.gb_android_2;
 
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -22,6 +23,8 @@ import ru.geekbrains.gb_android_2.database.CitiesListSource;
 import ru.geekbrains.gb_android_2.events.OpenWeatherMainFragmentEvent;
 import ru.geekbrains.gb_android_2.forecastRequest.ForecastRequest;
 import ru.geekbrains.gb_android_2.forecastRequest.OpenWeatherMap;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class BottomSheetDialogChooseCityFragment extends BottomSheetDialogFragment {
     private EditText enterCityEditText;
@@ -73,18 +76,22 @@ public class BottomSheetDialogChooseCityFragment extends BottomSheetDialogFragme
                 ForecastRequest.getForecastResponseReceived().await();
 
                 if(ForecastRequest.responseCode == 200) {
-                CurrentDataContainer.isFirstEnter = false;
-                CurrentDataContainer.getInstance().weekWeatherData = openWeatherMap.getWeekWeatherData(getResources());
-                CurrentDataContainer.getInstance().hourlyWeatherList = openWeatherMap.getHourlyWeatherData();
-                CurrentDataContainer.getInstance().currCityName = cityName;
-                CurrentDataContainer.getInstance().citiesList.add(0, cityName);
+                    CurrentDataContainer.isFirstEnter = false;
+                    CurrentDataContainer.getInstance().weekWeatherData = openWeatherMap.getWeekWeatherData(getResources());
+                    CurrentDataContainer.getInstance().hourlyWeatherList = openWeatherMap.getHourlyWeatherData();
+                    CurrentDataContainer.getInstance().currCityName = cityName;
+                    CurrentDataContainer.getInstance().citiesList.add(0, cityName);
 
-                // Добавляем город в бд:
-                CitiesListDao citiesListDao = App
-                            .getInstance()
-                            .getCitiesListDao();
+                    // Добавляем город в бд:
+                    CitiesListDao citiesListDao = App
+                                .getInstance()
+                                .getCitiesListDao();
                     CitiesListSource citiesListSource = new CitiesListSource(citiesListDao);
                     citiesListSource.addCity(new CitiesList(cityName));
+
+                    //Запоминаем выбранный город в SharedPreferences
+                    SharedPreferences sharedPreferences = requireActivity().getSharedPreferences(MainActivity.SETTINGS, MODE_PRIVATE);
+                    saveToPreference(sharedPreferences, cityName);
 
                     requireActivity().runOnUiThread(() -> {
                     dismiss();
@@ -109,5 +116,11 @@ public class BottomSheetDialogChooseCityFragment extends BottomSheetDialogFragme
                 e.printStackTrace();
             }
         }).start();
+    }
+
+    private void saveToPreference(SharedPreferences preferences, String currentCity) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("current city", currentCity);
+        editor.apply();
     }
 }

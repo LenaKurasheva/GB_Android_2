@@ -1,5 +1,6 @@
 package ru.geekbrains.gb_android_2;
 
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -10,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -38,7 +38,6 @@ import java.util.Locale;
 import java.util.Objects;
 
 import ru.geekbrains.gb_android_2.customViews.ThermometerView;
-import ru.geekbrains.gb_android_2.events.OpenWeatherMainFragmentEvent;
 import ru.geekbrains.gb_android_2.forecastRequest.ForecastRequest;
 import ru.geekbrains.gb_android_2.forecastRequest.OpenWeatherMap;
 import ru.geekbrains.gb_android_2.model.HourlyWeatherData;
@@ -46,6 +45,8 @@ import ru.geekbrains.gb_android_2.model.WeatherData;
 import ru.geekbrains.gb_android_2.rvDataAdapters.HourlyWeatherRecyclerDataAdapter;
 import ru.geekbrains.gb_android_2.rvDataAdapters.RVOnItemClick;
 import ru.geekbrains.gb_android_2.rvDataAdapters.WeekWeatherRecyclerDataAdapter;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     public static String currentCity = "";
@@ -123,15 +124,18 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Log.d(myLog, "WeatherMainFragment - savedInstanceState exists = " + (savedInstanceState != null));
-        updateChosenCity(savedInstanceState);
+        updateChosenCity();
         takeWeatherInfoForFirstEnter();
         Log.d(myLog, "WeatherMainFragment: onActivityCreated !AFTER updateChosenCity, currentCity: " + currentCity);
+    }
+
+    private void takeCityFromSharedPreference(SharedPreferences preferences) {
+        currentCity = preferences.getString("current city", "Saint Petersburg");
     }
 
     private void setOnSwipeRefreshListener() {
         swipeRefreshLayout.setOnRefreshListener(()-> {
             CurrentDataContainer.isFirstEnter = false;
-//            EventBus.getBus().post(new OpenWeatherMainFragmentEvent());
             OpenWeatherMap openWeatherMap = OpenWeatherMap.getInstance();
 
             ForecastRequest.getForecastFromServer(currentCity);
@@ -236,13 +240,10 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         });
     }
 
-    private String getCityName() {
-        currentCity = CurrentDataContainer.getInstance().currCityName;
-        return currentCity;
-    }
 
-    private void updateChosenCity(Bundle savedInstanceState) {
-        if (savedInstanceState == null) cityTextView.setText(getCityName());
+    private void updateChosenCity() {
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("settings", MODE_PRIVATE);
+        takeCityFromSharedPreference(sharedPreferences);
         cityTextView.setText(currentCity);
     }
 
@@ -358,40 +359,40 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     }
 
     private void setWeatherStatusImage(String weatherIconId){
-        if (weatherIconId.equals("thunderstorm")){
-            Uri uri = Uri.parse("http://192.168.1.35/users-images/thumbs/user_id/ffffffffffff1f1f.png");
-            weatherStatusImage.setImageURI(uri);
-        }
-         else if (weatherIconId.equals("shower_rain")) {
-             weatherStatusImage.setImageResource(R.drawable.rain_weather_status_3);
-         }
-         else if (weatherIconId.equals("rain_day")) {
-             weatherStatusImage.setImageResource(R.drawable.rain_weather_status_3);
-         }
-         else if (weatherIconId.equals("snow")) {
-             weatherStatusImage.setImageResource(R.drawable.snow_weather_status_2);
+        switch (weatherIconId) {
+            case "thunderstorm": {
+                Uri uri = Uri.parse("http://192.168.1.35/users-images/thumbs/user_id/ffffffffffff1f1f.png");
+                weatherStatusImage.setImageURI(uri);
+                break;
+            }
+            case "shower_rain":
+            case "rain_day":
+                weatherStatusImage.setImageResource(R.drawable.rain_weather_status_3);
+                break;
+            case "snow":
+                weatherStatusImage.setImageResource(R.drawable.snow_weather_status_2);
 //             Uri uri = Uri.parse("https://www.vhv.rs/file/max/33/332714_snow-falling-png.png"); // второй вариант
 //             weatherStatusImage.setImageURI(uri);
-         }
-         else if (weatherIconId.equals("mist")) {
-             weatherStatusImage.setColorFilter(Color.WHITE);
-             weatherStatusImage.setImageResource(R.drawable.mist_weather_status);
-         }
-         else if (weatherIconId.equals("clear_sky_day")) {
-             Uri uri = Uri.parse("https://www.nicepng.com/png/full/389-3899694_beach-illustration-sunshine-rays-white-cinematic-bars-png.png");
-             weatherStatusImage.setImageURI(uri);
-         }
-         else if (weatherIconId.equals("few_clouds_day")) {
-             weatherStatusImage.setImageResource(R.drawable.little_cloudy_weater_status);
-         }
-         else if (weatherIconId.equals("scattered_clouds")) {
-             Uri uri = Uri.parse("https://cdn.clipart.email/ebf7869a3ef385ffb67b8a2a0dcba02a_cartoon-clouds-png-transparent-without-background-image-free-png-_1000-824.png");
-             weatherStatusImage.setImageURI(uri);
-         }
-         else if (weatherIconId.equals("broken_clouds")) {
-             Uri uri = Uri.parse("https://cdn.clipart.email/ebf7869a3ef385ffb67b8a2a0dcba02a_cartoon-clouds-png-transparent-without-background-image-free-png-_1000-824.png");
-             weatherStatusImage.setImageURI(uri);
-         }
+                break;
+            case "mist":
+                weatherStatusImage.setColorFilter(Color.WHITE);
+                weatherStatusImage.setImageResource(R.drawable.mist_weather_status);
+                break;
+            case "clear_sky_day": {
+                Uri uri = Uri.parse("https://www.nicepng.com/png/full/389-3899694_beach-illustration-sunshine-rays-white-cinematic-bars-png.png");
+                weatherStatusImage.setImageURI(uri);
+                break;
+            }
+            case "few_clouds_day":
+                weatherStatusImage.setImageResource(R.drawable.little_cloudy_weater_status);
+                break;
+            case "scattered_clouds":
+            case "broken_clouds": {
+                Uri uri = Uri.parse("https://cdn.clipart.email/ebf7869a3ef385ffb67b8a2a0dcba02a_cartoon-clouds-png-transparent-without-background-image-free-png-_1000-824.png");
+                weatherStatusImage.setImageURI(uri);
+                break;
+            }
+        }
     }
 
     private int findDegreesLevel(int degrees){

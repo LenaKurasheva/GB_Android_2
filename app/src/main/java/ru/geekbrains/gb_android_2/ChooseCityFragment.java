@@ -2,6 +2,7 @@ package ru.geekbrains.gb_android_2;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -37,6 +38,8 @@ import ru.geekbrains.gb_android_2.model.HourlyWeatherData;
 import ru.geekbrains.gb_android_2.model.WeatherData;
 import ru.geekbrains.gb_android_2.rvDataAdapters.CitiesRecyclerDataAdapter;
 import ru.geekbrains.gb_android_2.rvDataAdapters.RVOnItemClick;
+
+import static android.content.Context.MODE_PRIVATE;
 
 
 public class ChooseCityFragment extends Fragment implements RVOnItemClick {
@@ -133,6 +136,8 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
 
                                     //Добавляем новый город в RV
                                     citiesListSource.addCity(new CitiesList(currentCity));
+                                    //Запоминаем выбранный город в SharedPreferences
+                                    saveToPreference(requireActivity().getSharedPreferences(MainActivity.SETTINGS, MODE_PRIVATE), currentCity);
 
                                     Log.d(myLog, "RESPONSE COD = " + ForecastRequest.responseCode + " CURR CITY = " + currentCity);
                                     weekWeatherData = openWeatherMap.getWeekWeatherData(getResources());
@@ -163,6 +168,12 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
             }
             return false;
         });
+    }
+
+    private void saveToPreference(SharedPreferences preferences, String currentCity) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("current city", currentCity);
+        editor.apply();
     }
 
     private void showAlertDialog(int messageId){
@@ -198,6 +209,9 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
 
 //          Ставим выбранный город на первое место в коллекции:
         adapter.putChosenCityToTopInCitiesList(currentCity);
+        //Запоминаем выбранный город в SharedPreferences
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences(MainActivity.SETTINGS, MODE_PRIVATE);
+        saveToPreference(sharedPreferences, currentCity);
 
         //Создаем прогноз погоды на неделю для нового выбранного города:
         takeWeatherInfoForFiveDays();

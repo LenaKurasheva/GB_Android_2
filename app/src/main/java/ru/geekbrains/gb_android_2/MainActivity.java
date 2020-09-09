@@ -8,9 +8,6 @@ import android.view.MenuItem;
 import android.view.Menu;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.imagepipeline.core.ImagePipelineConfig;
-import com.facebook.imagepipeline.core.ImageTranscoderType;
-import com.facebook.imagepipeline.core.MemoryChunkType;
 import com.google.android.material.navigation.NavigationView;
 import com.squareup.otto.Subscribe;
 
@@ -28,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
     public NavigationView navigationView;
     private DrawerLayout drawer;
+    public static final String SETTINGS = "settings";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
