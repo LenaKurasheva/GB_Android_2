@@ -68,7 +68,7 @@ public class CitiesRecyclerDataAdapter extends RecyclerView.Adapter<CitiesRecycl
 
     public void putChosenCityToTopInCitiesList(String cityName){
        new Thread(()->{
-           dataSource.reCreateCity(cityName);
+           dataSource.updateCityCreatedTime(cityName);
            handler.post(this::notifyDataSetChanged);
        }).start();
     }

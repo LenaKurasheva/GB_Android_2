@@ -55,11 +55,11 @@ public class CitiesListSource {
         loadCitiesList();
     }
 
-     // Пересоздаем грод, чтобы он отображался первым
-    public void reCreateCity(String cityName){
-        CitiesList city = citiesListDao.getCityByName(cityName);
-        removeCity(city.id);
-        addCity(new CitiesList(cityName));
+     // Меняем время добавления города, чтобы он отображался первым
+    public void updateCityCreatedTime(String cityName) {
+        long currentTime = System.currentTimeMillis() / 1000L;
+        citiesListDao.updateCreatedTime(cityName, currentTime);
+        loadCitiesList();
     }
 }
 

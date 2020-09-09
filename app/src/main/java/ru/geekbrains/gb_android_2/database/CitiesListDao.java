@@ -49,6 +49,9 @@ import java.util.List;
         //Получаем количество записей в таблице
         @Query("SELECT COUNT() FROM citieslist")
         long getCountCities();
+
+        @Query("update citieslist set created = :currentTime where city = :cityName")
+        void updateCreatedTime(String cityName, long currentTime);
     }
 
 
