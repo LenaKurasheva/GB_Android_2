@@ -30,13 +30,8 @@ public class CurrentDataContainer implements Serializable {
         }
     }
 
-    String currCityName = "Saint Petersburg";
-    boolean[] switchSettingsArray;
     ArrayList<WeatherData> weekWeatherData;
     ArrayList<HourlyWeatherData> hourlyWeatherList;
-    ArrayList<String> citiesList = new ArrayList<>();
     static boolean isFirstEnter = true;
-    static boolean isNightModeOn;
-    static boolean NightIsAlreadySettedInMain;
     static Stack<String> backStack = new Stack<>();
 }

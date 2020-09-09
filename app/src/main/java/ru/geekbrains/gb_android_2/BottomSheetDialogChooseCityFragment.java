@@ -79,8 +79,8 @@ public class BottomSheetDialogChooseCityFragment extends BottomSheetDialogFragme
                     CurrentDataContainer.isFirstEnter = false;
                     CurrentDataContainer.getInstance().weekWeatherData = openWeatherMap.getWeekWeatherData(getResources());
                     CurrentDataContainer.getInstance().hourlyWeatherList = openWeatherMap.getHourlyWeatherData();
-                    CurrentDataContainer.getInstance().currCityName = cityName;
-                    CurrentDataContainer.getInstance().citiesList.add(0, cityName);
+//                    CurrentDataContainer.getInstance().currCityName = cityName;
+//                    CurrentDataContainer.getInstance().citiesList.add(0, cityName);
 
                     // Добавляем город в бд:
                     CitiesListDao citiesListDao = App

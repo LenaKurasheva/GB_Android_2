@@ -88,7 +88,6 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
         super.onViewCreated(view, savedInstanceState);
         initViews(view);
         checkEnterCityField();
-        takeCitiesList();
         setupRecyclerView();// тут создается адаптер на основании citiesList из этого класса ChooseCityFragment (адаптер берет список городов из этого класса)
         setOnEnterCityEnterKeyListener();
     }
@@ -113,7 +112,9 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
                 if (!isErrorShown) {
                     enterCity.setEnabled(true);
                     if (!Objects.requireNonNull(enterCity.getText()).toString().equals("")) {
-                        String previousCity = CurrentDataContainer.getInstance().currCityName;
+                        String previousCity = requireActivity()
+                                .getSharedPreferences(MainActivity.SETTINGS, MODE_PRIVATE)
+                                .getString("current city", "Saint Petersburg");
                         currentCity = enterCity.getText().toString();
                         //Создаем прогноз погоды на неделю для нового выбранного города:
                         takeWeatherInfoForFiveDays();
@@ -132,7 +133,6 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
                                 }
                                 if (ForecastRequest.responseCode == 200) {
                                     CurrentDataContainer.isFirstEnter = false;
-                                    CurrentDataContainer.getInstance().currCityName = currentCity;
 
                                     //Добавляем новый город в RV
                                     citiesListSource.addCity(new CitiesList(currentCity));
@@ -197,17 +197,12 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
         EventBus.getBus().post(new OpenWeatherMainFragmentEvent());
     }
 
-    private void takeCitiesList(){
-        if(CurrentDataContainer.getInstance().citiesList != null) this.citiesList = CurrentDataContainer.getInstance().citiesList;
-    }
 
     // Обработчик нажатий на город из списка RV
     @Override
     public void onItemClicked(View view, String itemText, int position) {
         currentCity = itemText;
-        CurrentDataContainer.getInstance().currCityName = currentCity;
-
-//          Ставим выбранный город на первое место в коллекции:
+        // Ставим выбранный город на первое место в коллекции:
         adapter.putChosenCityToTopInCitiesList(currentCity);
         //Запоминаем выбранный город в SharedPreferences
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences(MainActivity.SETTINGS, MODE_PRIVATE);

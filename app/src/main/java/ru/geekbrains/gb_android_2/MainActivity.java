@@ -143,11 +143,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
   public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        String currCityName = getSharedPreferences(MainActivity.SETTINGS, MODE_PRIVATE)
+                .getString("current city", "Saint Petersburg");
+
         if (item.getItemId() == R.id.action_settings) {
             setSettingsFragment();
         }
         if (item.getItemId() == R.id.action_read_more){
-            String wiki = "https://ru.wikipedia.org/wiki/" + CurrentDataContainer.getInstance().currCityName;
+            String wiki = "https://ru.wikipedia.org/wiki/" + currCityName;
             Uri uri = Uri.parse(wiki);
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             startActivity(intent);

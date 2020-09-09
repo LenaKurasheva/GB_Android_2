@@ -1,5 +1,6 @@
 package ru.geekbrains.gb_android_2;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -240,7 +241,6 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         });
     }
 
-
     private void updateChosenCity() {
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("settings", MODE_PRIVATE);
         takeCityFromSharedPreference(sharedPreferences);
@@ -248,10 +248,8 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     }
 
     private  void updateWeatherInfo(Resources resources){
-        boolean[] settingsSwitchArray;
         this.citiesList = citiesListFromRes;
         if(CurrentDataContainer.isFirstEnter) {
-            CurrentDataContainer.getInstance().citiesList = citiesListFromRes;
             if(ForecastRequest.responseCode != 200) {
                 Log.d(myLog, "updateWeatherInfo from resources");
 
@@ -273,38 +271,26 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
 
                 Log.d(myLog, "WEatherMainFragment - updateWeatherInfo - FIRSTENTER; responseCode != 200; CITIES LIST = " + citiesList.toString());
             } else {
-                settingsSwitchArray = CurrentDataContainer.getInstance().switchSettingsArray;
-                isSettingsSwitchArrayTransferred(settingsSwitchArray);
+                takeSettingsSwitchDataFromPreferences();
                 setNewWeatherData(weekWeatherData, hourlyWeatherData);
                 Log.d(myLog, "WEatherMainFragment - updateWeatherInfo - FIRSTENTER; responseCode == 200; CITIES LIST = " + citiesList.toString());
             }
         }
         if(!CurrentDataContainer.isFirstEnter) {
-            currentCity = CurrentDataContainer.getInstance().currCityName;
-            settingsSwitchArray = CurrentDataContainer.getInstance().switchSettingsArray;
+            currentCity = requireActivity()
+                    .getSharedPreferences(MainActivity.SETTINGS, MODE_PRIVATE)
+                    .getString("current city", "Saint Petersburg");
             weekWeatherData = CurrentDataContainer.getInstance().weekWeatherData;
             hourlyWeatherData = CurrentDataContainer.getInstance().hourlyWeatherList;
-            citiesList = CurrentDataContainer.getInstance().citiesList;
-
-            isSettingsSwitchArrayTransferred(settingsSwitchArray);
+            takeSettingsSwitchDataFromPreferences();
             setNewWeatherData(weekWeatherData, hourlyWeatherData);
         }
     }
 
-    private void isSettingsSwitchArrayTransferred(boolean[] settingsSwitchArray){
-        Log.d(myLog, "NightIsAlreadySettedInMain " + CurrentDataContainer.NightIsAlreadySettedInMain );
-        Log.d(myLog, "NightMode " + CurrentDataContainer.isNightModeOn);
-        if(settingsSwitchArray != null) {
-            if (settingsSwitchArray[0] && !CurrentDataContainer.NightIsAlreadySettedInMain) {
-                CurrentDataContainer.NightIsAlreadySettedInMain = true;
-                CurrentDataContainer.isNightModeOn = true;
-                requireActivity().recreate();
-                Log.d(myLog, " RECREATE weather main fragment");
-            }
-            if (!settingsSwitchArray[0]) CurrentDataContainer.isNightModeOn = false;
-            if (settingsSwitchArray[1]) feelsLikeTextView.setVisibility(View.VISIBLE);
-            if (settingsSwitchArray[2]) pressureInfoTextView.setVisibility(View.VISIBLE);
-        }
+    private void takeSettingsSwitchDataFromPreferences(){
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences(MainActivity.SETTINGS, Context.MODE_PRIVATE);
+        if (sharedPreferences.getBoolean("pressure" , false))  pressureInfoTextView.setVisibility(View.VISIBLE);
+        if (sharedPreferences.getBoolean("feels like" , false)) feelsLikeTextView.setVisibility(View.VISIBLE);
     }
 
     private void setNewWeatherData(ArrayList<WeatherData> weekWeatherData, ArrayList<HourlyWeatherData> hourlyWeatherData) {
