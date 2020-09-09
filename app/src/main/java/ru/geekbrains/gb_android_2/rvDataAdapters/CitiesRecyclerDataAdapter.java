@@ -1,6 +1,6 @@
 package ru.geekbrains.gb_android_2.rvDataAdapters;
 
-import android.util.Log;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,17 +9,25 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 
 import ru.geekbrains.gb_android_2.R;
+import ru.geekbrains.gb_android_2.database.CitiesList;
+import ru.geekbrains.gb_android_2.database.CitiesListSource;
 
 
 public class CitiesRecyclerDataAdapter extends RecyclerView.Adapter<CitiesRecyclerDataAdapter.ViewHolder> {
-    private ArrayList<String> cities;
     private RVOnItemClick onItemClickCallback;
 
-    public CitiesRecyclerDataAdapter(ArrayList<String> cities, RVOnItemClick onItemClickCallback) {
-        this.cities = cities;
+    // Источник данных
+    private CitiesListSource dataSource;
+    android.os.Handler handler = new Handler();
+
+    public CitiesRecyclerDataAdapter(CitiesListSource dataSource, RVOnItemClick onItemClickCallback) {
+        this.dataSource = dataSource;
         this.onItemClickCallback = onItemClickCallback;
     }
 
@@ -33,39 +41,44 @@ public class CitiesRecyclerDataAdapter extends RecyclerView.Adapter<CitiesRecycl
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        String text = cities.get(position);
-
-        holder.setTextToTextView(text);
-        holder.setOnClickForItem(text);
+        // Заполняем данными записи на экране
+        new Thread(()->{
+            List<CitiesList> cities = dataSource.getCitiesList();
+            handler.post(()->{
+                CitiesList city = cities.get(position);
+                holder.cityName.setText(city.name);
+                holder.setOnClickForItem(city.name, position);
+            });
+        }).start();
     }
 
     @Override
     public int getItemCount() {
-        return cities == null ? 0 : cities.size();
+        int count = 0;
+        Callable<Integer> task = ()-> (int) dataSource.getCountCities();
+        FutureTask<Integer> future = new FutureTask<>(task);
+        new Thread(future).start();
+        try {
+            count =  (future.get());
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        return count;
     }
 
-
-    public void putChosenCityToTopInCitiesList(String chosenCity){
-        cities.remove(chosenCity);
-        cities.add(0, chosenCity);
-        notifyDataSetChanged();
+    public void putChosenCityToTopInCitiesList(String cityName){
+       new Thread(()->{
+           dataSource.reCreateCity(cityName);
+           handler.post(this::notifyDataSetChanged);
+       }).start();
     }
 
-    public void remove(String cityName) {
-        cities.remove(cityName);
-        notifyDataSetChanged();
+    public void remove(Integer cityId) {
+        new Thread(()->{
+        dataSource.removeCity(cityId);
+            handler.post(this::notifyDataSetChanged);
+        }).start();
     }
-
-    public void addNewCity(String newElement) {
-        cities.add(0, newElement);
-        notifyItemInserted(0);
-        Log.d("myLog", "CitiesRVDAtaAdapter: new city added to ArrayList cities : "  + newElement);
-    }
-    public ArrayList<String> getCitiesList(){
-        Log.d("myLog", "CitiesRVDAtaAdapter: get cities to put to CDC: "  + cities.toString());
-        return cities;
-    }
-
 
     class ViewHolder extends RecyclerView.ViewHolder {
         private TextView cityName;
@@ -75,19 +88,16 @@ public class CitiesRecyclerDataAdapter extends RecyclerView.Adapter<CitiesRecycl
             cityName = itemView.findViewById(R.id.cityNameTextView);
         }
 
-        void setTextToTextView(String text) {
-            cityName.setText(text);
-        }
-
-        void setOnClickForItem(final String text) {
+        void setOnClickForItem(final String text, int position) {
             cityName.setOnClickListener(view -> {
                 if(onItemClickCallback != null) {
-                    onItemClickCallback.onItemClicked(view, text);
+                    onItemClickCallback.onItemClicked(view, text, position);
                 }
             });
             cityName.setOnLongClickListener(view -> {
+
                 if(onItemClickCallback != null) {
-                    onItemClickCallback.onItemLongPressed(view);
+                    onItemClickCallback.onItemLongPressed(view, position);
                 }
                 return false;
             });

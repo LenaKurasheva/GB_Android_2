@@ -486,10 +486,10 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     }
 
     @Override
-    public void onItemClicked(View view, String itemText) {}
+    public void onItemClicked(View view, String itemText, int position) {}
 
     @Override
-    public void onItemLongPressed(View itemText) {}
+    public void onItemLongPressed(View itemText, int position) {}
 
     private void setupRecyclerView() {
         // Заменяем среднюю температуру из daysTemp на наибольшую/наименьшую темперутуру из tempMax и tempMin:

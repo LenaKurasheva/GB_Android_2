@@ -27,6 +27,9 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+import ru.geekbrains.gb_android_2.database.CitiesList;
+import ru.geekbrains.gb_android_2.database.CitiesListDao;
+import ru.geekbrains.gb_android_2.database.CitiesListSource;
 import ru.geekbrains.gb_android_2.events.OpenWeatherMainFragmentEvent;
 import ru.geekbrains.gb_android_2.forecastRequest.ForecastRequest;
 import ru.geekbrains.gb_android_2.forecastRequest.OpenWeatherMap;
@@ -50,6 +53,7 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
     private boolean isErrorShown;
     // Паттерн для проверки, является ли введеное слово названием города.
     Pattern checkEnterCity = Pattern.compile("^[а-яА-ЯЁa-zA-Z]+(?:[\\s-][а-яА-ЯЁa-zA-Z]+)*$");
+    private CitiesListSource citiesListSource;
 
     static ChooseCityFragment create(CurrentDataContainer container) {
         ChooseCityFragment fragment = new ChooseCityFragment();    // создание
@@ -126,14 +130,16 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
                                 if (ForecastRequest.responseCode == 200) {
                                     CurrentDataContainer.isFirstEnter = false;
                                     CurrentDataContainer.getInstance().currCityName = currentCity;
+
+                                    //Добавляем новый город в RV
+                                    citiesListSource.addCity(new CitiesList(currentCity));
+
                                     Log.d(myLog, "RESPONSE COD = " + ForecastRequest.responseCode + " CURR CITY = " + currentCity);
                                     weekWeatherData = openWeatherMap.getWeekWeatherData(getResources());
                                     hourlyWeatherList = openWeatherMap.getHourlyWeatherData();
                                     requireActivity().runOnUiThread(() -> {
                                     CurrentDataContainer.getInstance().weekWeatherData = weekWeatherData;
                                     CurrentDataContainer.getInstance().hourlyWeatherList = hourlyWeatherList;
-                                    //Добавляем новый город в RV
-                                    adapter.addNewCity(currentCity);
                                     Toast.makeText(requireActivity(), currentCity, Toast.LENGTH_SHORT).show();
                                     updateWeatherData();
                                     enterCity.setText("");
@@ -186,7 +192,7 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
 
     // Обработчик нажатий на город из списка RV
     @Override
-    public void onItemClicked(View view, String itemText) {
+    public void onItemClicked(View view, String itemText, int position) {
         currentCity = itemText;
         CurrentDataContainer.getInstance().currCityName = currentCity;
 
@@ -224,33 +230,51 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
     }
 
     @Override
-    public void onItemLongPressed(View view) {
+    public void onItemLongPressed(View view, int position) {
         TextView textView = (TextView) view;
-        deleteItem(textView);
+        deleteItem(textView, position);
     }
 
-    public void deleteItem(final TextView view) {
+    public void deleteItem(final TextView view, int position) {
         Snackbar.make(view, R.string.delete_city, Snackbar.LENGTH_LONG)
                 .setAction(R.string.delete, v -> {
                     String cityName = view.getText().toString();
-                    adapter.remove(cityName);
-                    citiesList.remove(cityName);
+
+                    // В новом потоке удаяем город из бд:
+                    Thread thread = new Thread(()-> {
+                        adapter.remove(position);
+                        citiesList.remove(cityName);
+                        // Удаляем запись из базы
+                        CitiesList cityForRemove = citiesListSource
+                                .getCitiesList()
+                                .get(position);
+                        citiesListSource.removeCity(cityForRemove.id);
+                    });
+                    thread.start();
+                    try {
+                        thread.join();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    adapter.notifyItemRemoved(position);
+
                 }).show();
     }
 
     private void takeWeatherInfoForFiveDays(){
-
         ForecastRequest.getForecastFromServer(currentCity);
-
         Log.d("retrofit", "ChooseCityFragment - countDownLatch = " + ForecastRequest.getForecastResponseReceived().getCount());
-
-
-
     }
 
     private void setupRecyclerView() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(requireActivity().getBaseContext());
-        adapter = new CitiesRecyclerDataAdapter(citiesList, this);
+
+        CitiesListDao citiesListDao = App
+                .getInstance()
+                .getCitiesListDao();
+        citiesListSource = new CitiesListSource(citiesListDao);
+
+        adapter = new CitiesRecyclerDataAdapter(citiesListSource, this);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
     }
@@ -282,12 +306,10 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
             isErrorShown = true;
         }
     }
-
     // Показать ошибку
     private void showError(TextView view, String message) {
         view.setError(message);
     }
-
     // спрятать ошибку
     private void hideError(TextView view) {
         view.setError(null);

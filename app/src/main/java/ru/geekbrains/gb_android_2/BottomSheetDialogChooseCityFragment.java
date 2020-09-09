@@ -16,6 +16,9 @@ import androidx.annotation.Nullable;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
+import ru.geekbrains.gb_android_2.database.CitiesList;
+import ru.geekbrains.gb_android_2.database.CitiesListDao;
+import ru.geekbrains.gb_android_2.database.CitiesListSource;
 import ru.geekbrains.gb_android_2.events.OpenWeatherMainFragmentEvent;
 import ru.geekbrains.gb_android_2.forecastRequest.ForecastRequest;
 import ru.geekbrains.gb_android_2.forecastRequest.OpenWeatherMap;
@@ -75,7 +78,15 @@ public class BottomSheetDialogChooseCityFragment extends BottomSheetDialogFragme
                 CurrentDataContainer.getInstance().hourlyWeatherList = openWeatherMap.getHourlyWeatherData();
                 CurrentDataContainer.getInstance().currCityName = cityName;
                 CurrentDataContainer.getInstance().citiesList.add(0, cityName);
-                requireActivity().runOnUiThread(() -> {
+
+                // Добавляем город в бд:
+                CitiesListDao citiesListDao = App
+                            .getInstance()
+                            .getCitiesListDao();
+                    CitiesListSource citiesListSource = new CitiesListSource(citiesListDao);
+                    citiesListSource.addCity(new CitiesList(cityName));
+
+                    requireActivity().runOnUiThread(() -> {
                     dismiss();
                     EventBus.getBus().post(new OpenWeatherMainFragmentEvent());
                 });

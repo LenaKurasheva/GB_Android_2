@@ -48,7 +48,7 @@ public class WeekWeatherRecyclerDataAdapter extends RecyclerView.Adapter<WeekWea
         holder.setTextToDayTemperatureTextView(dayTemp);
         holder.setTextToWeatherStateInfoTextView(weatherStateInf);
         holder.setImageToWeatherIconImageView(weatherIconId);
-        holder.setOnClickForItem(day);
+        holder.setOnClickForItem(day, position);
     }
 
     @Override
@@ -77,10 +77,10 @@ public class WeekWeatherRecyclerDataAdapter extends RecyclerView.Adapter<WeekWea
         void setTextToWeatherStateInfoTextView(String text) { weatherStateInfo.setText(text);}
         void setImageToWeatherIconImageView(int resourceId) { weatherIconImageView.setImageResource(resourceId);}
 
-        void setOnClickForItem(final String day) {
+        void setOnClickForItem(final String day, int position) {
             weatherIconImageView.setOnClickListener(view -> {
                 if(onItemClickCallback != null) {
-                    onItemClickCallback.onItemClicked(view, day);
+                    onItemClickCallback.onItemClicked(view, day, position);
                 }
             });
         }

@@ -43,7 +43,7 @@ public class HourlyWeatherRecyclerDataAdapter extends RecyclerView.Adapter<Hourl
         holder.setTextToTimeTextView(time);
         holder.setTextToHourlyTemperatureTextView(temperature);
         holder.setImageToHourlyWeatherIconImageView(weatherIcon);
-        holder.setOnClickForItem(time);
+        holder.setOnClickForItem(time, position);
     }
 
     @Override
@@ -69,10 +69,10 @@ public class HourlyWeatherRecyclerDataAdapter extends RecyclerView.Adapter<Hourl
         void setTextToHourlyTemperatureTextView(String text) { hourlyTemperatureTextView.setText(text);}
         void setImageToHourlyWeatherIconImageView(int resourceId) { hourlyWeatherIconImageView.setImageResource(resourceId);}
 
-        void setOnClickForItem(final String day) {
+        void setOnClickForItem(final String day, int position) {
             hourlyWeatherIconImageView.setOnClickListener(view -> {
                 if(onItemClickCallback != null) {
-                    onItemClickCallback.onItemClicked(view, day);
+                    onItemClickCallback.onItemClicked(view, day, position);
                 }
             });
         }
