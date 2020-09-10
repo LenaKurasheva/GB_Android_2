@@ -489,7 +489,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         LinearLayoutManager layoutManager = new LinearLayoutManager(requireActivity().getBaseContext(), LinearLayoutManager.VERTICAL, false);
         WeekWeatherRecyclerDataAdapter weekWeatherAdapter = new WeekWeatherRecyclerDataAdapter(days, daysTemp, weatherIcon, weatherStateInfo, this);
 
-        if (!isRefreshed) {
+        if (weatherRecyclerView.getItemDecorationCount() <= 0){
             DividerItemDecoration itemDecoration = new DividerItemDecoration(requireActivity().getBaseContext(), LinearLayoutManager.VERTICAL);
             itemDecoration.setDrawable(Objects.requireNonNull(ContextCompat.getDrawable(requireActivity().getBaseContext(), R.drawable.decorator_item)));
             weatherRecyclerView.addItemDecoration(itemDecoration);

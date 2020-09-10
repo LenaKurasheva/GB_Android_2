@@ -3,6 +3,7 @@ package ru.geekbrains.gb_android_2;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -20,7 +21,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -312,6 +315,11 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
                 .getInstance()
                 .getCitiesListDao();
         citiesListSource = new CitiesListSource(citiesListDao);
+
+        if (recyclerView.getItemDecorationCount() <= 0){
+            DividerItemDecoration itemDecoration = new DividerItemDecoration(requireActivity().getBaseContext(), LinearLayoutManager.VERTICAL);
+            recyclerView.addItemDecoration(itemDecoration);
+        }
 
         adapter = new CitiesRecyclerDataAdapter(citiesListSource, this);
         recyclerView.setLayoutManager(layoutManager);
