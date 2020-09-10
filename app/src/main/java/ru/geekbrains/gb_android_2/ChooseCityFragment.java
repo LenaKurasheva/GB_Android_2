@@ -3,7 +3,6 @@ package ru.geekbrains.gb_android_2;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -21,7 +20,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -150,6 +148,8 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
                                 .getSharedPreferences(MainActivity.SETTINGS, MODE_PRIVATE)
                                 .getString("current city", "Saint Petersburg");
                         currentCity = enterCity.getText().toString();
+                        // Делаем первую букву заглавной:
+                        currentCity = currentCity.substring(0, 1).toUpperCase() + currentCity.substring(1);
                         //Создаем прогноз погоды на неделю для нового выбранного города:
                         takeWeatherInfoForFiveDays();
                         Handler handler = new Handler();
@@ -171,6 +171,7 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
                                     //Добавляем новый город в RV
                                     citiesListSource.addCity(new CitiesList(currentCity));
                                     if(CurrentDataContainer.isCitiesListSortedByName) adapter.sortByName();
+                                    else adapter.sortByCreatedTime();
                                     //Запоминаем выбранный город в SharedPreferences
                                     saveToPreference(requireActivity().getSharedPreferences(MainActivity.SETTINGS, MODE_PRIVATE), currentCity);
 

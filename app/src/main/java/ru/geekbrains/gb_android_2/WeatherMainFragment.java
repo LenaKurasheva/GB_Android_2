@@ -370,12 +370,14 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
                 break;
             }
             case "few_clouds_day":
-                weatherStatusImage.setImageResource(R.drawable.little_cloudy_weater_status);
+                weatherStatusImage.setImageResource(R.drawable.little_cloudy_weather_status_2);
                 break;
             case "scattered_clouds":
             case "broken_clouds": {
-                Uri uri = Uri.parse("https://cdn.clipart.email/ebf7869a3ef385ffb67b8a2a0dcba02a_cartoon-clouds-png-transparent-without-background-image-free-png-_1000-824.png");
-                weatherStatusImage.setImageURI(uri);
+                // Второй вариант:
+//                Uri uri = Uri.parse("https://cdn.clipart.email/ebf7869a3ef385ffb67b8a2a0dcba02a_cartoon-clouds-png-transparent-without-background-image-free-png-_1000-824.png");
+//                weatherStatusImage.setImageURI(uri);
+                weatherStatusImage.setImageResource(R.drawable.cloudy_weather_status);
                 break;
             }
         }

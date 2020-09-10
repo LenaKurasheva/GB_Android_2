@@ -56,6 +56,7 @@ import java.util.List;
         // Sort by name
         @Query("SELECT * FROM citieslist ORDER BY city ASC")
         List<CitiesList> sortByName();
+
     }
 
 

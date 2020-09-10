@@ -66,6 +66,7 @@ public class BottomSheetDialogChooseCityFragment extends BottomSheetDialogFragme
 
     @SuppressLint("ResourceAsColor")
     private void checkIsShowingWeatherPossible(String cityName){
+
         OpenWeatherMap openWeatherMap = OpenWeatherMap.getInstance();
         ForecastRequest.getForecastFromServer(cityName);
         Log.d("retrofit", "countDownLatch = " + ForecastRequest.getForecastResponseReceived().getCount());
@@ -76,22 +77,23 @@ public class BottomSheetDialogChooseCityFragment extends BottomSheetDialogFragme
                 ForecastRequest.getForecastResponseReceived().await();
 
                 if(ForecastRequest.responseCode == 200) {
+                    // Делаем первую букву заглавной:
+                    String newCityName = cityName.substring(0, 1).toUpperCase() + cityName.substring(1);
+
                     CurrentDataContainer.isFirstEnter = false;
                     CurrentDataContainer.getInstance().weekWeatherData = openWeatherMap.getWeekWeatherData(getResources());
                     CurrentDataContainer.getInstance().hourlyWeatherList = openWeatherMap.getHourlyWeatherData();
-//                    CurrentDataContainer.getInstance().currCityName = cityName;
-//                    CurrentDataContainer.getInstance().citiesList.add(0, cityName);
 
                     // Добавляем город в бд:
                     CitiesListDao citiesListDao = App
                                 .getInstance()
                                 .getCitiesListDao();
                     CitiesListSource citiesListSource = new CitiesListSource(citiesListDao);
-                    citiesListSource.addCity(new CitiesList(cityName));
+                    citiesListSource.addCity(new CitiesList(newCityName));
 
                     //Запоминаем выбранный город в SharedPreferences
                     SharedPreferences sharedPreferences = requireActivity().getSharedPreferences(MainActivity.SETTINGS, MODE_PRIVATE);
-                    saveToPreference(sharedPreferences, cityName);
+                    saveToPreference(sharedPreferences, newCityName);
 
                     requireActivity().runOnUiThread(() -> {
                     dismiss();

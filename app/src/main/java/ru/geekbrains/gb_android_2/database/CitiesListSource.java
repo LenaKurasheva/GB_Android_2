@@ -38,9 +38,11 @@ public class CitiesListSource {
 
     // Добавить город
     public void addCity(CitiesList city){
-        citiesListDao.insertCity(city);
+        CitiesList cityFromDB = citiesListDao.getCityByName(city.name);
+        if (cityFromDB != null){
+            updateCityCreatedTime(cityFromDB.name);
+        } else citiesListDao.insertCity(city);
         // После изменения БД надо перечитать буфер
-        loadCitiesListSortedByCreated();
     }
 
     // Заменить город
