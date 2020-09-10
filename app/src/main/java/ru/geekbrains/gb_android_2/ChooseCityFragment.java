@@ -8,6 +8,9 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -48,7 +51,6 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
     static String currentCity = "";
     private RecyclerView recyclerView;
     private CitiesRecyclerDataAdapter adapter;
-    private ArrayList<String> citiesList = new ArrayList<>();
     private ArrayList<WeatherData> weekWeatherData = new ArrayList<>();
     private ArrayList<HourlyWeatherData> hourlyWeatherList = new ArrayList<>();
     final String myLog = "myLog";
@@ -72,6 +74,32 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         Log.d("myLog", "onCreate - fragment SettingsFragment");
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        // First clear current all the menu items
+        menu.clear();
+
+        // Add the new menu items
+        inflater.inflate(R.menu.choose_city_menu, menu);
+
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.sorting){
+            if(!CurrentDataContainer.isCitiesListSortedByName) {
+                adapter.sortByName();
+                CurrentDataContainer.isCitiesListSortedByName = true;
+            } else {
+                adapter.sortByCreatedTime();
+                CurrentDataContainer.isCitiesListSortedByName = false;
+            }
+        }
+        return false;
     }
 
     // При создании фрагмента укажем его макет
@@ -89,6 +117,7 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
         initViews(view);
         checkEnterCityField();
         setupRecyclerView();// тут создается адаптер на основании citiesList из этого класса ChooseCityFragment (адаптер берет список городов из этого класса)
+        if(CurrentDataContainer.isCitiesListSortedByName) adapter.sortByName();
         setOnEnterCityEnterKeyListener();
     }
 
@@ -136,6 +165,7 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
 
                                     //Добавляем новый город в RV
                                     citiesListSource.addCity(new CitiesList(currentCity));
+                                    if(CurrentDataContainer.isCitiesListSortedByName) adapter.sortByName();
                                     //Запоминаем выбранный город в SharedPreferences
                                     saveToPreference(requireActivity().getSharedPreferences(MainActivity.SETTINGS, MODE_PRIVATE), currentCity);
 
@@ -204,6 +234,8 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
         currentCity = itemText;
         // Ставим выбранный город на первое место в коллекции:
         adapter.putChosenCityToTopInCitiesList(currentCity);
+        if(CurrentDataContainer.isCitiesListSortedByName) {adapter.sortByName();}
+        else {adapter.sortByCreatedTime();}
         //Запоминаем выбранный город в SharedPreferences
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences(MainActivity.SETTINGS, MODE_PRIVATE);
         saveToPreference(sharedPreferences, currentCity);
@@ -247,12 +279,9 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
     public void deleteItem(final TextView view, int position) {
         Snackbar.make(view, R.string.delete_city, Snackbar.LENGTH_LONG)
                 .setAction(R.string.delete, v -> {
-                    String cityName = view.getText().toString();
-
                     // В новом потоке удаяем город из бд:
                     Thread thread = new Thread(()-> {
                         adapter.remove(position);
-                        citiesList.remove(cityName);
                         // Удаляем запись из базы
                         CitiesList cityForRemove = citiesListSource
                                 .getCitiesList()
@@ -265,8 +294,7 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    adapter.notifyItemRemoved(position);
-
+                    if(CurrentDataContainer.isCitiesListSortedByName) adapter.sortByName();
                 }).show();
     }
 

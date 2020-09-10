@@ -19,6 +19,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import ru.geekbrains.gb_android_2.events.OpenSettingsFragmentEvent;
 import ru.geekbrains.gb_android_2.events.OpenWeatherMainFragmentEvent;
 
 public class MainActivity extends AppCompatActivity {
@@ -87,9 +88,15 @@ public class MainActivity extends AppCompatActivity {
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void onOpenFragmentEvent(OpenWeatherMainFragmentEvent event) {
+    public void onOpenWeatherMainFragmentEvent(OpenWeatherMainFragmentEvent event) {
         setHomeFragment();
         navigationView.setCheckedItem(R.id.nav_home);
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onOpenSettingsFragmentEvent(OpenSettingsFragmentEvent event) {
+        setSettingsFragment();
     }
 
     private void setOnClickForSideMenuItems() {

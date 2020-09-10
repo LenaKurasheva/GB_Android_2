@@ -34,4 +34,5 @@ public class CurrentDataContainer implements Serializable {
     ArrayList<HourlyWeatherData> hourlyWeatherList;
     static boolean isFirstEnter = true;
     static Stack<String> backStack = new Stack<>();
+    static boolean isCitiesListSortedByName;
 }

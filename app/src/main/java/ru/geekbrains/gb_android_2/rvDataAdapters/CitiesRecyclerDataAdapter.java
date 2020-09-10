@@ -67,15 +67,32 @@ public class CitiesRecyclerDataAdapter extends RecyclerView.Adapter<CitiesRecycl
     }
 
     public void putChosenCityToTopInCitiesList(String cityName){
-       new Thread(()->{
-           dataSource.updateCityCreatedTime(cityName);
-           handler.post(this::notifyDataSetChanged);
-       }).start();
+       Thread thread = new Thread(()-> dataSource.updateCityCreatedTime(cityName));
+       thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void remove(Integer cityId) {
         new Thread(()->{
         dataSource.removeCity(cityId);
+            handler.post(this::notifyDataSetChanged);
+        }).start();
+    }
+
+    public void sortByName(){
+        new Thread(()->{
+            dataSource.loadCitiesListSortedByName();
+            handler.post(this::notifyDataSetChanged);
+        }).start();
+    }
+
+    public void sortByCreatedTime(){
+        new Thread(()->{
+            dataSource.loadCitiesListSortedByCreated();
             handler.post(this::notifyDataSetChanged);
         }).start();
     }

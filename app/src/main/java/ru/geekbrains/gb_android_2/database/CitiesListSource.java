@@ -21,13 +21,13 @@ public class CitiesListSource {
         // Если объекты еще не загружены, то загружаем их.
         // Сделано для того, чтобы не делать запросы в БД каждый раз
         if (citiesList == null){
-            loadCitiesList();
+            loadCitiesListSortedByCreated();
         }
         return citiesList;
     }
 
     // Загрузить города в буфер
-    public void loadCitiesList(){
+    public void loadCitiesListSortedByCreated(){
         citiesList = citiesListDao.getAllCities();
     }
 
@@ -40,26 +40,30 @@ public class CitiesListSource {
     public void addCity(CitiesList city){
         citiesListDao.insertCity(city);
         // После изменения БД надо перечитать буфер
-        loadCitiesList();
+        loadCitiesListSortedByCreated();
     }
 
     // Заменить город
     public void updateCity(CitiesList city){
         citiesListDao.updateCity(city);
-        loadCitiesList();
+        loadCitiesListSortedByCreated();
     }
 
     // Удалить город из базы
     public void removeCity(long id){
         citiesListDao.deteleCityById(id);
-        loadCitiesList();
+        loadCitiesListSortedByCreated();
     }
 
      // Меняем время добавления города, чтобы он отображался первым
     public void updateCityCreatedTime(String cityName) {
         long currentTime = System.currentTimeMillis() / 1000L;
         citiesListDao.updateCreatedTime(cityName, currentTime);
-        loadCitiesList();
+    }
+
+    // Сортируем города по имени
+    public void loadCitiesListSortedByName(){
+        citiesList = citiesListDao.sortByName();
     }
 }
 

@@ -52,6 +52,10 @@ import java.util.List;
 
         @Query("update citieslist set created = :currentTime where city = :cityName")
         void updateCreatedTime(String cityName, long currentTime);
+
+        // Sort by name
+        @Query("SELECT * FROM citieslist ORDER BY city ASC")
+        List<CitiesList> sortByName();
     }
 
 
