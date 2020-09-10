@@ -100,4 +100,6 @@
     <string name="connection_failed">Ошибка интернет соединения.</string>
     <string name="sorry_alert_dialog">Извините, я не могу найти прогноз.</string>
     <string name="update">обновлено: %1$s</string>
+    <string name="alfabetical_sorting">сортировка по алфавиту</string>
+    <string name="sorting_by_date">сортировка по дате поиска</string>
 </resources>

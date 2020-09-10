@@ -94,9 +94,11 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
             if(!CurrentDataContainer.isCitiesListSortedByName) {
                 adapter.sortByName();
                 CurrentDataContainer.isCitiesListSortedByName = true;
+                Toast.makeText(getContext(), R.string.alfabetical_sorting, Toast.LENGTH_SHORT).show();
             } else {
                 adapter.sortByCreatedTime();
                 CurrentDataContainer.isCitiesListSortedByName = false;
+                Toast.makeText(getContext(), R.string.sorting_by_date, Toast.LENGTH_SHORT).show();
             }
         }
         return false;

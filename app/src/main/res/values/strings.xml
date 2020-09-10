@@ -99,4 +99,6 @@
     <string name="connection_failed">Connection failed, please check your connection.</string>
     <string name="sorry_alert_dialog">Sorry, I can\'t find weather forecast.</string>
     <string name="update">update: %1$s</string>
+    <string name="alfabetical_sorting">alphabetical sorting</string>
+    <string name="sorting_by_date">sorting by date</string>
 </resources>
