@@ -14,8 +14,8 @@
     <color name="weather_status_snow">#BBDEFB</color>
     <color name="weather_status_mist">#E0F2F1</color>
     <color name="weather_status_clear_sky_day">#FFECB3</color>
-    <color name="weather_status_few_clouds_day">#E1F5FE</color>
-    <color name="weather_status_scattered_clouds">#E0F7FA</color>
+    <color name="weather_status_few_clouds_day">#E0F7FA</color>
+    <color name="weather_status_scattered_clouds">#E1F5FE</color>
     <color name="weather_status_broken_clouds">#ECEFF1</color>
 
     <color name="thermometer_1">#B8D4FC</color>

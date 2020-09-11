@@ -538,6 +538,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     }
 
     private void addDefaultDataToCurrentWeatherRV(Resources resources){
+        currentWeather = new ArrayList<>();
         String windInfoFromRes = resources.getString(R.string.windInfo);
         String wind = String.format(windInfoFromRes, "0");
         String feelsFromRes = resources.getString(R.string.feels_like_temp);

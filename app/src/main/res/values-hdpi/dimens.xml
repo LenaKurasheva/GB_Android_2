@@ -19,4 +19,6 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="thermometer_height">72dp</dimen>
     <dimen name="thermometer_width">24dp</dimen>
+    <dimen name="hourly_weather_marginStart">7dp</dimen>
+    <dimen name="weather_rv_date_width">27dp</dimen>
 </resources>
