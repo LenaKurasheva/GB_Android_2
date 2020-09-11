@@ -20,15 +20,14 @@
             android:textSize="20sp"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
-            android:paddingBottom="40dp"
+            android:paddingBottom="30dp"
             />
 
     </TableRow>
 
     <TableRow
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingTop="15dp">
+        android:layout_height="match_parent">
 
         <TextView
             android:id="@+id/feelsLikeTextView"
@@ -48,8 +47,7 @@
 
     <TableRow
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingTop="15dp">
+        android:layout_height="match_parent">
 
         <TextView
             android:id="@+id/atmosphere_pressure"
