@@ -29,6 +29,8 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginTop="@dimen/enterCity_editText_marginTop"
+        app:boxBackgroundColor="@color/choose_city_TextInputLayout"
+        app:boxStrokeColor="@color/weather_status_snow"
         app:errorEnabled="true"
         app:layout_constraintTop_toBottomOf="@+id/chooseYourCity" >
 

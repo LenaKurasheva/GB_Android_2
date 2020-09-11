@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Canvas;
 import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
@@ -404,43 +405,43 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
 
     private void setThermometerViewParameters(int degrees){
         if(degrees <= -30) {
-            ThermometerView.level = 10;
+            ThermometerView.level = 15;
             ThermometerView.levelColor = ContextCompat.getColor(requireContext(), R.color.thermometer_1);
         }
         else if(degrees <= -20) {
-            ThermometerView.level = 15;
+            ThermometerView.level = 20;
             ThermometerView.levelColor = ContextCompat.getColor(requireContext(), R.color.thermometer_2);
         }
         else if(degrees <= -10){
-            ThermometerView.level = 20;
+            ThermometerView.level = 25;
             ThermometerView.levelColor = ContextCompat.getColor(requireContext(), R.color.thermometer_3);
         }
         else if(degrees <= 0){
-            ThermometerView.level = 25;
+            ThermometerView.level = 30;
             ThermometerView.levelColor = ContextCompat.getColor(requireContext(), R.color.thermometer_4);
         }
         else if(degrees <= 10) {
-            ThermometerView.level = 30;
+            ThermometerView.level = 35;
             ThermometerView.levelColor = ContextCompat.getColor(requireContext(), R.color.thermometer_5);
         }
         else if(degrees <= 15){
-            ThermometerView.level = 38;
+            ThermometerView.level = 45;
             ThermometerView.levelColor = ContextCompat.getColor(requireContext(), R.color.thermometer_6);
         }
         else if(degrees <= 20){
-            ThermometerView.level = 48;
+            ThermometerView.level = 55;
             ThermometerView.levelColor = ContextCompat.getColor(requireContext(), R.color.thermometer_7);
         }
         else if(degrees <= 25) {
-            ThermometerView.level = 58;
+            ThermometerView.level = 65;
             ThermometerView.levelColor = ContextCompat.getColor(requireContext(), R.color.thermometer_8);
         }
         else if(degrees <= 30) {
-            ThermometerView.level = 68;
+            ThermometerView.level = 75;
             ThermometerView.levelColor = ContextCompat.getColor(requireContext(), R.color.thermometer_9);
         }
         else  if(degrees <= 40) {
-            ThermometerView.level = 78;
+            ThermometerView.level = 85;
             ThermometerView.levelColor = ContextCompat.getColor(requireContext(), R.color.thermometer_10);
         }
         else if(degrees <= 50) {
@@ -450,6 +451,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         else {
             ThermometerView.level = 100;
             ThermometerView.levelColor = ContextCompat.getColor(requireContext(), R.color.thermometer_12);        }
+        Log.d("BatteryView", "setThermometerViewParameters");
         thermometerView.invalidate();
     }
 

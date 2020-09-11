@@ -13,16 +13,14 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 
 
 public class SettingsFragment extends Fragment {
-    @SuppressLint("UseSwitchCompatOrMaterialCode")
-    private Switch nightModeSwitch;
-    @SuppressLint("UseSwitchCompatOrMaterialCode")
-    private Switch pressureSwitch;
-    @SuppressLint("UseSwitchCompatOrMaterialCode")
-    private Switch feelsLikeSwitch;
+    private SwitchCompat nightModeSwitch;
+    private SwitchCompat pressureSwitch;
+    private SwitchCompat feelsLikeSwitch;
     SettingsPresenter settingsActivityPresenter = SettingsPresenter.getInstance();
 
     static SettingsFragment create(CurrentDataContainer container) {

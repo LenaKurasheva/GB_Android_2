@@ -57,9 +57,9 @@ public class ThermometerView extends View {
     // Отступ элементов
     private static int padding = 10;
     // Скругление углов градуника
-    private final static int round = 5;
+    private final static int round = 25;
     // Скругление углов градуника
-    private final static int headRound = 25;
+    private final static int headRound = 30;
     public ThermometerView(Context context) {
         super(context);
         init();
@@ -161,15 +161,10 @@ public class ThermometerView extends View {
         // Получить реальные ширину и высоту
         width = w - getPaddingLeft() - getPaddingRight();
         height = h - getPaddingTop() - getPaddingBottom();
-        // Отрисовка батареи
+        // Отрисовка термометра
         thermometerRectangle.set(padding,padding,width-padding,height-padding);
-        levelRectangle.set(2 * padding,
-                // Координата по у ровна разности максимальной высоты уровня ртути и ткущей высоты уровня ртути
-                // + 2 отступа, т.к. верхняя озможная граница уровня ртути находится ниже границы вью на 2 отступа
-                (height-height/3) - (int)((height - height/3)*((double)level/(double)100)) + 2*padding,
-                width-2*padding,height-(height/3)+2*padding);
-        headRectangle.set(0,height-((float)height/3),width,height);
-        headLevelRectangle.set(padding,height-(((float)height/3)-padding), width-padding,height-padding);
+        headRectangle.set(0,height-width, width, height);
+        headLevelRectangle.set(padding,height-width+padding, width-padding,height-padding);
     }
 
     // Вызывается, когда надо нарисовать элемент
@@ -178,7 +173,7 @@ public class ThermometerView extends View {
         super.onDraw(canvas);
         Log.d(TAG, "onDraw");
 
-        canvas.drawRoundRect(thermometerRectangle, headRound, headRound, thermometerPaint);
+        canvas.drawRoundRect(thermometerRectangle, round, round, thermometerPaint);
         canvas.drawRoundRect(headRectangle, headRound, headRound, thermometerPaint);
 
         // Условие отрисовки, если нажат или нет элемент +
@@ -187,9 +182,16 @@ public class ThermometerView extends View {
             canvas.drawRoundRect(headLevelRectangle, headRound, headRound, levelPressedPaint);
         } else {
             levelPaint.setColor(levelColor);
+            //Перерисовываем уровень градусника
+            setLevelRectangle();
             canvas.drawRect(levelRectangle, levelPaint);
             canvas.drawRoundRect(headLevelRectangle, headRound, headRound, levelPaint);
         }
+    }
+    // Перенесла из onSizeChanged в onDraw, чтобы правильный уровень отрисовывался с первого входа в приложение:
+    private void setLevelRectangle(){
+        levelRectangle.set(2*padding, (height-width+padding) - (int)((height-width)*((float)level/100))+padding,
+                width-2*padding, height-width+padding+padding);
     }
 
     // Этот метод срабатывает при касании элемента

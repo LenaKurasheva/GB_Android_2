@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#6200EE</color>
-    <color name="colorPrimaryDark">#3700B3</color>
-    <color name="colorAccent">#03DAC5</color>
+    <color name="colorPrimary">#AACADF</color>
+    <color name="colorPrimaryDark">#93B2CC</color>
+    <color name="colorAccent">#BBDEFB</color>
     <color name="day">#90CAF9</color>
     <color name="no_color">#00000000</color>
     <color name="night">#0D47A1</color>
-    <color name="dark_grey">#424242</color>
-    <color name="color_green">#1DE9B6</color>
-    <color name="grey">#607D8B</color>
-    <color name="weather_status_image">#4FC3F7</color>
+    <color name="choose_city_TextInputLayout">#ECEFF1</color>
 
     <color name="weather_status_thunderstorm">#90A4AE</color>
     <color name="weather_status_shower_rain">#B0BEC5</color>
@@ -23,16 +20,18 @@
 
     <color name="thermometer_1">#B8D4FC</color>
     <color name="thermometer_2">#BDE1FF</color>
-    <color name="thermometer_3">#BDFFF9</color>
-    <color name="thermometer_4">#BDFFE2</color>
-    <color name="thermometer_5">#BDFFCC</color>
+    <color name="thermometer_3">#AFEAE4</color>
+    <color name="thermometer_4">#B3F3D7</color>
+    <color name="thermometer_5">#C1F3CC</color>
     <color name="thermometer_6">#DFFFBD</color>
-    <color name="thermometer_7">#FBFFBD</color>
-    <color name="thermometer_8">#FFF2BD</color>
-    <color name="thermometer_9">#FFE2BD</color>
-    <color name="thermometer_10">#FFD8BD</color>
-    <color name="thermometer_11">#FFAF8C</color>
-    <color name="thermometer_12">#FF9668</color>
+    <color name="thermometer_7">#F6FAC1</color>
+    <color name="thermometer_8">#FFECB3</color>
+    <color name="thermometer_9">#FACB92</color>
+    <color name="thermometer_10">#FAAD91</color>
+    <color name="thermometer_11">#FA704D</color>
+    <color name="thermometer_12">#E33F02</color>
+
+    <color name="thermometer_body">#808080</color>
 
     <color name="white">#ffff</color>
 </resources>
