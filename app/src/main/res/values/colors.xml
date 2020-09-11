@@ -10,7 +10,29 @@
     <color name="color_green">#1DE9B6</color>
     <color name="grey">#607D8B</color>
     <color name="weather_status_image">#4FC3F7</color>
-    <color name="weather_status_sun_image">#FF8A65</color>
-    <color name="weather_status_sun_back">#FFE0B2</color>
+
+    <color name="weather_status_thunderstorm">#90A4AE</color>
+    <color name="weather_status_shower_rain">#B0BEC5</color>
+    <color name="weather_status_rain_day">#CFD8DC</color>
+    <color name="weather_status_snow">#BBDEFB</color>
+    <color name="weather_status_mist">#E0F2F1</color>
+    <color name="weather_status_clear_sky_day">#FFECB3</color>
+    <color name="weather_status_few_clouds_day">#E1F5FE</color>
+    <color name="weather_status_scattered_clouds">#E0F7FA</color>
+    <color name="weather_status_broken_clouds">#ECEFF1</color>
+
+    <color name="thermometer_1">#B8D4FC</color>
+    <color name="thermometer_2">#BDE1FF</color>
+    <color name="thermometer_3">#BDFFF9</color>
+    <color name="thermometer_4">#BDFFE2</color>
+    <color name="thermometer_5">#BDFFCC</color>
+    <color name="thermometer_6">#DFFFBD</color>
+    <color name="thermometer_7">#FBFFBD</color>
+    <color name="thermometer_8">#FFF2BD</color>
+    <color name="thermometer_9">#FFE2BD</color>
+    <color name="thermometer_10">#FFD8BD</color>
+    <color name="thermometer_11">#FFAF8C</color>
+    <color name="thermometer_12">#FF9668</color>
+
     <color name="white">#ffff</color>
 </resources>

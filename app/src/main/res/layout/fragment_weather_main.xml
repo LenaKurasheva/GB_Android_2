@@ -130,8 +130,8 @@
         app:layout_constraintTop_toTopOf="@+id/degrees"
         app:level="40"
         app:padding = "@integer/thermometer_padding"
-        app:level_color="@color/color_green"
-        app:thermometer_color="@color/grey"/>
+        app:level_color="@color/weather_status_scattered_clouds"
+        app:thermometer_color="@android:color/tab_indicator_text"/>
 
     <TextView
         android:id="@+id/update_time"

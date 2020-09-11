@@ -17,7 +17,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:colorBackground">@color/day</item>
+        <item name="android:colorBackground">@color/white</item>
     </style>
 
     <style name="AppThemeDark" >

@@ -22,9 +22,9 @@ public class ThermometerView extends View {
     // Цвет градусника
     private int thermometerColor = Color.GRAY;
     // Цвет уровня ртути
-    private int levelColor = Color.GREEN;
+    public static int levelColor = Color.GREEN;
     // Цвет ртути при нажатии +
-    private int levelPressedColor = Color.RED;
+    private int levelPressedColor = Color.WHITE;
 
     // Изображение градусника
     private RectF thermometerRectangle = new RectF();
@@ -109,7 +109,7 @@ public class ThermometerView extends View {
         // вторым параметром идет значение по умолчанию, если атрибут не указан в макете,
         // то будет подставлятся эначение по умолчанию.
         levelColor = typedArray.getColor(R.styleable.ThermometerView_level_color, Color.GREEN);
-        levelPressedColor = typedArray.getColor(R.styleable.ThermometerView_level_pressed_color, Color.RED);
+        levelPressedColor = typedArray.getColor(R.styleable.ThermometerView_level_pressed_color, Color.WHITE);
 
         // Обратите внимание, что первый параметр пишется особым способом
         // через подчерки. первое слово означает имя определения
@@ -168,10 +168,8 @@ public class ThermometerView extends View {
                 // + 2 отступа, т.к. верхняя озможная граница уровня ртути находится ниже границы вью на 2 отступа
                 (height-height/3) - (int)((height - height/3)*((double)level/(double)100)) + 2*padding,
                 width-2*padding,height-(height/3)+2*padding);
-        headRectangle.set(0,height-(height/3),width,height);
-        headLevelRectangle.set(padding,height-((height/3)-padding), width-padding,height-padding);
-
-
+        headRectangle.set(0,height-((float)height/3),width,height);
+        headLevelRectangle.set(padding,height-(((float)height/3)-padding), width-padding,height-padding);
     }
 
     // Вызывается, когда надо нарисовать элемент
@@ -180,7 +178,7 @@ public class ThermometerView extends View {
         super.onDraw(canvas);
         Log.d(TAG, "onDraw");
 
-        canvas.drawRoundRect(thermometerRectangle, round, round, thermometerPaint);
+        canvas.drawRoundRect(thermometerRectangle, headRound, headRound, thermometerPaint);
         canvas.drawRoundRect(headRectangle, headRound, headRound, thermometerPaint);
 
         // Условие отрисовки, если нажат или нет элемент +
@@ -188,6 +186,7 @@ public class ThermometerView extends View {
             canvas.drawRect(levelRectangle, levelPressedPaint);
             canvas.drawRoundRect(headLevelRectangle, headRound, headRound, levelPressedPaint);
         } else {
+            levelPaint.setColor(levelColor);
             canvas.drawRect(levelRectangle, levelPaint);
             canvas.drawRoundRect(headLevelRectangle, headRound, headRound, levelPaint);
         }
