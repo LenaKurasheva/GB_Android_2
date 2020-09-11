@@ -102,6 +102,6 @@ public class SettingsFragment extends Fragment {
     private void saveToPreference(SharedPreferences preferences, boolean isChecked, String switchName) {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean(switchName, isChecked);
-        editor.apply();
+        editor.commit();
     }
 }
