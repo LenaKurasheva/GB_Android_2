@@ -102,4 +102,8 @@
     <string name="update">обновлено: %1$s</string>
     <string name="alfabetical_sorting">сортировка по алфавиту</string>
     <string name="sorting_by_date">сортировка по дате поиска</string>
+    <string name="broadcastReceiver_internet_conn_failed">Интернет соединение отсутствует</string>
+    <string name="broadcastReceiver_check_internet">Пожалуйста, проверьте интернет соединение</string>
+    <string name="broadcastReceiver_wifi_conn_failed">Wi-fi соединение отсутствует</string>
+    <string name="broadcastReceiver_check_wifi">Пожалуйста, проверьте wi-fi соединение</string>
 </resources>
