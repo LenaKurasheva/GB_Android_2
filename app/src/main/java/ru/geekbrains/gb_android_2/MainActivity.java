@@ -8,9 +8,6 @@ import android.view.MenuItem;
 import android.view.Menu;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.imagepipeline.core.ImagePipelineConfig;
-import com.facebook.imagepipeline.core.ImageTranscoderType;
-import com.facebook.imagepipeline.core.MemoryChunkType;
 import com.google.android.material.navigation.NavigationView;
 import com.squareup.otto.Subscribe;
 
@@ -22,12 +19,14 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import ru.geekbrains.gb_android_2.events.OpenSettingsFragmentEvent;
 import ru.geekbrains.gb_android_2.events.OpenWeatherMainFragmentEvent;
 
 public class MainActivity extends AppCompatActivity {
 
     public NavigationView navigationView;
     private DrawerLayout drawer;
+    public static final String SETTINGS = "settings";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,9 +88,15 @@ public class MainActivity extends AppCompatActivity {
 
     @Subscribe
     @SuppressWarnings("unused")
-    public void onOpenFragmentEvent(OpenWeatherMainFragmentEvent event) {
+    public void onOpenWeatherMainFragmentEvent(OpenWeatherMainFragmentEvent event) {
         setHomeFragment();
         navigationView.setCheckedItem(R.id.nav_home);
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onOpenSettingsFragmentEvent(OpenSettingsFragmentEvent event) {
+        setSettingsFragment();
     }
 
     private void setOnClickForSideMenuItems() {
@@ -145,11 +150,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
   public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        String currCityName = getSharedPreferences(MainActivity.SETTINGS, MODE_PRIVATE)
+                .getString("current city", "Saint Petersburg");
+
         if (item.getItemId() == R.id.action_settings) {
             setSettingsFragment();
         }
         if (item.getItemId() == R.id.action_read_more){
-            String wiki = "https://ru.wikipedia.org/wiki/" + CurrentDataContainer.getInstance().currCityName;
+            String wiki = "https://ru.wikipedia.org/wiki/" + currCityName;
             Uri uri = Uri.parse(wiki);
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             startActivity(intent);

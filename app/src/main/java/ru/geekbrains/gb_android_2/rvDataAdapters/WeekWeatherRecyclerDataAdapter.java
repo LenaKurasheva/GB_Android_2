@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -19,13 +20,15 @@ public class WeekWeatherRecyclerDataAdapter extends RecyclerView.Adapter<WeekWea
     private List<String> daysTemp;
     private List<String> weatherStateInfo;
     private RVOnItemClick onItemClickCallback;
+    private List<Integer> cardViewColor;
 
-    public WeekWeatherRecyclerDataAdapter(List<String> days, List<String> daysTemp, List<Integer> weatherIcons, List<String> weatherStateInfo, RVOnItemClick onItemClickCallback) {
+    public WeekWeatherRecyclerDataAdapter(List<String> days, List<String> daysTemp, List<Integer> weatherIcons, List<String> weatherStateInfo, List<Integer> cardViewColor, RVOnItemClick onItemClickCallback) {
         // Берем информацию из входящих списков, исключая первый элемент, чтобы не отображать текущий день (только 4 следующих):
         this.weatherIcons = weatherIcons.subList(1, weatherIcons.size());
         this.days = days.subList(1, days.size());
         this.daysTemp = daysTemp.subList(1, daysTemp.size());
         this.weatherStateInfo = weatherStateInfo.subList(1, weatherStateInfo.size());
+        this.cardViewColor = cardViewColor.subList(1, cardViewColor.size());
         this.onItemClickCallback = onItemClickCallback;
     }
 
@@ -43,12 +46,14 @@ public class WeekWeatherRecyclerDataAdapter extends RecyclerView.Adapter<WeekWea
         String dayTemp = daysTemp.get(position);
         Integer weatherIconId = weatherIcons.get(position);
         String weatherStateInf = weatherStateInfo.get(position);
+        Integer cardColor = cardViewColor.get(position);
 
         holder.setTextToDayTextView(day);
         holder.setTextToDayTemperatureTextView(dayTemp);
         holder.setTextToWeatherStateInfoTextView(weatherStateInf);
         holder.setImageToWeatherIconImageView(weatherIconId);
-        holder.setOnClickForItem(day);
+        holder.setColorToCardView(cardColor);
+        holder.setOnClickForItem(day, position);
     }
 
     @Override
@@ -61,6 +66,7 @@ public class WeekWeatherRecyclerDataAdapter extends RecyclerView.Adapter<WeekWea
         private TextView dayTemperatureTextView;
         private ImageView weatherIconImageView;
         private TextView weatherStateInfo;
+        private CardView cardView;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -68,6 +74,7 @@ public class WeekWeatherRecyclerDataAdapter extends RecyclerView.Adapter<WeekWea
             dayTemperatureTextView = itemView.findViewById(R.id.dayTemperature);
             weatherIconImageView = itemView.findViewById(R.id.weatherIcon);
             weatherStateInfo = itemView.findViewById(R.id.weatherStateInfo);
+            cardView = itemView.findViewById(R.id.cardView);
         }
 
         void setTextToDayTextView(String text) {
@@ -76,11 +83,12 @@ public class WeekWeatherRecyclerDataAdapter extends RecyclerView.Adapter<WeekWea
         void setTextToDayTemperatureTextView(String text) { dayTemperatureTextView.setText(text);}
         void setTextToWeatherStateInfoTextView(String text) { weatherStateInfo.setText(text);}
         void setImageToWeatherIconImageView(int resourceId) { weatherIconImageView.setImageResource(resourceId);}
+        void setColorToCardView(int color) {cardView.setCardBackgroundColor(color);}
 
-        void setOnClickForItem(final String day) {
+        void setOnClickForItem(final String day, int position) {
             weatherIconImageView.setOnClickListener(view -> {
                 if(onItemClickCallback != null) {
-                    onItemClickCallback.onItemClicked(view, day);
+                    onItemClickCallback.onItemClicked(view, day, position);
                 }
             });
         }

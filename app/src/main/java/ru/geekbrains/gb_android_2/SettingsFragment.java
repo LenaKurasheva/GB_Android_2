@@ -1,6 +1,8 @@
 package ru.geekbrains.gb_android_2;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,16 +13,14 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.Fragment;
 
 
 public class SettingsFragment extends Fragment {
-    @SuppressLint("UseSwitchCompatOrMaterialCode")
-    private Switch nightModeSwitch;
-    @SuppressLint("UseSwitchCompatOrMaterialCode")
-    private Switch pressureSwitch;
-    @SuppressLint("UseSwitchCompatOrMaterialCode")
-    private Switch feelsLikeSwitch;
+    private SwitchCompat nightModeSwitch;
+    private SwitchCompat pressureSwitch;
+    private SwitchCompat feelsLikeSwitch;
     SettingsPresenter settingsActivityPresenter = SettingsPresenter.getInstance();
 
     static SettingsFragment create(CurrentDataContainer container) {
@@ -68,8 +68,8 @@ public class SettingsFragment extends Fragment {
         nightModeSwitch.setOnClickListener(view -> {
             Toast.makeText(getContext(), "nightmode is in dev", Toast.LENGTH_SHORT).show();
             settingsActivityPresenter.changeNightModeSwitchStatus();
-            settingsActivityPresenter.createSettingsSwitchArray();
-            CurrentDataContainer.getInstance().switchSettingsArray = settingsActivityPresenter.getSettingsArray();
+            saveToPreference(requireActivity().getSharedPreferences(MainActivity.SETTINGS, Context.MODE_PRIVATE),
+                    settingsActivityPresenter.getIsNightModeSwitchOn(), "night mode");
             requireActivity().recreate();
         });
     }
@@ -77,25 +77,29 @@ public class SettingsFragment extends Fragment {
     private void setOnPressureSwitchClickListener(){
         pressureSwitch.setOnClickListener(view -> {
             settingsActivityPresenter.changePressureSwitchStatus();
-            settingsActivityPresenter.createSettingsSwitchArray();
-            CurrentDataContainer.getInstance().switchSettingsArray = settingsActivityPresenter.getSettingsArray();
+            saveToPreference(requireActivity().getSharedPreferences(MainActivity.SETTINGS, Context.MODE_PRIVATE),
+                    settingsActivityPresenter.getIsPressureSwitchOn(), "pressure");
         });
     }
 
     private void setOnFeelsLikeSwitchClickListener(){
         feelsLikeSwitch.setOnClickListener(view -> {
             settingsActivityPresenter.changeFeelsLikeSwitchStatus();
-            settingsActivityPresenter.createSettingsSwitchArray();
-            CurrentDataContainer.getInstance().switchSettingsArray = settingsActivityPresenter.getSettingsArray();
+            saveToPreference(requireActivity().getSharedPreferences(MainActivity.SETTINGS, Context.MODE_PRIVATE),
+                    settingsActivityPresenter.getIsFeelsLikeSwitchOn(), "feels like");
         });
     }
 
     public void setCurrentSwitchState(){
-       boolean[] switchArr =  settingsActivityPresenter.getSettingsArray();
-       if(switchArr != null){
-           nightModeSwitch.setChecked(switchArr[0]);
-           feelsLikeSwitch.setChecked(switchArr[1]);
-           pressureSwitch.setChecked(switchArr[2]);
-       }
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences(MainActivity.SETTINGS, Context.MODE_PRIVATE);
+        nightModeSwitch.setChecked(sharedPreferences.getBoolean("night mode" , false));
+        pressureSwitch.setChecked(sharedPreferences.getBoolean("pressure" , false));
+        feelsLikeSwitch.setChecked(sharedPreferences.getBoolean("feels like" , false));
+    }
+
+    private void saveToPreference(SharedPreferences preferences, boolean isChecked, String switchName) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(switchName, isChecked);
+        editor.commit();
     }
 }

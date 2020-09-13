@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackground"
         android:textSize="@dimen/citiesRVTextSize"
-        android:paddingStart="25dp"
+        android:paddingStart="9dp"
         android:paddingEnd="16dp"
         android:paddingTop="@dimen/citiesRM_textView_paddingTop"
         android:paddingBottom="@dimen/citiesRV_textView_paddingBottom"

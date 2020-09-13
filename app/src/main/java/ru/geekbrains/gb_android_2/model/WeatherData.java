@@ -20,6 +20,7 @@ public class WeatherData implements Serializable {
     private String tempMax;
     private String tempMin;
     private int intDegrees;
+    private Integer cardViewColor;
 
     int tempRandom;
     int windRandom;
@@ -34,6 +35,7 @@ public class WeatherData implements Serializable {
     public String getTempMax(){return tempMax;}
     public String getTempMin(){return tempMin;}
     public int getIntDegrees(){return intDegrees;}
+    public int getCardViewColor(){return cardViewColor;}
 
     public WeatherData(Resources resources, String degrees, String windInfo, String pressure,
                        String weatherStateInfo, String feelLike, int weatherIcon, String tempMax, String tempMin){
@@ -115,55 +117,63 @@ public class WeatherData implements Serializable {
                 " feelLike = " + feelLike +
                 " weatherIcon = " + weatherIcon +
                 "tempMax = " + tempMax +
-                "tempMin = " + tempMin;
+                "tempMin = " + tempMin +
+                " cardColor = " + cardViewColor.toString();
     }
 
-    public String findIconById(int weatherIcon){
+    public void findIconById(int weatherIcon){
         if(weatherIcon >= 200 && weatherIcon <= 232){
             this.weatherIcon = "thunderstorm";
-            return this.weatherIcon;
+            cardViewColor = R.color.weather_status_thunderstorm;
+            return;
         }
         if(weatherIcon >= 300 && weatherIcon <= 321){
             this.weatherIcon = "shower_rain";
-            return this.weatherIcon;
+            cardViewColor = R.color.weather_status_shower_rain;
+            return;
 
         }
         if(weatherIcon >= 500 && weatherIcon <= 531){
             this.weatherIcon = "rain_day";
-            return this.weatherIcon;
+            cardViewColor = R.color.weather_status_rain_day;
+            return;
 
         }
         if(weatherIcon >= 600 && weatherIcon <= 622){
             this.weatherIcon = "snow";
-            return this.weatherIcon;
+            cardViewColor = R.color.weather_status_snow;
+            return;
 
         }
         if(weatherIcon >= 700 && weatherIcon <= 781){
             this.weatherIcon = "mist";
-            return this.weatherIcon;
+            cardViewColor = R.color.weather_status_mist;
+            return;
 
         }
         if(weatherIcon == 800){
             this.weatherIcon = "clear_sky_day";
-            return this.weatherIcon;
+            cardViewColor = R.color.weather_status_clear_sky_day;
+            return;
 
         }
         if(weatherIcon == 801){
             this.weatherIcon = "few_clouds_day";
-            return this.weatherIcon;
+            cardViewColor = R.color.weather_status_few_clouds_day;
+            return;
 
         }
         if(weatherIcon == 802){
             this.weatherIcon = "scattered_clouds";
-            return this.weatherIcon;
+            cardViewColor = R.color.weather_status_scattered_clouds;
+            return;
 
         }
         if(weatherIcon == 803 || weatherIcon == 804 ){
             this.weatherIcon = "broken_clouds";
-            return this.weatherIcon;
+            cardViewColor = R.color.weather_status_broken_clouds;
 
         }
-        return null;
     }
 
     private void calculateRandomValues(){

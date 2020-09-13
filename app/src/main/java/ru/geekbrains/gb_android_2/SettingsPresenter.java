@@ -9,17 +9,16 @@ public class SettingsPresenter {
     private boolean isNightModeSwitchOn;
     private boolean isPressureSwitchOn;
     private boolean isFeelsLikeSwitchOn;
-    private boolean[] settingsArray;
 
     private SettingsPresenter(){}
-
-    public boolean[] getSettingsArray(){return settingsArray;}
 
     public void changeFeelsLikeSwitchStatus(){
        isFeelsLikeSwitchOn = !isFeelsLikeSwitchOn;
     }
 
     public boolean getIsNightModeSwitchOn(){return isNightModeSwitchOn;}
+    public boolean getIsPressureSwitchOn(){return isPressureSwitchOn;}
+    public boolean getIsFeelsLikeSwitchOn(){return isFeelsLikeSwitchOn;}
 
     public void changeNightModeSwitchStatus(){
         isNightModeSwitchOn = !isNightModeSwitchOn;
@@ -27,11 +26,6 @@ public class SettingsPresenter {
 
     public void changePressureSwitchStatus(){
         isPressureSwitchOn = !isPressureSwitchOn;
-    }
-
-    public boolean[] createSettingsSwitchArray(){
-        settingsArray =  new boolean[]{isNightModeSwitchOn, isFeelsLikeSwitchOn, isPressureSwitchOn};
-        return  settingsArray;
     }
 
     // Метод, который возвращает экземпляр объекта.

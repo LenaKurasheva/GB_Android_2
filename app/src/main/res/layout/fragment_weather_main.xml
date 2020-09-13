@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/swiperefresh"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-<ScrollView xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
@@ -16,16 +16,40 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     tools:context="ru.geekbrains.gb_android_2.WeatherMainFragment">
-<!--    android:background="@color/day"-->
+
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/weatherStatus"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/hourlyWeatherRV"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ContentDescription"
+        tools:srcCompat="@tools:sample/backgrounds/scenic"
+        />
+
+    <!-- Текущий прогноз погоды -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/currentWeatherRV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="3dp"
+        app:layout_constraintTop_toBottomOf="@+id/cloudyInfoTextView" />
 
     <!-- Почасовой прогноз погоды -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/hourlyWeatherRV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:paddingStart="2dp"
+        android:paddingEnd="18dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pressureInfoTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/currentWeatherRV" />
 
     <!-- Список 5-ти дней с отображением погоды -->
     <androidx.recyclerview.widget.RecyclerView
@@ -41,18 +65,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/hourlyWeatherRV" />
 
-    <com.facebook.drawee.view.SimpleDraweeView
-        android:id="@+id/weatherStatus"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/hourlyWeatherRV"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="ContentDescription"
-        tools:srcCompat="@tools:sample/backgrounds/scenic"
-        android:tint="#4FC3F7"
-    />
 
     <TextView
         android:id="@+id/city"
@@ -89,26 +101,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/degrees" />
 
-    <TextView
-        android:id="@+id/feelsLikeTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="invisible"
-        android:text="@string/feels_like_temp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cloudyInfoTextView" />
-
-    <TextView
-        android:id="@+id/pressureInfoTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/pressureInfo"
-        android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/feelsLikeTextView" />
-
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
         android:layout_width="0dp"
@@ -119,26 +111,14 @@
     <TextView
         android:id="@+id/currTime"
         android:layout_width="0dp"
-        android:layout_marginStart="20dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
         android:text="@string/currTime"
         app:layout_constraintBottom_toBottomOf="@+id/degrees"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.51"
         app:layout_constraintStart_toEndOf="@id/thermometerView"
-        app:layout_constraintTop_toTopOf="@+id/degrees"
-        app:layout_constraintVertical_bias="0.4" />
-
-    <TextView
-        android:id="@+id/windSpeed"
-        android:layout_width="0dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="3dp"
-        android:layout_height="wrap_content"
-        android:text="@string/windInfo"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/thermometerView"
-        app:layout_constraintTop_toBottomOf="@+id/currTime" />
+        app:layout_constraintTop_toTopOf="@+id/degrees" />
 
     <ru.geekbrains.gb_android_2.customViews.ThermometerView
         android:id="@+id/thermometerView"
@@ -151,8 +131,8 @@
         app:layout_constraintTop_toTopOf="@+id/degrees"
         app:level="40"
         app:padding = "@integer/thermometer_padding"
-        app:level_color="@color/color_green"
-        app:thermometer_color="@color/grey"/>
+        app:level_color="@color/white"
+        app:thermometer_color="@color/thermometer_body"/>
 
     <TextView
         android:id="@+id/update_time"
@@ -161,12 +141,13 @@
         android:layout_marginStart="18dp"
         android:layout_marginEnd="10dp"
         android:textSize="10sp"
+        android:paddingStart="2dp"
         android:text="@string/update"
+        android:textColor="#80808080"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@id/hourlyWeatherRV"
-        tools:layout_editor_absoluteY="266dp" />
-
+        tools:ignore="RtlSymmetry,SmallSp" />
 </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
