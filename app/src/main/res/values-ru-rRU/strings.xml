@@ -10,13 +10,13 @@
     <string name="ok">Ok</string>
     <string name="settings">Настройки</string>
     <string name="set_on_night_mode">Включить ночной режим</string>
-    <string name="show_atmosphere_pressure">Показывать атмосферное давление</string>
+    <string name="show_atmosphere_pressure">Показать атмосферное давление</string>
     <string name="windInfo">ветер: %1$s м/с</string>
     <string name="or_choose_from_list">История поиска</string>
     <string name="pressureInfo">%1$s мм рт.ст.</string>
     <string name="currTime">00:00</string>
     <string name="show_temperature_feels_like">Показать темературу по ощущению</string>
-    <string name="feels_like_temp">ощущается: %s%2$s °</string>
+    <string name="feels_like_temp">ощущается: %s%2$s°</string>
     <string name="HintTextInputEditText">Введите название города.</string>
     <string name="setOnBtnOkEnterCityToast">Некорректное имя города</string>
     <string name="toDeleteCity">Чтобы удалить город, нажмите</string>

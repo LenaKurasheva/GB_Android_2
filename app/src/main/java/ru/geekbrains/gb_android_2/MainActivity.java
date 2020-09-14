@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         if(wifiConnectionReceiver  != null) unregisterReceiver(wifiConnectionReceiver);
+        if(internetConnectionReceiver != null) unregisterReceiver(internetConnectionReceiver);
     }
 
     // инициализация канала нотификаций
