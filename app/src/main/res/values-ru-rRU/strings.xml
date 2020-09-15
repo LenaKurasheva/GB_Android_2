@@ -89,12 +89,12 @@
     <string name="nav_header_title">Android Studio</string>
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Настройки</string>
 
     <string name="menu_home">Домой</string>
     <string name="menu_choose_city">Выберите город</string>
     <string name="menu_about">О приложении</string>
-    <string name="read_wiki">Википедия</string>
+    <string name="read_wiki">Wikipedia</string>
     <string name="elena_kurasheva_2020">© Елена Курашева, 2020</string>
     <string name="city_not_found">Город не найден, попробуйте еще раз.</string>
     <string name="connection_failed">Ошибка интернет соединения.</string>

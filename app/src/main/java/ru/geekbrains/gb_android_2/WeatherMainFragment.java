@@ -16,10 +16,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -41,6 +41,7 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.squareup.otto.Subscribe;
 
 
 import java.io.IOException;
@@ -56,6 +57,8 @@ import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 
 import ru.geekbrains.gb_android_2.customViews.ThermometerView;
+import ru.geekbrains.gb_android_2.events.ShowCurrLocationItemEvent;
+import ru.geekbrains.gb_android_2.events.ShowCurrentLocationWeatherEvent;
 import ru.geekbrains.gb_android_2.forecastRequest.ForecastRequest;
 import ru.geekbrains.gb_android_2.forecastRequest.OpenWeatherMap;
 import ru.geekbrains.gb_android_2.model.HourlyWeatherData;
@@ -98,11 +101,11 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
     private ThermometerView thermometerView;
     private MapView mMapView;
     private GoogleMap googleMap;
-    private LocationManager mLocManager = null;
     private Double cityLatitude;
     private Double cityLongitude;
     CountDownLatch countDownLatch = new CountDownLatch(1);
     private String cityFromLocation;
+    private MenuItem itemCurrLocation;
 
 
     static WeatherMainFragment create(CurrentDataContainer container) {
@@ -139,9 +142,6 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
 
     private void loadGoogleMap(View rootView, Bundle savedInstanceState) {
 
-        // Location manager instance
-        mLocManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
-
         mMapView = (MapView) rootView.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
 
@@ -166,7 +166,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
                             new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 100);
 
                 } else {
-                   showActualMap();
+                    showActualMap();
 //                         // For dropping a marker at a point on the Map
 //                        LatLng sydney = new LatLng(-34, 151);
 //                        googleMap.addMarker(new MarkerOptions().position(sydney).title("Marker Title").snippet("Marker Description"));
@@ -180,6 +180,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         if (requestCode == 100){
             if(permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION) && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                 showActualMap();
+                EventBus.getBus().post(new ShowCurrLocationItemEvent());
             }
         }
     }
@@ -195,8 +196,6 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         googleMap.setMyLocationEnabled(true);
 
         updateChosenCity();
-//        Log.d("googleMAP1", "currentCity = " +currentCity);
-//        Log.d("googleMAP1", "cityLatitude & cityLongitude = " +cityLatitude+", "+cityLongitude);
 
         // Проверяем, первый раз пользователь открывает приложение или нет:
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("settings", MODE_PRIVATE);
@@ -204,31 +203,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
 
         // Если пользователь открывает приложение впервые, показываем тукещее местоположение:
         if(CurrentDataContainer.isFirstEnter) {
-            getLocation();
-            // Get last know location
-
-//            @SuppressLint("MissingPermission") final Location loc = mLocManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
-//            // If location available
-//            if (loc != null) {
-//                // Create LatLng object for Maps
-//                LatLng home = new LatLng(loc.getLatitude(), loc.getLongitude());
-
-            if(cityLongitude != null && cityLatitude != null){
-                LatLng home = new LatLng(cityLatitude, cityLongitude);
-                // For zooming automatically to the location of the marker
-                CameraPosition cameraPosition = new CameraPosition.Builder().target(home).zoom(12).build();
-                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-                cityFromLocation = getAddressByCoordinates(cityLatitude, cityLongitude);
-                Log.d("googleMAP", "cityFromLocation = " + cityFromLocation);
-                // Сохраним текущий город в шерид преференс:
-                SharedPreferences preferences = requireActivity().getSharedPreferences(MainActivity.SETTINGS, MODE_PRIVATE);
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putString("current city", cityFromLocation);
-                editor.apply();
-
-                updateChosenCity();
-                takeWeatherInfoForFirstEnter(cityFromLocation);
-            }
+            setWeatherForFirstEnter();
         // Иначе показываем город, который он смотрел последним:
         } else {
             getLocationByCityName(currentCity);
@@ -237,6 +212,27 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
                 CameraPosition cameraPosition = new CameraPosition.Builder().target(currCity).zoom(11).build();
                 googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));//
             }
+        }
+    }
+
+    private void setWeatherForFirstEnter(){
+        getLocation();
+        if(cityLongitude != null && cityLatitude != null) {
+            LatLng home = new LatLng(cityLatitude, cityLongitude);
+            // For zooming automatically to the location of the marker
+            CameraPosition cameraPosition = new CameraPosition.Builder().target(home).zoom(12).build();
+            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            cityFromLocation = getAddressByCoordinates(cityLatitude, cityLongitude);
+            Log.d("googleMAP", "cityFromLocation = " + cityFromLocation);
+            // Сохраним текущий город в шерид преференс:
+            SharedPreferences preferences = requireActivity().getSharedPreferences(MainActivity.SETTINGS, MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString("current city", cityFromLocation);
+            editor.apply();
+
+            updateChosenCity();
+            //TODO тут возможно стоит отменить складывание города в шаредпреыеренсис
+            takeWeatherInfoForFirstEnter(cityFromLocation);
         }
     }
 
@@ -260,7 +256,10 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         }
     }
 
-    private void getLocation(){
+    @SuppressLint("MissingPermission")
+    public void getLocation(){
+        LocationManager mLocManager = null;
+
         // Location manager
         mLocManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
 
@@ -371,7 +370,6 @@ Log.d("lifeCycle", "onActivityCreated");
 
     private void setOnSwipeRefreshListener() {
         swipeRefreshLayout.setOnRefreshListener(()-> {
-//            CurrentDataContainer.isFirstEnter = false;
             CurrentDataContainer.isFirstCityInSession = false;
             OpenWeatherMap openWeatherMap = OpenWeatherMap.getInstance();
 
@@ -405,7 +403,6 @@ Log.d("lifeCycle", "onActivityCreated");
     }
 
     private void takeWeatherInfoForFirstEnter(String currentCity){
-//        if(CurrentDataContainer.isFirstEnter){
         if(CurrentDataContainer.isFirstCityInSession){
             Log.d("googleMap", "*FIRST ENTER*");
             OpenWeatherMap openWeatherMap = OpenWeatherMap.getInstance();
@@ -417,14 +414,18 @@ Log.d("lifeCycle", "onActivityCreated");
                 try {
                     // Ждем, пока не получим актуальный response code:
                     ForecastRequest.getForecastResponseReceived().await();
+                    Log.d("googleMap", "await finished");
 
                     Log.d("retrofit", "response code for first enter = " + ForecastRequest.responseCode);
                     weekWeatherData = openWeatherMap.getWeekWeatherData(getResources());
                     hourlyWeatherData = openWeatherMap.getHourlyWeatherData();
+                    CurrentDataContainer.getInstance().weekWeatherData = weekWeatherData;
+                    CurrentDataContainer.getInstance().hourlyWeatherList = hourlyWeatherData;
                     requireActivity().runOnUiThread(() -> {
                         if(ForecastRequest.responseCode != 200) showAlertDialog();
-                        Log.d(myLog, "takeWeatherInfoForFirstEnter - after updateWeatherInfo;  CITIES LIST = "+ citiesList.toString());
-                        updateWeatherInfo(getResources());//?????????????????????????????????????????????????????????????
+                        updateWeatherInfo(getResources());
+                        Log.d("googleMap", "updateWeatherInfo finished");
+
                         setupRecyclerView();
                         setupHourlyWeatherRecyclerView();
                         setupCurrentWeatherRecyclerView();
@@ -486,8 +487,8 @@ Log.d("lifeCycle", "onActivityCreated");
 
     private  void updateWeatherInfo(Resources resources){
         this.citiesList = citiesListFromRes;
-//        if(CurrentDataContainer.isFirstEnter) {
         if(CurrentDataContainer.isFirstCityInSession) {
+            Log.d("googleMap", "updateWeatherInfo -> urrentDataContainer.isFirstCityInSession" );
             if(ForecastRequest.responseCode != 200) {
                 Log.d(myLog, "updateWeatherInfo from resources");
 
@@ -510,8 +511,9 @@ Log.d("lifeCycle", "onActivityCreated");
                 Log.d(myLog, "WEatherMainFragment - updateWeatherInfo - FIRSTENTER; responseCode == 200; CITIES LIST = " + citiesList.toString());
             }
         }
-//        if(!CurrentDataContainer.isFirstEnter) {
         if(!CurrentDataContainer.isFirstCityInSession) {
+            Log.d("googleMap", "updateWeatherInfo -> !currentDataContainer.isFirstCityInSession" );
+
             currentCity = requireActivity()
                     .getSharedPreferences(MainActivity.SETTINGS, MODE_PRIVATE)
                     .getString("current city", "Saint Petersburg");
@@ -826,5 +828,26 @@ Log.d("lifeCycle", "onActivityCreated");
 
         currentWeatherRecyclerView.setLayoutManager(layoutManager);
         currentWeatherRecyclerView.setAdapter(currentWeatherRecyclerDataAdapter);
+    }
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getBus().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getBus().unregister(this);
+        super.onStop();
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onShowCurrentLocationWeatherEvent(ShowCurrentLocationWeatherEvent event) {
+        CurrentDataContainer.isFirstCityInSession = true;
+        CurrentDataContainer.isFirstEnter = true;
+        setWeatherForFirstEnter();
+        CurrentDataContainer.isFirstCityInSession = false;
+        CurrentDataContainer.isFirstEnter = false;
     }
 }
