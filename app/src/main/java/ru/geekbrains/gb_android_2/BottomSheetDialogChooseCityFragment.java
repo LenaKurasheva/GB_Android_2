@@ -81,6 +81,7 @@ public class BottomSheetDialogChooseCityFragment extends BottomSheetDialogFragme
                     String newCityName = cityName.substring(0, 1).toUpperCase() + cityName.substring(1);
 
                     CurrentDataContainer.isFirstEnter = false;
+                    CurrentDataContainer.isFirstCityInSession = false;
                     CurrentDataContainer.getInstance().weekWeatherData = openWeatherMap.getWeekWeatherData(getResources());
                     CurrentDataContainer.getInstance().hourlyWeatherList = openWeatherMap.getHourlyWeatherData();
 
@@ -93,7 +94,9 @@ public class BottomSheetDialogChooseCityFragment extends BottomSheetDialogFragme
 
                     //Запоминаем выбранный город в SharedPreferences
                     SharedPreferences sharedPreferences = requireActivity().getSharedPreferences(MainActivity.SETTINGS, MODE_PRIVATE);
-                    saveToPreference(sharedPreferences, newCityName);
+                    saveCityToPreference(sharedPreferences, newCityName);
+
+                    saveIsFirstEnterToPreference(sharedPreferences, CurrentDataContainer.isFirstEnter);
 
                     requireActivity().runOnUiThread(() -> {
                     dismiss();
@@ -120,9 +123,14 @@ public class BottomSheetDialogChooseCityFragment extends BottomSheetDialogFragme
         }).start();
     }
 
-    private void saveToPreference(SharedPreferences preferences, String currentCity) {
+    private void saveCityToPreference(SharedPreferences preferences, String currentCity) {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("current city", currentCity);
+        editor.apply();
+    }
+    private void saveIsFirstEnterToPreference(SharedPreferences preferences, boolean isFirstEnter) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("isFirstEnter", isFirstEnter);
         editor.apply();
     }
 }

@@ -167,13 +167,17 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
                                 }
                                 if (ForecastRequest.responseCode == 200) {
                                     CurrentDataContainer.isFirstEnter = false;
+                                    CurrentDataContainer.isFirstCityInSession = false;
+
 
                                     //Добавляем новый город в RV
                                     citiesListSource.addCity(new CitiesList(currentCity));
                                     if(CurrentDataContainer.isCitiesListSortedByName) adapter.sortByName();
                                     else adapter.sortByCreatedTime();
                                     //Запоминаем выбранный город в SharedPreferences
-                                    saveToPreference(requireActivity().getSharedPreferences(MainActivity.SETTINGS, MODE_PRIVATE), currentCity);
+                                    saveCurrentCityToPreference(requireActivity().getSharedPreferences(MainActivity.SETTINGS, MODE_PRIVATE), currentCity);
+
+                                    saveIsFirstEnterToPreference(requireActivity().getSharedPreferences(MainActivity.SETTINGS, MODE_PRIVATE), CurrentDataContainer.isFirstEnter);
 
                                     Log.d(myLog, "RESPONSE COD = " + ForecastRequest.responseCode + " CURR CITY = " + currentCity);
                                     weekWeatherData = openWeatherMap.getWeekWeatherData(getResources());
@@ -206,9 +210,15 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
         });
     }
 
-    private void saveToPreference(SharedPreferences preferences, String currentCity) {
+    private void saveCurrentCityToPreference(SharedPreferences preferences, String currentCity) {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("current city", currentCity);
+        editor.apply();
+    }
+
+    private void saveIsFirstEnterToPreference(SharedPreferences preferences, boolean isFirstEnter) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("isFirstEnter", isFirstEnter);
         editor.apply();
     }
 
@@ -244,7 +254,7 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
         else {adapter.sortByCreatedTime();}
         //Запоминаем выбранный город в SharedPreferences
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences(MainActivity.SETTINGS, MODE_PRIVATE);
-        saveToPreference(sharedPreferences, currentCity);
+        saveCurrentCityToPreference(sharedPreferences, currentCity);
 
         //Создаем прогноз погоды на неделю для нового выбранного города:
         takeWeatherInfoForFiveDays();
@@ -258,6 +268,9 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
             }
             if(ForecastRequest.responseCode == 200) {
                 CurrentDataContainer.isFirstEnter = false;
+                CurrentDataContainer.isFirstCityInSession = false;
+                saveIsFirstEnterToPreference(requireActivity().getSharedPreferences(MainActivity.SETTINGS, MODE_PRIVATE), CurrentDataContainer.isFirstEnter);
+
                 Log.d(myLog, "RESPONSE COD = " + ForecastRequest.responseCode + " CURR CITY = " + currentCity);
 
                 weekWeatherData = openWeatherMap.getWeekWeatherData(getResources());
