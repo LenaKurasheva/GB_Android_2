@@ -59,6 +59,9 @@ import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 
 import ru.geekbrains.gb_android_2.customViews.ThermometerView;
+import ru.geekbrains.gb_android_2.database.CitiesList;
+import ru.geekbrains.gb_android_2.database.CitiesListDao;
+import ru.geekbrains.gb_android_2.database.CitiesListSource;
 import ru.geekbrains.gb_android_2.events.ShowCurrLocationItemEvent;
 import ru.geekbrains.gb_android_2.events.ShowCurrentLocationWeatherEvent;
 import ru.geekbrains.gb_android_2.forecastRequest.ForecastRequest;
@@ -464,6 +467,7 @@ Log.d("lifeCycle", "onActivityCreated");
     }
 
     private void takeWeatherInfoForFirstEnter(String currentCity){
+        //TODO тут надо добавлять годные города в БД
         if(CurrentDataContainer.isFirstCityInSession){
             Log.d("googleMap", "*FIRST ENTER*");
             OpenWeatherMap openWeatherMap = OpenWeatherMap.getInstance();
@@ -498,6 +502,15 @@ Log.d("lifeCycle", "onActivityCreated");
                             setupRecyclerView();
                             setupHourlyWeatherRecyclerView();
                             setupCurrentWeatherRecyclerView();
+
+                            // Добавляем текущий город и далее все города, которые были успешно найдены на карте в бд:
+                            new Thread (()->{
+                               CitiesListDao citiesListDao = App
+                                       .getInstance()
+                                       .getCitiesListDao();
+                               CitiesListSource citiesListSource = new CitiesListSource(citiesListDao);
+                               citiesListSource.addCity(new CitiesList(currentCity));
+                           }).start();
                         }
                     });
                 } catch (InterruptedException e) {
