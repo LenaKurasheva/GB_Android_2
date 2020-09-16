@@ -355,7 +355,13 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick{
 
         // Get first element from List
         Address a = list.get(0);
-        return a.getLocality();
+        Log.d("googleMap", list.toString());
+        Log.d("googleMap", "FIRST ADDRESS FROM LIST: " + a.toString());
+        Log.d("googleMap", "CITY FROM FIRST ADDRESS FROM LIST: " + a.getLocality());
+        String city = a.getLocality();
+        if(city == null) city = a.getSubAdminArea();
+        if(city == null) city = a.getAdminArea();
+        return city;
     }
 
     @Override
@@ -477,7 +483,12 @@ Log.d("lifeCycle", "onActivityCreated");
                     CurrentDataContainer.getInstance().weekWeatherData = weekWeatherData;
                     CurrentDataContainer.getInstance().hourlyWeatherList = hourlyWeatherData;
                     requireActivity().runOnUiThread(() -> {
-                        if(ForecastRequest.responseCode == 404) showAlertDialog(getResources().getString(R.string.city_not_found));
+                        String alertMessage;
+                        if(cityFromLocation != null) {
+                            String alertMessageFromRes = getResources().getString(R.string.alert_message);
+                            alertMessage = String.format(alertMessageFromRes, cityFromLocation);
+                        } else alertMessage = getResources().getString(R.string.city_not_found);
+                        if(ForecastRequest.responseCode == 404) showAlertDialog(alertMessage);
                         else if(ForecastRequest.responseCode != 200) showAlertDialog(getResources().getString(R.string.connection_failed));
                         else {
                             updateChosenCity();
