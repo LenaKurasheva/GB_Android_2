@@ -174,12 +174,14 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick{
 //                        LatLng sydney = new LatLng(-34, 151);
 //                        googleMap.addMarker(new MarkerOptions().position(sydney).title("Marker Title").snippet("Marker Description"));
                 }
-                LatLng currPlace = new LatLng(cityLatitude, cityLongitude);
-                googleMap.addMarker(new MarkerOptions()
-                        .position(currPlace)
-                        .alpha(0.6f)
-                        .title(""));
-                Log.d("googleMap", "onMapReady, cityLatitude = " + cityLatitude + ", cityLongitude = " +cityLongitude);
+                if(cityLatitude != null && cityLongitude != null) {
+                    LatLng currPlace = new LatLng(cityLatitude, cityLongitude);
+                    googleMap.addMarker(new MarkerOptions()
+                            .position(currPlace)
+                            .alpha(0.6f)
+                            .title(""));
+                    Log.d("googleMap", "onMapReady, cityLatitude = " + cityLatitude + ", cityLongitude = " + cityLongitude);
+                }
             }
         });
     }
@@ -207,7 +209,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick{
         googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
-                showWeatherForChosenPoint();
+                showWeatherForChosenPoint(latLng);
             }
         });
 
@@ -231,7 +233,36 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick{
         }
     }
 
-    private void showWeatherForChosenPoint(){
+    private void showWeatherForChosenPoint(LatLng latLng){
+        cityLongitude = latLng.longitude;
+        cityLatitude = latLng.latitude;
+        LatLng home = new LatLng(cityLatitude, cityLongitude);
+        // For zooming automatically to the location of the marker
+        CameraPosition cameraPosition = new CameraPosition.Builder().target(home).zoom(12).build();
+        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        googleMap.clear();
+        googleMap.addMarker(new MarkerOptions()
+                .position(home)
+                .alpha(0.6f)
+                .title(""));
+
+        cityFromLocation = getAddressByCoordinates(cityLatitude, cityLongitude);
+        Log.d("googleMAP", "cityFromLocation = " + cityFromLocation);
+        if(cityFromLocation!= null && !cityFromLocation.equals("Not found") && !cityFromLocation.equals("Не найдено")) {
+            // Сохраним текущий город в шерид преференс:
+            SharedPreferences preferences = requireActivity().getSharedPreferences(MainActivity.SETTINGS, MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString("current city", cityFromLocation);
+            editor.commit();
+
+//            updateChosenCity();
+            takeCityFromSharedPreference(preferences);
+            CurrentDataContainer.isFirstCityInSession = true;
+            takeWeatherInfoForFirstEnter(cityFromLocation);
+            CurrentDataContainer.isFirstCityInSession = false;
+        } else {
+            showAlertDialog(getResources().getString(R.string.city_not_found));
+        }
     }
 
     private void setWeatherForFirstEnter(){
@@ -241,11 +272,9 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick{
             // For zooming automatically to the location of the marker
             CameraPosition cameraPosition = new CameraPosition.Builder().target(home).zoom(12).build();
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
-            LatLng currPlace = new LatLng(cityLatitude, cityLongitude);
             googleMap.clear();
             googleMap.addMarker(new MarkerOptions()
-                    .position(currPlace)
+                    .position(home)
                     .alpha(0.6f)
                     .title(""));
 
@@ -315,7 +344,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick{
         // Try to get addresses list
         List<Address> list;
         try {
-            list = geo.getFromLocation(latitude, longtitude, 1);
+            list = geo.getFromLocation(latitude, longtitude, 5);
         } catch (IOException e) {
             e.printStackTrace();
             return getString(R.string.not_found);
@@ -415,7 +444,7 @@ Log.d("lifeCycle", "onActivityCreated");
                     requireActivity().runOnUiThread(() -> {
                         updateWeatherInfo(getResources());
                         Log.d("swipe", "setOnSwipeRefreshListener -> weather updated");
-                        if(ForecastRequest.responseCode != 200) showAlertDialog();
+                        if(ForecastRequest.responseCode != 200) showAlertDialog(getResources().getString(R.string.connection_failed));
                         setupRecyclerView();
                         setupHourlyWeatherRecyclerView();
                         setupCurrentWeatherRecyclerView();
@@ -448,13 +477,17 @@ Log.d("lifeCycle", "onActivityCreated");
                     CurrentDataContainer.getInstance().weekWeatherData = weekWeatherData;
                     CurrentDataContainer.getInstance().hourlyWeatherList = hourlyWeatherData;
                     requireActivity().runOnUiThread(() -> {
-                        if(ForecastRequest.responseCode != 200) showAlertDialog();
-                        updateWeatherInfo(getResources());
-                        Log.d("googleMap", "updateWeatherInfo finished");
+                        if(ForecastRequest.responseCode == 404) showAlertDialog(getResources().getString(R.string.city_not_found));
+                        else if(ForecastRequest.responseCode != 200) showAlertDialog(getResources().getString(R.string.connection_failed));
+                        else {
+                            updateChosenCity();
+                            updateWeatherInfo(getResources());
+                            Log.d("googleMap", "updateWeatherInfo finished");
 
-                        setupRecyclerView();
-                        setupHourlyWeatherRecyclerView();
-                        setupCurrentWeatherRecyclerView();
+                            setupRecyclerView();
+                            setupHourlyWeatherRecyclerView();
+                            setupCurrentWeatherRecyclerView();
+                        }
                     });
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -718,13 +751,13 @@ Log.d("lifeCycle", "onActivityCreated");
         thermometerView.invalidate();
     }
 
-    private void showAlertDialog(){
+    private void showAlertDialog(String message){
         // Создаем билдер и передаем контекст приложения
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         // в билдере указываем заголовок окна (можно указывать как ресурс, так и строку)
         builder.setTitle(R.string.sorry_alert_dialog)
                 // указываем сообщение в окне (также есть вариант со строковым параметром)
-                .setMessage(R.string.connection_failed)
+                .setMessage(message)
                 // можно указать и пиктограмму
                 .setIcon(R.drawable.ic_baseline_sentiment_dissatisfied_24)
                 // устанавливаем кнопку (название кнопки также можно задавать строкой)
