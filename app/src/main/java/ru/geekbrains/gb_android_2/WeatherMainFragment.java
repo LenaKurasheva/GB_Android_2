@@ -844,9 +844,18 @@ Log.d("lifeCycle", "onActivityCreated");
     @Subscribe
     @SuppressWarnings("unused")
     public void onShowCurrentLocationWeatherEvent(ShowCurrentLocationWeatherEvent event) {
+        SharedPreferences preferences = requireActivity().getSharedPreferences(MainActivity.SETTINGS, MODE_PRIVATE);
+        String previousCity = preferences.getString("current city", null);
         CurrentDataContainer.isFirstCityInSession = true;
         CurrentDataContainer.isFirstEnter = true;
+
         setWeatherForFirstEnter();
+
+        // Вернем предыдущий город
+//        SharedPreferences.Editor editor = preferences.edit();
+//        editor.putString("current city", previousCity);
+//        editor.apply();
+
         CurrentDataContainer.isFirstCityInSession = false;
         CurrentDataContainer.isFirstEnter = false;
     }
