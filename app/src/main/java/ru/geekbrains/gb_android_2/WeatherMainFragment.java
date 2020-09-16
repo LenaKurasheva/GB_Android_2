@@ -39,8 +39,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.squareup.otto.Subscribe;
 
 
@@ -71,7 +73,7 @@ import ru.geekbrains.gb_android_2.rvDataAdapters.WeekWeatherRecyclerDataAdapter;
 import static android.content.Context.LOCATION_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
 
-public class WeatherMainFragment extends Fragment implements RVOnItemClick {
+public class WeatherMainFragment extends Fragment implements RVOnItemClick{
     public static String currentCity = "";
     private TextView cityTextView;
     private TextView degrees;
@@ -154,6 +156,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         }
 
         mMapView.getMapAsync(new OnMapReadyCallback() {
+
             @Override
             public void onMapReady(GoogleMap mMap) {
                 googleMap = mMap;
@@ -171,6 +174,12 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
 //                        LatLng sydney = new LatLng(-34, 151);
 //                        googleMap.addMarker(new MarkerOptions().position(sydney).title("Marker Title").snippet("Marker Description"));
                 }
+                LatLng currPlace = new LatLng(cityLatitude, cityLongitude);
+                googleMap.addMarker(new MarkerOptions()
+                        .position(currPlace)
+                        .alpha(0.6f)
+                        .title(""));
+                Log.d("googleMap", "onMapReady, cityLatitude = " + cityLatitude + ", cityLongitude = " +cityLongitude);
             }
         });
     }
@@ -195,6 +204,13 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         // For showing a move to my location button
         googleMap.setMyLocationEnabled(true);
 
+        googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(LatLng latLng) {
+                showWeatherForChosenPoint();
+            }
+        });
+
         updateChosenCity();
 
         // Проверяем, первый раз пользователь открывает приложение или нет:
@@ -215,6 +231,9 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
         }
     }
 
+    private void showWeatherForChosenPoint(){
+    }
+
     private void setWeatherForFirstEnter(){
         getLocation();
         if(cityLongitude != null && cityLatitude != null) {
@@ -222,6 +241,14 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
             // For zooming automatically to the location of the marker
             CameraPosition cameraPosition = new CameraPosition.Builder().target(home).zoom(12).build();
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+            LatLng currPlace = new LatLng(cityLatitude, cityLongitude);
+            googleMap.clear();
+            googleMap.addMarker(new MarkerOptions()
+                    .position(currPlace)
+                    .alpha(0.6f)
+                    .title(""));
+
             cityFromLocation = getAddressByCoordinates(cityLatitude, cityLongitude);
             Log.d("googleMAP", "cityFromLocation = " + cityFromLocation);
             // Сохраним текущий город в шерид преференс:
@@ -231,7 +258,6 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
             editor.apply();
 
             updateChosenCity();
-            //TODO тут возможно стоит отменить складывание города в шаредпреыеренсис
             takeWeatherInfoForFirstEnter(cityFromLocation);
         }
     }
