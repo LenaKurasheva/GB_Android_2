@@ -98,7 +98,6 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick{
     private TextView currTime;
     private TextView weatherStatusTextView;
     private ArrayList<String> citiesListFromRes;
-    private ArrayList<String> citiesList;
     private ArrayList<WeatherData> weekWeatherData;
     private ArrayList<HourlyWeatherData> hourlyWeatherData;
     private SimpleDraweeView weatherStatusImage;
@@ -201,39 +200,45 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick{
 
     @SuppressLint("MissingPermission")
     private void showActualMap(){
-        googleMap.getUiSettings().setMyLocationButtonEnabled(true);
+        if (!isGeoDisabled()) {
+            googleMap.getUiSettings().setMyLocationButtonEnabled(true);
 
-        // Enable zoom controls
-        googleMap.getUiSettings().setZoomControlsEnabled(true);
+            // Enable zoom controls
+            googleMap.getUiSettings().setZoomControlsEnabled(true);
 
-        // For showing a move to my location button
-        googleMap.setMyLocationEnabled(true);
+            // For showing a move to my location button
+            googleMap.setMyLocationEnabled(true);
 
-        googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-            @Override
-            public void onMapLongClick(LatLng latLng) {
-                showWeatherForChosenPoint(latLng);
-            }
-        });
+            googleMap.setOnMapLongClickListener(this::showWeatherForChosenPoint);
 
-        updateChosenCity();
+            updateChosenCity();
 
-        // Проверяем, первый раз пользователь открывает приложение или нет:
-        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("settings", MODE_PRIVATE);
-        CurrentDataContainer.isFirstEnter = sharedPreferences.getBoolean("isFirstEnter", true);
+            // Проверяем, первый раз пользователь открывает приложение или нет:
+            SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("settings", MODE_PRIVATE);
+            CurrentDataContainer.isFirstEnter = sharedPreferences.getBoolean("isFirstEnter", true);
 
-        // Если пользователь открывает приложение впервые, показываем тукещее местоположение:
-        if(CurrentDataContainer.isFirstEnter) {
-            setWeatherForFirstEnter();
-        // Иначе показываем город, который он смотрел последним:
-        } else {
-            getLocationByCityName(currentCity);
-            if(cityLatitude !=null && cityLongitude != null){
-                LatLng currCity = new LatLng(cityLatitude, cityLongitude);
-                CameraPosition cameraPosition = new CameraPosition.Builder().target(currCity).zoom(11).build();
-                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));//
+            // Если пользователь открывает приложение впервые, показываем тукещее местоположение:
+            if (CurrentDataContainer.isFirstEnter) {
+                setWeatherForFirstEnter();
+                // Иначе показываем город, который он смотрел последним:
+            } else {
+                getLocationByCityName(currentCity);
+                if (cityLatitude != null && cityLongitude != null) {
+                    LatLng currCity = new LatLng(cityLatitude, cityLongitude);
+                    CameraPosition cameraPosition = new CameraPosition.Builder().target(currCity).zoom(11).build();
+                    googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));//
+                }
             }
         }
+    }
+
+    // Проверяем, есть ли доступ к получению местоположения
+    private boolean isGeoDisabled(){
+        LocationManager locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
+        boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        if(!isGPSEnabled) return !isNetworkEnabled;
+        return false;
     }
 
     private void showWeatherForChosenPoint(LatLng latLng){
@@ -569,7 +574,7 @@ Log.d("lifeCycle", "onActivityCreated");
     }
 
     private  void updateWeatherInfo(Resources resources){
-        this.citiesList = citiesListFromRes;
+        ArrayList<String> citiesList = citiesListFromRes;
         if(CurrentDataContainer.isFirstCityInSession) {
             Log.d("googleMap", "updateWeatherInfo -> urrentDataContainer.isFirstCityInSession" );
             if(ForecastRequest.responseCode != 200) {
@@ -926,7 +931,7 @@ Log.d("lifeCycle", "onActivityCreated");
         CurrentDataContainer.isFirstCityInSession = true;
         CurrentDataContainer.isFirstEnter = true;
 
-        setWeatherForFirstEnter();
+        if (!isGeoDisabled()) setWeatherForFirstEnter();
 
         // Вернем предыдущий город
 //        SharedPreferences.Editor editor = preferences.edit();
