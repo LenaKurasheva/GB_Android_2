@@ -106,4 +106,6 @@
     <string name="broadcastReceiver_check_internet">Пожалуйста, проверьте интернет соединение</string>
     <string name="broadcastReceiver_wifi_conn_failed">Wi-fi соединение отсутствует</string>
     <string name="broadcastReceiver_check_wifi">Пожалуйста, проверьте wi-fi соединение</string>
+    <string name="not_found">Не найдено</string>
+    <string name="provided_by_open_weather_map">Прогноз: Open Weather Map</string>
 </resources>

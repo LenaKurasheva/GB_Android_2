@@ -29,7 +29,6 @@ public class AboutFragment extends Fragment {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-//        Log.d("Theme", "onCreate - fragment WeatherMainFragment");
         Log.d("myLog", "onCreate - fragment AboutFragment");
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
@@ -41,7 +40,6 @@ public class AboutFragment extends Fragment {
         if(item!=null)
             item.setVisible(false);
     }
-    
 
     // При создании фрагмента укажем его макет
     @Override

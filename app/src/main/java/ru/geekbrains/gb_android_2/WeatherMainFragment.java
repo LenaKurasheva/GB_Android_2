@@ -292,11 +292,11 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick {
             list = geo.getFromLocation(latitude, longtitude, 1);
         } catch (IOException e) {
             e.printStackTrace();
-            return e.getLocalizedMessage();
+            return getString(R.string.not_found);
         }
 
         // If list is empty, return "No data" string
-        if (list.isEmpty()) return "no data";
+        if (list.isEmpty()) return getString(R.string.not_found) ;
 
         // Get first element from List
         Address a = list.get(0);
@@ -803,12 +803,6 @@ Log.d("lifeCycle", "onActivityCreated");
         Log.d("tempMax-min in RV", daysTemp.toString());
         LinearLayoutManager layoutManager = new LinearLayoutManager(requireActivity().getBaseContext(), LinearLayoutManager.VERTICAL, false);
         WeekWeatherRecyclerDataAdapter weekWeatherAdapter = new WeekWeatherRecyclerDataAdapter(days, daysTemp, weatherIcon, weatherStateInfo, cardViewColor, this);
-
-//        if (weatherRecyclerView.getItemDecorationCount() <= 0){
-//            DividerItemDecoration itemDecoration = new DividerItemDecoration(requireActivity().getBaseContext(), LinearLayoutManager.VERTICAL);
-//            itemDecoration.setDrawable(Objects.requireNonNull(ContextCompat.getDrawable(requireActivity().getBaseContext(), R.drawable.decorator_item)));
-//            weatherRecyclerView.addItemDecoration(itemDecoration);
-//        }
 
         weatherRecyclerView.setLayoutManager(layoutManager);
         weatherRecyclerView.setAdapter(weekWeatherAdapter);
