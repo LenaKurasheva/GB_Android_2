@@ -1,7 +1,14 @@
 package ru.geekbrains.gb_android_2;//package ru.geekbrains.gb_android_2;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -19,6 +26,8 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import ru.geekbrains.gb_android_2.broadcastReceiver.InternetConnectionReceiver;
+import ru.geekbrains.gb_android_2.broadcastReceiver.WifiConnectionReceiver;
 import ru.geekbrains.gb_android_2.events.OpenSettingsFragmentEvent;
 import ru.geekbrains.gb_android_2.events.OpenWeatherMainFragmentEvent;
 
@@ -27,6 +36,9 @@ public class MainActivity extends AppCompatActivity {
     public NavigationView navigationView;
     private DrawerLayout drawer;
     public static final String SETTINGS = "settings";
+    WifiConnectionReceiver wifiConnectionReceiver = new WifiConnectionReceiver();
+    InternetConnectionReceiver internetConnectionReceiver = new InternetConnectionReceiver();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +58,36 @@ public class MainActivity extends AppCompatActivity {
         setOnClickForSideMenuItems();
         // Инициализируем библиотеку для работы с картинками:
         Fresco.initialize(this);
+
+        // Программная регистрация ресиверов
+        IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        IntentFilter wifiFilter = new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION);
+        registerReceiver(wifiConnectionReceiver, wifiFilter);
+        registerReceiver(internetConnectionReceiver, intentFilter);
+        initNotificationChannel();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(wifiConnectionReceiver  != null) unregisterReceiver(wifiConnectionReceiver);
+        if(internetConnectionReceiver != null) unregisterReceiver(internetConnectionReceiver);
+    }
+
+    // инициализация канала нотификаций
+    private void initNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            int importance = NotificationManager.IMPORTANCE_LOW;
+            NotificationChannel channel = new NotificationChannel("2", "wifi connection", importance);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(channel);
+            }
+            NotificationChannel internetChannel = new NotificationChannel("1", "internet connection", importance);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(internetChannel);
+            }
+        }
     }
 
     @Override

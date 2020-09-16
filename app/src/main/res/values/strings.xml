@@ -101,4 +101,8 @@
     <string name="update">update: %1$s</string>
     <string name="alfabetical_sorting">alphabetical sorting</string>
     <string name="sorting_by_date">sorting by date</string>
+    <string name="broadcastReceiver_internet_conn_failed">Internet connection failed</string>
+    <string name="broadcastReceiver_check_internet">Please, check your connection</string>
+    <string name="broadcastReceiver_wifi_conn_failed">Wi-fi connection failed</string>
+    <string name="broadcastReceiver_check_wifi">Please, check your connection</string>
 </resources>
