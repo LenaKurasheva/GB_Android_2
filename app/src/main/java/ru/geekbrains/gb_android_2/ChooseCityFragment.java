@@ -252,8 +252,10 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
         adapter.putChosenCityToTopInCitiesList(currentCity);
         if(CurrentDataContainer.isCitiesListSortedByName) {adapter.sortByName();}
         else {adapter.sortByCreatedTime();}
-        //Запоминаем выбранный город в SharedPreferences
+        // Запоминаем текущий город
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences(MainActivity.SETTINGS, MODE_PRIVATE);
+        String previousCity = sharedPreferences.getString("current city", null);
+        // Записываем выбранный город в SharedPreferences
         saveCurrentCityToPreference(sharedPreferences, currentCity);
 
         //Создаем прогноз погоды на неделю для нового выбранного города:
@@ -282,6 +284,9 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
                     updateWeatherData();
                 });
             } else {
+                // Возвращаем предыдущий город в SharedPreferences
+                saveCurrentCityToPreference(sharedPreferences, previousCity);
+
                 Log.d(myLog, "RESPONSE COD = " + ForecastRequest.responseCode + " CURR CITY = " + currentCity);
                 handler.post(()->showAlertDialog(R.string.connection_failed));
             }
