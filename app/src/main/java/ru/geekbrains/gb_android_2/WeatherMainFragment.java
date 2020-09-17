@@ -169,6 +169,9 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick{
             if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED) {
 
+                // Делаем фрагмент прозрачным, пока пользователь не разрешит доступ к геопозици, либо не выберет город:
+                if (CurrentDataContainer.isFirstEnter) constraintLayout.setAlpha(0f);
+
                 requestPermissions(
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 100);
 
@@ -192,6 +195,8 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick{
         if (requestCode == 100){
             if(permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION) && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                 showActualMap();
+                // Возвращаем видимость лэйауту:
+                constraintLayout.setAlpha(1f);
                 EventBus.getBus().post(new ShowCurrLocationItemEvent());
             }
             // Если пользователь не дал разрешеия на использование геолокации, открываем фрагмент выбора города (если это первое открытие):
@@ -507,6 +512,11 @@ Log.d("lifeCycle", "onActivityCreated");
                         }
                         else if(ForecastRequest.responseCode != 200) showAlertDialog(getResources().getString(R.string.connection_failed));
                         else {
+
+
+                            // Возвращаем видимость лэйауту:
+                            constraintLayout.setAlpha(1f);
+
                             // Если мы попали сюда, выбрав город на карте:
                             if (cityFromLocation != null) {
                                 // Сохраним текущий город в шерид преференс:

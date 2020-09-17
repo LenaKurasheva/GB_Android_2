@@ -152,7 +152,6 @@ public class MainActivity extends AppCompatActivity {
     @SuppressWarnings("unused")
     public void onOpenSettingsFragmentEvent(OpenSettingsFragmentEvent event) {
         setSettingsFragment();
-        navigationView.setCheckedItem(R.id.nav_choose_city);
     }
 
     @Subscribe
@@ -165,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
     @SuppressWarnings("unused")
     public void onOpenChooseCityFragmentEvent(OpenChooseCityFragmentEvent event) {
         setChooseCityFragment();
+        navigationView.setCheckedItem(R.id.nav_choose_city);
     }
 
     private void setOnClickForSideMenuItems() {
