@@ -36,4 +36,5 @@ public class CurrentDataContainer implements Serializable {
     static boolean isFirstCityInSession = true;
     static Stack<String> backStack = new Stack<>();
     static boolean isCitiesListSortedByName;
+    public static boolean isNetworkConnected;
 }

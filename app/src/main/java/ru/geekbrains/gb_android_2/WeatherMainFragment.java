@@ -959,19 +959,13 @@ Log.d("lifeCycle", "onActivityCreated");
     @Subscribe
     @SuppressWarnings("unused")
     public void onShowCurrentLocationWeatherEvent(ShowCurrentLocationWeatherEvent event) {
-        SharedPreferences preferences = requireActivity().getSharedPreferences(MainActivity.SETTINGS, MODE_PRIVATE);
-        String previousCity = preferences.getString("current city", null);
         CurrentDataContainer.isFirstCityInSession = true;
         CurrentDataContainer.isFirstEnter = true;
 
-        if (!isGeoDisabled()) setWeatherForFirstEnter();
-        //TODO
-        // Обнуить данные, если нет интернта или замьютить экран, т.к. город отображается с данными от предыдущего города
-
-        // Вернем предыдущий город
-//        SharedPreferences.Editor editor = preferences.edit();
-//        editor.putString("current city", previousCity);
-//        editor.apply();
+        // Если интернет соединение есть, то покаем погоду на текущюю геопозицию
+        if(CurrentDataContainer.isNetworkConnected) setWeatherForFirstEnter();
+        // Иначе покажем предупреждение об отсуствии интернета
+        else showAlertDialog(getResources().getString(R.string.connection_failed));
 
         CurrentDataContainer.isFirstCityInSession = false;
         CurrentDataContainer.isFirstEnter = false;

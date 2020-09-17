@@ -9,6 +9,7 @@ import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
+import ru.geekbrains.gb_android_2.CurrentDataContainer;
 import ru.geekbrains.gb_android_2.R;
 
 public class InternetConnectionReceiver extends BroadcastReceiver {
@@ -20,10 +21,12 @@ public class InternetConnectionReceiver extends BroadcastReceiver {
             if(intent.getExtras()!=null) {
                 if(!intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, Boolean.FALSE)){
                     Log.i("app","Network connected");
+                    CurrentDataContainer.isNetworkConnected = true;
                     clearNotification(context);
 
                 } else if(intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY,Boolean.FALSE)) {
                     Log.d("app","There's no network connectivity");
+                    CurrentDataContainer.isNetworkConnected = false;
                     // создать нотификацию
                     NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "1")
                             .setSmallIcon(R.drawable.ic_home)
