@@ -41,7 +41,7 @@ public class OpenWeatherRepo {
 
         return adapter.create(OpenWeatherInterface.class);
     }
-    
+
     // Для поддержки 21 API:
     private static OkHttpClient.Builder getUnsafeOkHttpClient() {
         try {
