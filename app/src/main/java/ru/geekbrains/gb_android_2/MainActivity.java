@@ -31,6 +31,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import ru.geekbrains.gb_android_2.broadcastReceiver.InternetConnectionReceiver;
 import ru.geekbrains.gb_android_2.broadcastReceiver.WifiConnectionReceiver;
+import ru.geekbrains.gb_android_2.events.OpenChooseCityFragmentEvent;
 import ru.geekbrains.gb_android_2.events.OpenSettingsFragmentEvent;
 import ru.geekbrains.gb_android_2.events.OpenWeatherMainFragmentEvent;
 import ru.geekbrains.gb_android_2.events.ShowCurrLocationItemEvent;
@@ -61,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
         toggle.syncState();
 
         setHomeFragment();
+//        setChooseCityFragment();
+
         setOnClickForSideMenuItems();
         // Инициализируем библиотеку для работы с картинками:
         Fresco.initialize(this);
@@ -149,12 +152,19 @@ public class MainActivity extends AppCompatActivity {
     @SuppressWarnings("unused")
     public void onOpenSettingsFragmentEvent(OpenSettingsFragmentEvent event) {
         setSettingsFragment();
+        navigationView.setCheckedItem(R.id.nav_choose_city);
     }
 
     @Subscribe
     @SuppressWarnings("unused")
     public void onShowCurrLocationItemEvent(ShowCurrLocationItemEvent event) {
         currCityLocation.setVisible(true);
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onOpenChooseCityFragmentEvent(OpenChooseCityFragmentEvent event) {
+        setChooseCityFragment();
     }
 
     private void setOnClickForSideMenuItems() {
