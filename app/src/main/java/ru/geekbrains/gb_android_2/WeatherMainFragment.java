@@ -157,33 +157,26 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick{
             e.printStackTrace();
         }
 
-        mMapView.getMapAsync(new OnMapReadyCallback() {
+        mMapView.getMapAsync(mMap -> {
+            googleMap = mMap;
 
-            @Override
-            public void onMapReady(GoogleMap mMap) {
-                googleMap = mMap;
+            // Enable the my-location layer in the map
+            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
 
-                // Enable the my-location layer in the map
-                if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 100);
 
-                    requestPermissions(
-                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 100);
-
-                } else {
-                    showActualMap();
-//                         // For dropping a marker at a point on the Map
-//                        LatLng sydney = new LatLng(-34, 151);
-//                        googleMap.addMarker(new MarkerOptions().position(sydney).title("Marker Title").snippet("Marker Description"));
-                }
-                if(cityLatitude != null && cityLongitude != null) {
-                    LatLng currPlace = new LatLng(cityLatitude, cityLongitude);
-                    googleMap.addMarker(new MarkerOptions()
-                            .position(currPlace)
-                            .alpha(0.6f)
-                            .title(""));
-                    Log.d("googleMap", "onMapReady, cityLatitude = " + cityLatitude + ", cityLongitude = " + cityLongitude);
-                }
+            } else {
+                showActualMap();
+            }
+            if(cityLatitude != null && cityLongitude != null) {
+                LatLng currPlace = new LatLng(cityLatitude, cityLongitude);
+                googleMap.addMarker(new MarkerOptions()
+                        .position(currPlace)
+                        .alpha(0.6f)
+                        .title(""));
+                Log.d("googleMap", "onMapReady, cityLatitude = " + cityLatitude + ", cityLongitude = " + cityLongitude);
             }
         });
     }
