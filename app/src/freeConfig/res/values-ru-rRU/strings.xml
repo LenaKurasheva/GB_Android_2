@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Погода.free</string>
+    <string name="little_cloudy">не найдено</string>
+    <string name="night">Ночь</string>
+    <string name="plus_16">+0°</string>
+    <string name="city">Город</string>
+    <string name="choose_your_city">Пожалуйста, введите название города</string>
+    <string name="enter_the_name_of_the_city">Ваш город</string>
+    <string name="ok">Ok</string>
+    <string name="settings">Настройки</string>
+    <string name="set_on_night_mode">Включить ночной режим</string>
+    <string name="show_atmosphere_pressure">Показать атмосферное давление</string>
+    <string name="windInfo">ветер: %1$s м/с</string>
+    <string name="or_choose_from_list">История поиска</string>
+    <string name="pressureInfo">%1$s мм рт.ст.</string>
+    <string name="currTime">00:00</string>
+    <string name="show_temperature_feels_like">Показать темературу по ощущению</string>
+    <string name="feels_like_temp">ощущается: %s%2$s°</string>
+    <string name="HintTextInputEditText">Введите название города.</string>
+    <string name="setOnBtnOkEnterCityToast">Некорректное имя города</string>
+    <string name="toDeleteCity">Чтобы удалить город, нажмите</string>
+    <string name="cityDeleted">Город удален</string>
+    <string name="pleaseChooseCotyFirst">Пожалуйста, сначала выберите город</string>
+    <string name="about">О приложении</string>
+    <string name="appName">Погода</string>
+    <string name="version">Версия 1.0 17.08.2020</string>
+    <string name="delete_city">Удалить город?</string>
+    <string name="delete">Удалить</string>
+
+    <string-array name="cities">
+        <item>Москва</item>
+        <item>Санкт Петербург</item>
+        <item>Иваново</item>
+        <item>Челябинск</item>
+        <item>Буй</item>
+    </string-array>
+
+    <string-array name="days">
+        <item>Пн</item>
+        <item>Вт</item>
+        <item>Ср</item>
+        <item>Чт</item>
+        <item>Пт</item>
+    </string-array>
+
+    <string-array name="daysTemp">
+        <item>+0</item>
+        <item>+0</item>
+        <item>+0</item>
+        <item>+0</item>
+        <item>+0</item>
+        <item>+0</item>
+        <item>+0</item>
+        <item>+0</item>
+    </string-array>
+
+    <string-array name="weatherState">
+        <item>Дождь</item>
+        <item>Ясно</item>
+        <item>Переменная облачность</item>
+        <item>Пасмурно</item>
+        <item>Облачность с прояснениями</item>
+        <item>Гроза</item>
+    </string-array>
+
+    <string-array name="iconsId">
+        <item>cloudy_rainy_not_windy</item>
+        <item>sunny_not_cloudy</item>
+        <item>cloudy_icon</item>
+        <item>cloudy_icon</item>
+        <item>little_cloudy_sunny</item>
+        <item>storm_cloudy</item>
+    </string-array>
+
+    <string-array name="hours">
+        <item>00.00</item>
+        <item>03.00</item>
+        <item>06.00</item>
+        <item>09.00</item>
+        <item>12.00</item>
+        <item>15.00</item>
+        <item>18.00</item>
+        <item>21.00</item>
+    </string-array>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Настройки</string>
+
+    <string name="menu_home">Домой</string>
+    <string name="menu_choose_city">Выберите город</string>
+    <string name="menu_about">О приложении</string>
+    <string name="read_wiki">Wikipedia</string>
+    <string name="elena_kurasheva_2020">© Елена Курашева, 2020</string>
+    <string name="city_not_found">Город не найден, попробуйте еще раз.</string>
+    <string name="connection_failed">Ошибка интернет соединения.</string>
+    <string name="sorry_alert_dialog">Извините, я не могу найти прогноз.</string>
+    <string name="update">обновлено: %1$s</string>
+    <string name="alfabetical_sorting">сортировка по алфавиту</string>
+    <string name="sorting_by_date">сортировка по дате поиска</string>
+    <string name="broadcastReceiver_internet_conn_failed">Интернет соединение отсутствует</string>
+    <string name="broadcastReceiver_check_internet">Пожалуйста, проверьте интернет соединение</string>
+    <string name="broadcastReceiver_wifi_conn_failed">Wi-fi соединение отсутствует</string>
+    <string name="broadcastReceiver_check_wifi">Пожалуйста, проверьте wi-fi соединение</string>
+    <string name="not_found">Не найдено</string>
+    <string name="provided_by_open_weather_map">Прогноз: Open Weather Map</string>
+    <string name="alert_message">Погода в %1$s не найдена. Пожалуйтса, попробуйте еще раз или воспользуйтесь поиском по имени.</string>
+    <string name="please_choose_city_first">Пожалуйста, выберите город.</string>
+</resources>

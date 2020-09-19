@@ -1,4 +1,4 @@
-package ru.geekbrains.gb_android_2;//package ru.geekbrains.gb_android_2;
+package ru.geekbrains.gb_android_2;
 
 import android.Manifest;
 import android.app.NotificationChannel;
@@ -13,21 +13,21 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.Menu;
+import android.view.MenuItem;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.google.android.material.navigation.NavigationView;
 import com.squareup.otto.Subscribe;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import ru.geekbrains.gb_android_2.broadcastReceiver.InternetConnectionReceiver;
 import ru.geekbrains.gb_android_2.broadcastReceiver.WifiConnectionReceiver;
@@ -61,8 +61,11 @@ public class MainActivity extends AppCompatActivity {
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        setHomeFragment();
-//        setChooseCityFragment();
+        if(CurrentDataContainer.isFirstEnter) {
+            setChooseCityFragment();
+            navigationView.setCheckedItem(R.id.nav_choose_city);
+        }
+        else setHomeFragment();
 
         setOnClickForSideMenuItems();
         // Инициализируем библиотеку для работы с картинками:
