@@ -20,6 +20,11 @@
         android:checkableBehavior="single"
         android:id="@+id/additional_items">
         <item
+            android:id="@+id/nav_auth"
+            android:icon="@drawable/ic_baseline_how_to_reg_24"
+            android:title="@string/login_with_google" />
+
+        <item
             android:id="@+id/nav_about"
             android:icon="@drawable/ic_baseline_info_24"
             android:title="@string/menu_about" />

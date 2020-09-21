@@ -12,9 +12,13 @@ import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -26,6 +30,14 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.squareup.otto.Subscribe;
 
@@ -45,17 +57,29 @@ public class MainActivity extends AppCompatActivity {
     WifiConnectionReceiver wifiConnectionReceiver = new WifiConnectionReceiver();
     InternetConnectionReceiver internetConnectionReceiver = new InternetConnectionReceiver();
     private MenuItem currCityLocation;
+    private GoogleSignInClient googleSignInClient;
+    private final int RC_SIGN_IN = 5123;
+    SimpleDraweeView userPhotoSimpleDraweeView;
+    TextView userNameTextView;
+    TextView userEmailTextView;
+    View headerView;
+    MenuItem navAuthMenuItem;
+    GoogleSignInAccount account;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Инициализируем библиотеку для работы с картинками:
+        Fresco.initialize(this);
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        drawer = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
+        findViews();
+
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -68,8 +92,6 @@ public class MainActivity extends AppCompatActivity {
         else setHomeFragment();
 
         setOnClickForSideMenuItems();
-        // Инициализируем библиотеку для работы с картинками:
-        Fresco.initialize(this);
 
         // Программная регистрация ресиверов
         IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
@@ -77,6 +99,96 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(wifiConnectionReceiver, wifiFilter);
         registerReceiver(internetConnectionReceiver, intentFilter);
         initNotificationChannel();
+
+        // Добавим аутентификацию Google:
+        String serverClientId = "116115044550-8ciggkdmab75skg7ar90t5doomdb73gl.apps.googleusercontent.com";
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(serverClientId)
+                .requestServerAuthCode(serverClientId, false)
+                .requestEmail()
+                .requestProfile()
+                .build();
+        googleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        if(account == null) {
+            navigationView.removeHeaderView(headerView);
+        }
+    }
+
+    private void findViews(){
+        drawer = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.nav_view);
+        headerView = navigationView.getHeaderView(0);
+        userPhotoSimpleDraweeView = (SimpleDraweeView) headerView.findViewById(R.id.userPhoto);
+        userNameTextView = (TextView) headerView.findViewById(R.id.userName);
+        userEmailTextView = (TextView) headerView.findViewById(R.id.userEmail);
+        navAuthMenuItem = (MenuItem) navigationView.getMenu().findItem(R.id.nav_auth);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
+
+        if (requestCode == RC_SIGN_IN) {
+            // The Task returned from this call is always completed, no need to attach
+            // a listener.
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            Log.d("Google SignIn", "onActivityResult -> getSignedInAccountFromIntent");
+            handleSignInResult(task);
+        }
+    }
+    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+        try {
+            account = completedTask.getResult(ApiException.class);
+            String token = account.getIdToken();
+            Log.d("Google SignIn", "signInResult:success code=" + token);
+
+            // here we can send token to server
+
+            // Signed in successfully, show authenticated UI.
+            if(!TextUtils.isEmpty(token)) {
+                Toast.makeText(getApplicationContext(), "Received not empty token!",
+                        Toast.LENGTH_SHORT).show();
+                updateUI(account);
+            }
+        } catch (ApiException e) {
+            // The ApiException status code indicates the detailed failure reason.
+            // Please refer to the GoogleSignInStatusCodes class reference for more information.
+            Log.d("Google SignIn", "signInResult:failed code=" + e.getStatusCode() + "; message: " + e.getMessage());
+            e.printStackTrace();
+            updateUI(null);
+        }
+    }
+
+    private void updateUI(GoogleSignInAccount account) {
+        // Убираем выделение из бокового меню:
+        String currFragmentName = CurrentDataContainer.backStack.peek();
+        if(currFragmentName.equals("WeatherMainFragment")) navigationView.setCheckedItem(R.id.nav_home);
+        if(currFragmentName.equals("ChooseCityFragment")) navigationView.setCheckedItem(R.id.nav_choose_city);
+        if(currFragmentName.equals("AboutFragment")) navigationView.setCheckedItem(R.id.nav_about);
+        // Если открыт фрагмент с настройками, кт. нет в Navigation drawer, убираем вделение со всех пунктов меню:
+        if(currFragmentName.equals("SettingsFragment")) {
+            int size = navigationView.getMenu().size();
+            for (int i = 0; i < size; i++) {
+                navigationView.getMenu().getItem(i).setChecked(false);
+            }
+        }
+        if(account != null) {
+            navigationView.addHeaderView(headerView);
+
+            String userEmail = account.getEmail();
+            Uri photoUri = account.getPhotoUrl();
+            String userName = account.getDisplayName();
+            userNameTextView.setText(userName);
+            userEmailTextView.setText(userEmail);
+            userPhotoSimpleDraweeView.setImageURI(photoUri);
+            navAuthMenuItem.setTitle(R.string.exit);
+        }
+        if (account == null) {
+            navigationView.removeHeaderView(headerView);
+            navAuthMenuItem.setTitle(R.string.login_with_google);
+        }
     }
 
     @Override
@@ -106,10 +218,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu, menu);
-        currCityLocation = menu.findItem(R.id.action_curr_location);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            currCityLocation.setVisible(true);}
         return true;
     }
 
@@ -135,6 +243,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
+        // Check for existing Google Sign In account, if the user is already signed in
+        // the GoogleSignInAccount will be non-null.
+        account = GoogleSignIn.getLastSignedInAccount(this);
+        if(account != null) Log.d("Google SignIn", "onStart -> account name = " + account.getDisplayName());
+        updateUI(account);
         EventBus.getBus().register(this);
     }
 
@@ -181,6 +294,19 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.nav_choose_city: {
                     setChooseCityFragment();
                     drawer.close();
+                    break;
+                }
+                case R.id.nav_auth: {
+                    if(account == null) {
+                        Intent signInIntent = googleSignInClient.getSignInIntent();
+                        MainActivity.this.startActivityForResult(signInIntent, RC_SIGN_IN);
+                    } else {
+                        googleSignInClient.signOut()
+                                .addOnCompleteListener(this, (OnCompleteListener<Void>) task -> {
+                                    updateUI(null);
+                                    account = null;
+                                });
+                    }
                     break;
                 }
                 case R.id.nav_about: {

@@ -15,16 +15,12 @@
       },
       "oauth_client": [
         {
-          "client_id": "116115044550-5l69of2hriuohjpegaj9fltvsk8dq190.apps.googleusercontent.com",
+          "client_id": "116115044550-3ps5m3fqabtpv2fortm4bq1l2mhhonma.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "ru.geekbrains.gb_android_2",
-            "certificate_hash": "700831fc2e25dee94facda49d6bcc8fcf95be4e9"
+            "certificate_hash": "2ff8dcb1bd8db96914296eaba99f3bdc9babc5f4"
           }
-        },
-        {
-          "client_id": "116115044550-71ieomkpors11uft1lfqn92j9cb761tl.apps.googleusercontent.com",
-          "client_type": 3
         }
       ],
       "api_key": [
@@ -36,7 +32,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "116115044550-71ieomkpors11uft1lfqn92j9cb761tl.apps.googleusercontent.com",
+              "client_id": "116115044550-8ciggkdmab75skg7ar90t5doomdb73gl.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

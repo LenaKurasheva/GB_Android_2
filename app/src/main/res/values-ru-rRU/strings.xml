@@ -109,4 +109,6 @@
     <string name="not_found">Не найдено</string>
     <string name="provided_by_open_weather_map">Прогноз: Open Weather Map</string>
     <string name="alert_message">Погода в %1$s не найдена. Пожалуйтса, попробуйте еще раз или воспользуйтесь поиском по имени.</string>
+    <string name="login_with_google">Войти через аккаунт Google</string>
+    <string name="exit">Выйти</string>
 </resources>
