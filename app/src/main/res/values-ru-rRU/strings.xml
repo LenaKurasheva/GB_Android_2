@@ -89,12 +89,12 @@
     <string name="nav_header_title">Android Studio</string>
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Настройки</string>
 
     <string name="menu_home">Домой</string>
     <string name="menu_choose_city">Выберите город</string>
     <string name="menu_about">О приложении</string>
-    <string name="read_wiki">Википедия</string>
+    <string name="read_wiki">Wikipedia</string>
     <string name="elena_kurasheva_2020">© Елена Курашева, 2020</string>
     <string name="city_not_found">Город не найден, попробуйте еще раз.</string>
     <string name="connection_failed">Ошибка интернет соединения.</string>
@@ -106,4 +106,7 @@
     <string name="broadcastReceiver_check_internet">Пожалуйста, проверьте интернет соединение</string>
     <string name="broadcastReceiver_wifi_conn_failed">Wi-fi соединение отсутствует</string>
     <string name="broadcastReceiver_check_wifi">Пожалуйста, проверьте wi-fi соединение</string>
+    <string name="not_found">Не найдено</string>
+    <string name="provided_by_open_weather_map">Прогноз: Open Weather Map</string>
+    <string name="alert_message">Погода в %1$s не найдена. Пожалуйтса, попробуйте еще раз или воспользуйтесь поиском по имени.</string>
 </resources>

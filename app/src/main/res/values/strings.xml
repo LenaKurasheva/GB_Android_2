@@ -105,4 +105,8 @@
     <string name="broadcastReceiver_check_internet">Please, check your connection</string>
     <string name="broadcastReceiver_wifi_conn_failed">Wi-fi connection failed</string>
     <string name="broadcastReceiver_check_wifi">Please, check your connection</string>
+    <string name="not_found">Not found</string>
+    <string name="provided_by_open_weather_map">Forecast: Open Weather Map</string>
+    <string name="alert_message">Weather in %1$s not found. Please, try again or use search by name.</string>
+
 </resources>

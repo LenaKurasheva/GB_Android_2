@@ -1,10 +1,12 @@
 package ru.geekbrains.gb_android_2;//package ru.geekbrains.gb_android_2;
 
+import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
@@ -20,6 +22,7 @@ import com.squareup.otto.Subscribe;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -28,8 +31,11 @@ import androidx.appcompat.widget.Toolbar;
 
 import ru.geekbrains.gb_android_2.broadcastReceiver.InternetConnectionReceiver;
 import ru.geekbrains.gb_android_2.broadcastReceiver.WifiConnectionReceiver;
+import ru.geekbrains.gb_android_2.events.OpenChooseCityFragmentEvent;
 import ru.geekbrains.gb_android_2.events.OpenSettingsFragmentEvent;
 import ru.geekbrains.gb_android_2.events.OpenWeatherMainFragmentEvent;
+import ru.geekbrains.gb_android_2.events.ShowCurrLocationItemEvent;
+import ru.geekbrains.gb_android_2.events.ShowCurrentLocationWeatherEvent;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String SETTINGS = "settings";
     WifiConnectionReceiver wifiConnectionReceiver = new WifiConnectionReceiver();
     InternetConnectionReceiver internetConnectionReceiver = new InternetConnectionReceiver();
+    private MenuItem currCityLocation;
 
 
     @Override
@@ -55,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
         toggle.syncState();
 
         setHomeFragment();
+//        setChooseCityFragment();
+
         setOnClickForSideMenuItems();
         // Инициализируем библиотеку для работы с картинками:
         Fresco.initialize(this);
@@ -94,6 +103,10 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu, menu);
+        currCityLocation = menu.findItem(R.id.action_curr_location);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            currCityLocation.setVisible(true);}
         return true;
     }
 
@@ -139,6 +152,19 @@ public class MainActivity extends AppCompatActivity {
     @SuppressWarnings("unused")
     public void onOpenSettingsFragmentEvent(OpenSettingsFragmentEvent event) {
         setSettingsFragment();
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onShowCurrLocationItemEvent(ShowCurrLocationItemEvent event) {
+        currCityLocation.setVisible(true);
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void onOpenChooseCityFragmentEvent(OpenChooseCityFragmentEvent event) {
+        setChooseCityFragment();
+        navigationView.setCheckedItem(R.id.nav_choose_city);
     }
 
     private void setOnClickForSideMenuItems() {
@@ -203,6 +229,9 @@ public class MainActivity extends AppCompatActivity {
             Uri uri = Uri.parse(wiki);
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             startActivity(intent);
+        }
+        if(item.getItemId() == R.id.action_curr_location){
+           EventBus.getBus().post(new ShowCurrentLocationWeatherEvent());
         }
         return false;
     }

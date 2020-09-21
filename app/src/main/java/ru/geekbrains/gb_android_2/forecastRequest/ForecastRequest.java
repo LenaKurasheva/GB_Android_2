@@ -44,15 +44,16 @@ public class ForecastRequest {
                     }
                     responseCode = 0;
                     forecastResponseReceived.countDown();
+                    Log.d("retrofit", "response.code =" + " " + response.code());
                 }
                 Log.d("retrofit", "response.code = " + responseCode);
                 Log.d("retrofit", "weatherRequest is null: " + (weatherRequest == null));
             }
 
             //сбой при интернет подключении
-            @SuppressWarnings("NullableProblems")
             @Override
             public void onFailure(Call<WeatherRequest> call, Throwable t) {
+                Log.d("retrofit", "THROWABLE: " + t.toString());
                 forecastResponseReceived.countDown();
                 responseCode = 0;
             }
