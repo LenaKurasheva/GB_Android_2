@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Weather</string>
+    <string name="app_name">Weather.free</string>
     <string name="little_cloudy">not found</string>
     <string name="night">Night</string>
     <string name="plus_16">+0°</string>
@@ -108,7 +108,6 @@
     <string name="not_found">Not found</string>
     <string name="provided_by_open_weather_map">Forecast: Open Weather Map</string>
     <string name="alert_message">Weather in %1$s not found. Please, try again or use search by name.</string>
-    <string name="login_with_google">Login with Google account</string>
-    <string name="exit">Exit</string>
+    <string name="please_choose_city_first">Please, choose city first</string>
 
 </resources>

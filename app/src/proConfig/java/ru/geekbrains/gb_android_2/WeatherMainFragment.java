@@ -3,25 +3,26 @@ package ru.geekbrains.gb_android_2;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,6 +37,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -43,8 +50,8 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.Task;
 import com.squareup.otto.Subscribe;
-
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -57,12 +64,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
+
+import retrofit2.http.Url;
 import ru.geekbrains.gb_android_2.customViews.ThermometerView;
 import ru.geekbrains.gb_android_2.database.CitiesList;
 import ru.geekbrains.gb_android_2.database.CitiesListDao;
 import ru.geekbrains.gb_android_2.database.CitiesListSource;
 import ru.geekbrains.gb_android_2.events.OpenChooseCityFragmentEvent;
-import ru.geekbrains.gb_android_2.events.OpenSettingsFragmentEvent;
 import ru.geekbrains.gb_android_2.events.ShowCurrLocationItemEvent;
 import ru.geekbrains.gb_android_2.events.ShowCurrentLocationWeatherEvent;
 import ru.geekbrains.gb_android_2.forecastRequest.ForecastRequest;
@@ -126,9 +134,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick{
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        Log.d("myLog", "onCreate - fragment WeatherMainFragment");
         Log.d("lifeCycle", "onCreate");
-
         super.onCreate(savedInstanceState);
     }
 
@@ -228,7 +234,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick{
             // Если пользователь открывает приложение впервые, показываем тукещее местоположение:
             if (CurrentDataContainer.isFirstEnter) {
                 setWeatherForFirstEnter();
-            // Иначе показываем город, который он смотрел последним:
+                // Иначе показываем город, который он смотрел последним:
             } else {
                 getLocationByCityName(currentCity);
                 if (cityLatitude != null && cityLongitude != null) {
@@ -305,15 +311,15 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick{
     }
 
     private void getLocationByCityName(String cityName){
-            // Create geocoder
-            final Geocoder geo = new Geocoder(getContext());
+        // Create geocoder
+        final Geocoder geo = new Geocoder(getContext());
         List<Address> list = null;
 
         try {
             list = geo.getFromLocationName(cityName, 1);
         } catch (IOException e) {
             e.printStackTrace();
-    //                return e.getLocalizedMessage();
+            //                return e.getLocalizedMessage();
         }
 
         if (list != null && !list.isEmpty()) {
@@ -428,7 +434,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick{
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-Log.d("lifeCycle", "onActivityCreated");
+        Log.d("lifeCycle", "onActivityCreated");
         super.onActivityCreated(savedInstanceState);
         Log.d(myLog, "WeatherMainFragment - savedInstanceState exists = " + (savedInstanceState != null));
         updateChosenCity();
@@ -542,12 +548,12 @@ Log.d("lifeCycle", "onActivityCreated");
 
                             // Добавляем текущий город и далее все города, которые были успешно найдены на карте в бд:
                             new Thread (()->{
-                               CitiesListDao citiesListDao = App
-                                       .getInstance()
-                                       .getCitiesListDao();
-                               CitiesListSource citiesListSource = new CitiesListSource(citiesListDao);
-                               citiesListSource.addCity(new CitiesList(currentCity));
-                           }).start();
+                                CitiesListDao citiesListDao = App
+                                        .getInstance()
+                                        .getCitiesListDao();
+                                CitiesListSource citiesListSource = new CitiesListSource(citiesListDao);
+                                citiesListSource.addCity(new CitiesList(currentCity));
+                            }).start();
                         }
                     });
                 } catch (InterruptedException e) {
@@ -830,7 +836,7 @@ Log.d("lifeCycle", "onActivityCreated");
         alert.show();
     }
 
-    public void takeCitiesListFromResources(android.content.res.Resources resources){
+    public void takeCitiesListFromResources(Resources resources){
         String[] cities = resources.getStringArray(R.array.cities);
         List<String> cit = Arrays.asList(cities);
         citiesListFromRes = new ArrayList<>(cit);
@@ -854,7 +860,7 @@ Log.d("lifeCycle", "onActivityCreated");
         days = daysList;
     }
 
-    public void addDefaultDataToDaysTempFromRes(android.content.res.Resources resources){
+    public void addDefaultDataToDaysTempFromRes(Resources resources){
         String[] daysTempStringArr = resources.getStringArray(R.array.daysTemp);
         daysTemp  = Arrays.asList(daysTempStringArr);
         tempMax = daysTemp;
@@ -863,7 +869,7 @@ Log.d("lifeCycle", "onActivityCreated");
 
     private void addDefaultDataToWeatherStateInfo(){
         for (int i = 0; i < OpenWeatherMap.FORECAST_DAYS ; i++) {
-           weatherStateInfo.add("not found");
+            weatherStateInfo.add("not found");
         }
     }
 
@@ -885,7 +891,7 @@ Log.d("lifeCycle", "onActivityCreated");
         }
     }
 
-    public void addDefaultDataToHourlyWeatherRV(android.content.res.Resources resources){
+    public void addDefaultDataToHourlyWeatherRV(Resources resources){
         String[] hourlyTempStringArr = resources.getStringArray(R.array.daysTemp);
         hourlyTemperature  = Arrays.asList(hourlyTempStringArr);
 
@@ -964,7 +970,7 @@ Log.d("lifeCycle", "onActivityCreated");
 
         // Если интернет соединение есть, то покаем погоду на текущюю геопозицию
         if(CurrentDataContainer.isNetworkConnected) setWeatherForFirstEnter();
-        // Иначе покажем предупреждение об отсуствии интернета
+            // Иначе покажем предупреждение об отсуствии интернета
         else showAlertDialog(getResources().getString(R.string.connection_failed));
 
         CurrentDataContainer.isFirstCityInSession = false;

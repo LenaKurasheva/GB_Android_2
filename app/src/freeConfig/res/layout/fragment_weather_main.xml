@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swiperefresh"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        >
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/full_screen_constraintlayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:context="ru.geekbrains.gb_android_2.WeatherMainFragment">
+
+            <com.facebook.drawee.view.SimpleDraweeView
+                android:id="@+id/weatherStatus"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toTopOf="@+id/hourlyWeatherRV"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="ContentDescription"
+                tools:srcCompat="@tools:sample/backgrounds/scenic"
+                />
+
+            <!-- Текущий прогноз погоды -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/currentWeatherRV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="3dp"
+                app:layout_constraintTop_toBottomOf="@+id/cloudyInfoTextView" />
+
+            <!-- Почасовой прогноз погоды -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/hourlyWeatherRV"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:paddingStart="2dp"
+                android:paddingEnd="18dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/currentWeatherRV" />
+
+            <!-- Список 5-ти дней с отображением погоды -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/weekWeatherRV"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginTop="10dp"
+                app:layout_constraintBottom_toTopOf="@id/footer"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/hourlyWeatherRV" />
+
+
+            <TextView
+                android:id="@+id/city"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="@string/city"
+                android:textSize="30sp"
+                app:layout_constraintBottom_toTopOf="@+id/degrees"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/degrees"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/plus_16"
+                android:textSize="@dimen/degrees"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/thermometerView"
+                app:layout_constraintHorizontal_bias="0.75"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.12" />
+
+            <TextView
+                android:id="@+id/cloudyInfoTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/little_cloudy"
+                android:visibility="visible"
+                android:layout_marginTop="5dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/degrees" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.5" />
+
+            <TextView
+                android:id="@+id/currTime"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:text="@string/currTime"
+                app:layout_constraintBottom_toBottomOf="@+id/degrees"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.51"
+                app:layout_constraintStart_toEndOf="@id/thermometerView"
+                app:layout_constraintTop_toTopOf="@+id/degrees" />
+
+            <ru.geekbrains.gb_android_2.customViews.ThermometerView
+                android:id="@+id/thermometerView"
+                android:layout_width="@dimen/thermometer_width"
+                android:layout_height="@dimen/thermometer_height"
+                app:layout_constraintBottom_toBottomOf="@id/degrees"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.63"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/degrees"
+                app:level="40"
+                app:padding = "@integer/thermometer_padding"
+                app:level_color="@color/white"
+                app:thermometer_color="@color/thermometer_body"/>
+
+            <TextView
+                android:id="@+id/update_time"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:layout_marginEnd="10dp"
+                android:textSize="10sp"
+                android:paddingStart="2dp"
+                android:text="@string/update"
+                android:textColor="#80808080"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/hourlyWeatherRV"
+                tools:ignore="RtlSymmetry,SmallSp" />
+
+            <include
+                android:id="@+id/footer"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/weekWeatherRV"
+                android:layout_marginTop="30dp"
+                android:layout_height="80dp"
+                android:layout_width="match_parent"
+                layout="@layout/footer_layout"
+                />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
