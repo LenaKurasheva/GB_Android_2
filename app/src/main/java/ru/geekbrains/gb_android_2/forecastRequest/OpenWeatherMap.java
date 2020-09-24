@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
 
+import ru.geekbrains.gb_android_2.App;
+import ru.geekbrains.gb_android_2.R;
 import ru.geekbrains.gb_android_2.model.HourlyWeatherData;
 import ru.geekbrains.gb_android_2.model.WeatherData;
 import ru.geekbrains.gb_android_2.model.weather.WeatherRequest;
@@ -105,9 +107,22 @@ public final class OpenWeatherMap {
         weatherStateInfoArrayList.add(String.format(Locale.getDefault(), "%s", weatherRequest.getList().get(0).getWeather().get(0).getDescription()));
         weatherIconsArrayList.add(weatherRequest.getList().get(0).getWeather().get(0).getId());
         degreesArrayList.add(String.format(Locale.getDefault(), "%s", Math.round(weatherRequest.getList().get(0).getMain().getTemp())));
-        windInfoArrayList.add(String.format(Locale.getDefault(), "%s", Math.round(weatherRequest.getList().get(0).getWind().getSpeed())));
+        windInfoArrayList.add(String.format(Locale.getDefault(), "%s", Math.round(weatherRequest.getList().get(0).getWind().getSpeed())) + App.getInstance().getString(R.string.m_s) + getCurrWindDirection());
         pressureArrayList.add(String.format(Locale.getDefault(), "%s", weatherRequest.getList().get(0).getMain().getPressure()));
         feelLikeArrayList.add(String.format(Locale.getDefault(), "%s", weatherRequest.getList().get(0).getMain().getFeelsLike()));
+    }
+
+    private String getCurrWindDirection(){
+        Integer windDirInteger = weatherRequest.getList().get(0).getWind().getDeg();
+        if((windDirInteger >= 0 && windDirInteger < 22.5) || (windDirInteger > 337.5 && windDirInteger <0)) return App.getInstance().getString(R.string.N);
+        else if (windDirInteger >= 22.5 && windDirInteger <= 67.5) return App.getInstance().getString(R.string.NI);
+        else if (windDirInteger > 67.5 && windDirInteger < 112.5) return App.getInstance().getString(R.string.I);
+        else if (windDirInteger >= 112.5 && windDirInteger <= 157.5) return App.getInstance().getString(R.string.SI);
+        else if (windDirInteger > 157.5 && windDirInteger < 202.5) return App.getInstance().getString(R.string.S);
+        else if (windDirInteger >= 202.5 && windDirInteger <= 247.5) return App.getInstance().getString(R.string.SW);
+        else if (windDirInteger > 247.5 && windDirInteger < 292.5) return App.getInstance().getString(R.string.W);
+        else if (windDirInteger >= 292.5 && windDirInteger <= 337.5) return App.getInstance().getString(R.string.NW);
+        else return "";
     }
 
     private void addDataForNextFourDaysToDataLists(){

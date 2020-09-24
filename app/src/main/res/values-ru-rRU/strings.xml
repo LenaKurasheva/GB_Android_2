@@ -11,7 +11,7 @@
     <string name="settings">Настройки</string>
     <string name="set_on_night_mode">Включить ночной режим</string>
     <string name="show_atmosphere_pressure">Показать атмосферное давление</string>
-    <string name="windInfo">ветер: %1$s м/с</string>
+    <string name="windInfo">ветер: %1$s</string>
     <string name="or_choose_from_list">История поиска</string>
     <string name="pressureInfo">%1$s мм рт.ст.</string>
     <string name="currTime">00:00</string>
@@ -110,4 +110,13 @@
     <string name="provided_by_open_weather_map">Прогноз: Open Weather Map</string>
     <string name="alert_message">Погода в %1$s не найдена. Пожалуйтса, попробуйте еще раз или воспользуйтесь поиском по имени.</string>
     <string name="places_api_key">AIzaSyD3YSJ6LJLFjr94lDYfclthZ-ROzfAhVOI</string>
+    <string name="m_s">\ м/с</string>
+    <string name="N">\u0020С</string>
+    <string name="S">\u0020Ю</string>
+    <string name="I">\u0020З</string>
+    <string name="W">\u0020В</string>
+    <string name="NI">\u0020СЗ</string>
+    <string name="NW">\u0020СВ</string>
+    <string name="SI">\u0020ЮЗ</string>
+    <string name="SW">\u0020ЮВ</string>
 </resources>
