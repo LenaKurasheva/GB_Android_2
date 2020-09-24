@@ -15,6 +15,7 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -633,6 +634,8 @@ Log.d("lifeCycle", "onActivityCreated");
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("settings", MODE_PRIVATE);
         takeCityFromSharedPreference(sharedPreferences);
         cityTextView.setText(currentCity);
+        if(currentCity.length() > 16) cityTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 27);
+        else cityTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30);
     }
 
     private  void updateWeatherInfo(Resources resources){
