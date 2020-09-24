@@ -8,17 +8,14 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -56,20 +53,17 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.concurrent.CountDownLatch;
 import ru.geekbrains.gb_android_2.customViews.ThermometerView;
 import ru.geekbrains.gb_android_2.database.CitiesList;
 import ru.geekbrains.gb_android_2.database.CitiesListDao;
 import ru.geekbrains.gb_android_2.database.CitiesListSource;
 import ru.geekbrains.gb_android_2.events.OpenChooseCityFragmentEvent;
-import ru.geekbrains.gb_android_2.events.OpenSettingsFragmentEvent;
 import ru.geekbrains.gb_android_2.events.ShowCurrLocationItemEvent;
 import ru.geekbrains.gb_android_2.events.ShowCurrentLocationWeatherEvent;
 import ru.geekbrains.gb_android_2.forecastRequest.ForecastRequest;
 import ru.geekbrains.gb_android_2.forecastRequest.OpenWeatherMap;
 import ru.geekbrains.gb_android_2.model.HourlyWeatherData;
 import ru.geekbrains.gb_android_2.model.WeatherData;
-import ru.geekbrains.gb_android_2.placeDetailsRequest.GooglePlaceDetails;
 import ru.geekbrains.gb_android_2.rvDataAdapters.CurrentWeatherRecyclerDataAdapter;
 import ru.geekbrains.gb_android_2.rvDataAdapters.HourlyWeatherRecyclerDataAdapter;
 import ru.geekbrains.gb_android_2.rvDataAdapters.RVOnItemClick;
@@ -107,10 +101,9 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick{
     private ThermometerView thermometerView;
     private MapView mMapView;
     private GoogleMap googleMap;
-    CountDownLatch countDownLatch = new CountDownLatch(1);
     private String cityFromLocation;
-    private MenuItem itemCurrLocation;
     private ConstraintLayout constraintLayout;
+    private CitiesListSource citiesListSource;
 
 
     static WeatherMainFragment create(CurrentDataContainer container) {
@@ -150,13 +143,13 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick{
 
     private void loadGoogleMap(View rootView, Bundle savedInstanceState) {
 
-        mMapView = (MapView) rootView.findViewById(R.id.mapView);
+        mMapView = rootView.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
 
         mMapView.onResume(); // needed to get the map to display immediately
 
         try {
-            MapsInitializer.initialize(getActivity().getApplicationContext());
+            MapsInitializer.initialize(requireActivity().getApplicationContext());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -165,7 +158,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick{
             googleMap = mMap;
 
             // Enable the my-location layer in the map
-            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+            if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED) {
 
                 // Делаем фрагмент прозрачным, пока пользователь не разрешит доступ к геопозици, либо не выберет город:
@@ -233,7 +226,7 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick{
 //                    cityLatitude = GooglePlaceDetails.getInstance().getCityLatitude();
 //                    cityLongitude = GooglePlaceDetails.getInstance().getCityLongitude();
 //                } else getLocationByCityName(currentCity);
-                if(CurrentDataContainer.cityLatitude == null && CurrentDataContainer.cityLongitude == null) getLocationByCityName(currentCity);
+                takeCoordinatesFromDB(currentCity);
                 if (CurrentDataContainer.cityLatitude != null && CurrentDataContainer.cityLongitude != null) {
                     LatLng currCity = new LatLng(CurrentDataContainer.cityLatitude, CurrentDataContainer.cityLongitude);
                     CameraPosition cameraPosition = new CameraPosition.Builder().target(currCity).zoom(11).build();
@@ -243,9 +236,33 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick{
         }
     }
 
+    private void takeCoordinatesFromDB(String city){
+        // При первом входе в программу ничего не делаем, иначе он заберет из базы дефолтные (0.0:0.0) и найдет температуру по ним
+        if (CurrentDataContainer.isFirstEnter) {}
+
+        else if(CurrentDataContainer.cityLatitude == null && CurrentDataContainer.cityLongitude == null) {
+            Thread thread = new Thread(()->{
+                CitiesListDao citiesListDao = App
+                        .getInstance()
+                        .getCitiesListDao();
+                citiesListSource = new CitiesListSource(citiesListDao);
+                List<Double> coord = citiesListSource.getCoordinatesFromDB(city);
+                CurrentDataContainer.cityLatitude = coord.get(0);
+                CurrentDataContainer.cityLongitude = coord.get(1);
+                Log.d("coord", "cityLatitude and cityLongitude from db = "+ CurrentDataContainer.cityLatitude + " " + CurrentDataContainer.cityLongitude);
+            });
+            thread.start();
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     // Проверяем, есть ли доступ к получению местоположения
     private boolean isGeoDisabled(){
-        LocationManager locationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
+        LocationManager locationManager = (LocationManager) requireActivity().getSystemService(LOCATION_SERVICE);
         boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
         if(!isGPSEnabled) return !isNetworkEnabled;
@@ -332,10 +349,10 @@ public class WeatherMainFragment extends Fragment implements RVOnItemClick{
 
     @SuppressLint("MissingPermission")
     public void getLocation(){
-        LocationManager mLocManager = null;
+        LocationManager mLocManager;
 
         // Location manager
-        mLocManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
+        mLocManager = (LocationManager) requireActivity().getSystemService(LOCATION_SERVICE);
 
         // Current Location
         Location loc;
@@ -439,7 +456,7 @@ Log.d("lifeCycle", "onActivityCreated");
         Log.d(myLog, "WeatherMainFragment - savedInstanceState exists = " + (savedInstanceState != null));
         updateChosenCity();
         Log.d("cityName", "updateChosenCity.3 = " + currentCity);
-        takeWeatherInfoForFirstCityInSession(currentCity);
+        if(!currentCity.equals("Your City"))takeWeatherInfoForFirstCityInSession(currentCity);
         Log.d(myLog, "WeatherMainFragment: onActivityCreated !AFTER updateChosenCity, currentCity: " + currentCity);
     }
 
@@ -457,7 +474,9 @@ Log.d("lifeCycle", "onActivityCreated");
             // Обновляем значение currentCity:
             takeCityFromSharedPreference(requireActivity().getSharedPreferences("settings", MODE_PRIVATE));
 
-            getLocationByCityName(currentCity);
+            // Берем координаты из CurrentDataContainer, если null, то из базы по имени города
+            takeCoordinatesFromDB(currentCity);
+
             ForecastRequest.getForecastFromServer(CurrentDataContainer.cityLatitude, CurrentDataContainer.cityLongitude);
             Log.d("retrofit", "WeatherMain - countDownLatch = " + ForecastRequest.getForecastResponseReceived().getCount());
 
@@ -491,7 +510,7 @@ Log.d("lifeCycle", "onActivityCreated");
         if(CurrentDataContainer.isFirstCityInSession){
             Log.d("googleMap", "*FIRST ENTER*");
             OpenWeatherMap openWeatherMap = OpenWeatherMap.getInstance();
-            getLocationByCityName(currentCity);
+            takeCoordinatesFromDB(currentCity);
             ForecastRequest.getForecastFromServer(CurrentDataContainer.cityLatitude, CurrentDataContainer.cityLongitude);
             Log.d("retrofit", "WeatherMain - countDownLatch = " + ForecastRequest.getForecastResponseReceived().getCount());
 
@@ -515,12 +534,15 @@ Log.d("lifeCycle", "onActivityCreated");
 
                         if(ForecastRequest.responseCode == 404 && CurrentDataContainer.isFirstEnter){}
                         else if(ForecastRequest.responseCode == 404){
+                            Log.d("response", "responseCode = "+ ForecastRequest.responseCode);
                             showAlertDialog(alertMessage);
                         }
-                        else if(ForecastRequest.responseCode != 200) showAlertDialog(getResources().getString(R.string.connection_failed));
+                        else if(ForecastRequest.responseCode != 200){
+                            Log.d("response", "responseCode = "+ ForecastRequest.responseCode);
+                            showAlertDialog(getResources().getString(R.string.connection_failed));
+                        }
                         else {
-
-
+                            Log.d("response", "responseCode = "+ ForecastRequest.responseCode);
                             // Возвращаем видимость лэйауту:
                             constraintLayout.setAlpha(1f);
 
@@ -539,7 +561,7 @@ Log.d("lifeCycle", "onActivityCreated");
 
                             updateChosenCity();
 
-                            Log.d("cityName", "updateChosenCity.4 = " + this.currentCity);
+                            Log.d("cityName", "updateChosenCity.4 = " + WeatherMainFragment.currentCity);
                             updateWeatherInfo(getResources());
                             Log.d("googleMap", "updateWeatherInfo finished");
 
@@ -553,7 +575,7 @@ Log.d("lifeCycle", "onActivityCreated");
                                        .getInstance()
                                        .getCitiesListDao();
                                CitiesListSource citiesListSource = new CitiesListSource(citiesListDao);
-                               citiesListSource.addCity(new CitiesList(currentCity));
+                               citiesListSource.addCity(new CitiesList(currentCity, CurrentDataContainer.cityLatitude, CurrentDataContainer.cityLongitude));
                            }).start();
                         }
                     });

@@ -96,7 +96,7 @@ public class BottomSheetDialogChooseCityFragment extends BottomSheetDialogFragme
                                 .getInstance()
                                 .getCitiesListDao();
                     CitiesListSource citiesListSource = new CitiesListSource(citiesListDao);
-                    citiesListSource.addCity(new CitiesList(newCityName));
+                    citiesListSource.addCity(new CitiesList(newCityName, CurrentDataContainer.cityLatitude, CurrentDataContainer.cityLongitude));
 
                     //Запоминаем выбранный город в SharedPreferences
                     SharedPreferences sharedPreferences = requireActivity().getSharedPreferences(MainActivity.SETTINGS, MODE_PRIVATE);
@@ -109,14 +109,15 @@ public class BottomSheetDialogChooseCityFragment extends BottomSheetDialogFragme
                     EventBus.getBus().post(new OpenWeatherMainFragmentEvent());
                 });
             }
-            if(ForecastRequest.responseCode == 404){
+            if(ForecastRequest.responseCode == 400 || ForecastRequest.responseCode == 404){
                 handler.post(()->{
                     enterCityEditText.setText("");
                     chooseCityTextView.setText(R.string.city_not_found);
                     chooseCityTextView.setTextColor(R.color.colorPrimary);
                 });
             }
-            if(ForecastRequest.responseCode != 404 && ForecastRequest.responseCode != 200){
+            if(ForecastRequest.responseCode != 400 && ForecastRequest.responseCode != 200 && ForecastRequest.responseCode != 404){
+                Log.d("response", "bottomSheetFragment responseCode = "+ ForecastRequest.responseCode);
                 handler.post(()->{
                 enterCityEditText.setText("");
                 chooseCityTextView.setText(R.string.connection_failed);

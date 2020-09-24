@@ -57,6 +57,14 @@ import java.util.List;
         @Query("SELECT * FROM citieslist ORDER BY city ASC")
         List<CitiesList> sortByName();
 
+        // Get coordinates by name
+        @Query("SELECT latitude FROM citieslist WHERE city = :name")
+        double getLatitudeByName(String name);
+
+        // Get coordinates by name
+        @Query("SELECT longitude FROM citieslist WHERE city = :name")
+        double getLongitudeByName(String name);
+
     }
 
 

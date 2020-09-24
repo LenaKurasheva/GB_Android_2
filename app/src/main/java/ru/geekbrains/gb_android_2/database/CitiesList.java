@@ -27,9 +27,20 @@ import androidx.room.PrimaryKey;
         @ColumnInfo(name = "created")
         public long created;
 
+        @ColumnInfo(name = "latitude")
+        public Double latitude;
+
+        @ColumnInfo(name = "longitude")
+        public Double longitude;
+
         public CitiesList(){}
 
-        public CitiesList(String cityName){this.name = cityName; this.created = System.currentTimeMillis()/1000L;}
+        public CitiesList(String cityName, Double latitude, Double longitude){
+            this.name = cityName;
+            this.created = System.currentTimeMillis()/1000L;
+            this.latitude = latitude;
+            this.longitude = longitude;
+        }
     }
 
 

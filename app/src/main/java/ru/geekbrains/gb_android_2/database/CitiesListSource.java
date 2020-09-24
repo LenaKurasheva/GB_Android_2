@@ -1,5 +1,6 @@
 package ru.geekbrains.gb_android_2.database;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -66,6 +67,17 @@ public class CitiesListSource {
     // Сортируем города по имени
     public void loadCitiesListSortedByName(){
         citiesList = citiesListDao.sortByName();
+    }
+
+    // Get coordinates by name
+    public List<Double> getCoordinatesFromDB(String name){
+        Double latitude = citiesListDao.getLatitudeByName(name);
+        Double longitude = citiesListDao.getLongitudeByName(name);
+        List<Double> coordinates = new ArrayList<>();
+        coordinates.add(latitude);
+        coordinates.add(longitude);
+        loadCitiesListSortedByCreated();
+        return coordinates;
     }
 }
 

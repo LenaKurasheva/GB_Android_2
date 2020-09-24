@@ -5,13 +5,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,7 +18,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,26 +32,17 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.AutocompletePrediction;
 import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
-import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.model.RectangularBounds;
 import com.google.android.libraries.places.api.model.TypeFilter;
-import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
-import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
-import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
-import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -79,7 +67,6 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class ChooseCityFragment extends Fragment implements RVOnItemClick, PlacesRVOnItemClick {
 
-    private static final int AUTOCOMPLETE_REQUEST_CODE = 1111;
     private TextInputEditText enterCity;
     static String currentCity = "";
     private RecyclerView recyclerView, placesRV;
@@ -93,10 +80,7 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick, Place
     // Паттерн для проверки, является ли введеное слово названием города.
     Pattern checkEnterCity = Pattern.compile("^[а-яА-ЯЁa-zA-Z]+(?:[\\s-][а-яА-ЯЁa-zA-Z]+)*$");
     private CitiesListSource citiesListSource;
-    private String apiKey = "AIzaSyD3YSJ6LJLFjr94lDYfclthZ-ROzfAhVOI";
-    private TextInputLayout textInputLayout;
     PlacesClient placesClient;
-    private boolean doesPlacesRVExist = false;
     private boolean isCityChosen;
     private ConstraintLayout constraintLayout;
     private ArrayList<String> placesIds;
@@ -166,19 +150,19 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick, Place
 
         // Добавляем google places API с подсказками при поиске города
         // Initialize the SDK
-        Places.initialize(getActivity().getApplicationContext(), apiKey);
+        String apiKey = "AIzaSyD3YSJ6LJLFjr94lDYfclthZ-ROzfAhVOI";
+        Places.initialize(requireActivity().getApplicationContext(), apiKey);
 
         // Create a new PlacesClient instance
-        placesClient = Places.createClient(getContext());
+        placesClient = Places.createClient(requireContext());
         setupPlacesRecyclerView(null);
         addTextChangedListenerToEnterCityEditText();
         setOnEnterCityEnterKeyListener();
     }
 
     private void initViews(View view) {
-        enterCity = (TextInputEditText)view.findViewById(R.id.enterCity);
+        enterCity = view.findViewById(R.id.enterCity);
         recyclerView = view.findViewById(R.id.cities);
-        textInputLayout = view.findViewById(R.id.enterCityLayout);
         placesRV = view.findViewById(R.id.places);
         constraintLayout = view.findViewById(R.id.choose_city_constraint);
 
@@ -190,17 +174,8 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick, Place
       // and once again when the user makes a selection (for example when calling fetchPlace()).
       AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
 
-      // Create a RectangularBounds object.
-      RectangularBounds bounds = RectangularBounds.newInstance(
-              new LatLng(-33.880490, 151.184363),
-              new LatLng(-33.858754, 151.229596));
       // Use the builder to create a FindAutocompletePredictionsRequest.
       FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
-              // Call either setLocationBias() OR setLocationRestriction().
-//              .setLocationBias(bounds)
-              //.setLocationRestriction(bounds)
-//              .setOrigin(new LatLng(-33.8749937,151.2041382))
-//              .setCountries("AU", "NZ")
               .setTypeFilter(TypeFilter.CITIES)
               .setSessionToken(token)
               .setQuery(query)
@@ -212,9 +187,9 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick, Place
           for (AutocompletePrediction prediction : response.getAutocompletePredictions()) {
               Log.d("places", prediction.getPrimaryText(null).toString());
               Log.d("places", prediction.getPlaceTypes().toString());
-              Log.d("places", prediction.getPlaceId().toString());
+              Log.d("places", prediction.getPlaceId());
               placesFullText.add(prediction.getFullText(null).toString());
-              placesIds.add(prediction.getPlaceId().toString());
+              placesIds.add(prediction.getPlaceId());
           }
           showPlacesLIst(placesFullText);
           placesAdapter.updatePlacesList(placesFullText);
@@ -232,13 +207,11 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick, Place
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                 String userQuery = enterCity.getText().toString();
+                 String userQuery = Objects.requireNonNull(enterCity.getText()).toString();
                  if(userQuery.length() >= 3 && !isCityChosen) {
-                     doesPlacesRVExist = true;
                      getPlacesList(userQuery);
                  }
                  if(userQuery.length() >= 3 && isCityChosen) {
-                     doesPlacesRVExist = false;
                      recyclerView.setVisibility(View.VISIBLE);
                      placesRV.setVisibility(View.GONE);
                  }
@@ -263,7 +236,6 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick, Place
             ConstraintSet constraintSet = new ConstraintSet();
             constraintSet.clone(constraintLayout);
             constraintSet.connect(R.id.places, ConstraintSet.TOP, R.id.enterCityLayout, ConstraintSet.BOTTOM, 0);
-            doesPlacesRVExist = true;
         } else {
             placesRV.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
@@ -286,7 +258,6 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick, Place
     public void onPlaceItemClicked(View view, String itemText, int position) {
         isCityChosen = true;
         placesRV.setVisibility(View.GONE);
-        doesPlacesRVExist = false;
         recyclerView.setVisibility(View.VISIBLE);
         String place = itemText.split(",", 2)[0];
         enterCity.setText(place);
@@ -392,8 +363,8 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick, Place
                                     CurrentDataContainer.isFirstCityInSession = false;
 
 
-                                    //Добавляем новый город в RV
-                                    citiesListSource.addCity(new CitiesList(currentCity));
+                                    //Добавляем новый город в базу и RV
+                                    citiesListSource.addCity(new CitiesList(currentCity, CurrentDataContainer.cityLatitude, CurrentDataContainer.cityLongitude));
                                     if(CurrentDataContainer.isCitiesListSortedByName) adapter.sortByName();
                                     else adapter.sortByCreatedTime();
                                     //Запоминаем выбранный город в SharedPreferences
@@ -480,8 +451,27 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick, Place
         // Записываем выбранный город в SharedPreferences
         saveCurrentCityToPreference(sharedPreferences, currentCity);
 
+        // Берем его координаты из базы:
+        Thread thread = new Thread(()->{
+            CitiesListDao citiesListDao = App
+                    .getInstance()
+                    .getCitiesListDao();
+            citiesListSource = new CitiesListSource(citiesListDao);
+            List<Double> coord = citiesListSource.getCoordinatesFromDB(currentCity);
+            CurrentDataContainer.cityLatitude = coord.get(0);
+            CurrentDataContainer.cityLongitude = coord.get(1);
+            Log.d("coord", "cityLatitude and cityLongitude from db = "+ CurrentDataContainer.cityLatitude + " " + CurrentDataContainer.cityLongitude);
+        });
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         //Создаем прогноз погоды на неделю для нового выбранного города:
-        takeWeatherInfoForFiveDays();
+        ForecastRequest.getForecastFromServer(CurrentDataContainer.cityLatitude, CurrentDataContainer.cityLongitude);
+
+
         Handler handler = new Handler();
         new Thread(() -> {
             try {
