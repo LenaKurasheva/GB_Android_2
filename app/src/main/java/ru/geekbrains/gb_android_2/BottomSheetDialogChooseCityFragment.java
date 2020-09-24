@@ -2,6 +2,8 @@ package ru.geekbrains.gb_android_2;
 
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -16,6 +18,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+
+import java.io.IOException;
+import java.util.List;
 
 import ru.geekbrains.gb_android_2.database.CitiesList;
 import ru.geekbrains.gb_android_2.database.CitiesListDao;
@@ -68,7 +73,8 @@ public class BottomSheetDialogChooseCityFragment extends BottomSheetDialogFragme
     private void checkIsShowingWeatherPossible(String cityName){
 
         OpenWeatherMap openWeatherMap = OpenWeatherMap.getInstance();
-        ForecastRequest.getForecastFromServer(cityName);
+        findCoordinatesByCityName(cityName);
+        ForecastRequest.getForecastFromServer(CurrentDataContainer.cityLatitude,  CurrentDataContainer.cityLongitude);
         Log.d("retrofit", "countDownLatch = " + ForecastRequest.getForecastResponseReceived().getCount());
         Handler handler = new Handler();
         new Thread(() -> {
@@ -122,6 +128,30 @@ public class BottomSheetDialogChooseCityFragment extends BottomSheetDialogFragme
             }
         }).start();
     }
+
+    private void findCoordinatesByCityName(String cityName){
+        // Create geocoder
+        final Geocoder geo = new Geocoder(getContext());
+        List<Address> list = null;
+
+        try {
+            list = geo.getFromLocationName(cityName, 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+            //                return e.getLocalizedMessage();
+        }
+
+        if (list != null && !list.isEmpty()) {
+            // Get first element from List
+            Address address = list.get(0);
+            CurrentDataContainer.cityLatitude = address.getLatitude();
+            CurrentDataContainer.cityLongitude = address.getLongitude();
+        } else {
+            CurrentDataContainer.cityLatitude = null;
+            CurrentDataContainer.cityLongitude = null;
+        }
+    }
+
 
     private void saveCityToPreference(SharedPreferences preferences, String currentCity) {
         SharedPreferences.Editor editor = preferences.edit();

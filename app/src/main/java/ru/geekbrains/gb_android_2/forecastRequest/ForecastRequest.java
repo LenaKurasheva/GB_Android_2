@@ -20,10 +20,10 @@ public class ForecastRequest {
 
     public static CountDownLatch getForecastResponseReceived(){return forecastResponseReceived;}
 
-    public static void getForecastFromServer(String currentCity) {
+    public static void getForecastFromServer(Double lat, Double lon) {
         forecastResponseReceived = new CountDownLatch(1);
         Log.d("retrofit", "countDounLatch = " + forecastResponseReceived.getCount());
-       OpenWeatherRepo.getInstance().getAPI().loadWeather(currentCity,"metric",
+       OpenWeatherRepo.getInstance().getAPI().loadWeather(lat, lon,"metric",
                 "2a72f5f940375d439b4598c5184c5e82").enqueue(new Callback<WeatherRequest>() {
             @Override
             public void onResponse(@NonNull Call<WeatherRequest> call,
@@ -39,6 +39,11 @@ public class ForecastRequest {
                     //обрабатываем ее
                     if (response.code() == 404) {
                         responseCode = 404;
+                        forecastResponseReceived.countDown();
+                        return;
+                    }
+                    if(response.code() == 400) {
+                        responseCode = 400;
                         forecastResponseReceived.countDown();
                         return;
                     }

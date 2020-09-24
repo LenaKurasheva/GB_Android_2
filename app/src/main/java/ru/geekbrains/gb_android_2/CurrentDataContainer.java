@@ -37,4 +37,6 @@ public class CurrentDataContainer implements Serializable {
     static Stack<String> backStack = new Stack<>();
     static boolean isCitiesListSortedByName;
     public static boolean isNetworkConnected;
+    public static Double cityLatitude;
+    public static Double cityLongitude;
 }

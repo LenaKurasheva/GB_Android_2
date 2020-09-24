@@ -7,7 +7,8 @@ import ru.geekbrains.gb_android_2.model.weather.WeatherRequest;
 
 public interface OpenWeatherInterface {
     @GET("data/2.5/forecast")
-    Call<WeatherRequest> loadWeather(@Query("q") String city,
+    Call<WeatherRequest> loadWeather(@Query("lat") Double latitude,
+                                     @Query("lon") Double longitude,
                                      @Query("units") String units,
                                      @Query("appid") String keyApi);
 }

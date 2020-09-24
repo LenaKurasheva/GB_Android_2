@@ -3,9 +3,15 @@ package ru.geekbrains.gb_android_2;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.location.Address;
+import android.location.Geocoder;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -14,21 +20,42 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.AutocompletePrediction;
+import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.RectangularBounds;
+import com.google.android.libraries.places.api.model.TypeFilter;
+import com.google.android.libraries.places.api.net.FetchPlaceRequest;
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
+import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
+import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
+import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -40,18 +67,24 @@ import ru.geekbrains.gb_android_2.forecastRequest.ForecastRequest;
 import ru.geekbrains.gb_android_2.forecastRequest.OpenWeatherMap;
 import ru.geekbrains.gb_android_2.model.HourlyWeatherData;
 import ru.geekbrains.gb_android_2.model.WeatherData;
+import ru.geekbrains.gb_android_2.placeDetailsRequest.GooglePlaceDetails;
+import ru.geekbrains.gb_android_2.placeDetailsRequest.PlaceDetailsRequest;
 import ru.geekbrains.gb_android_2.rvDataAdapters.CitiesRecyclerDataAdapter;
+import ru.geekbrains.gb_android_2.rvDataAdapters.GooglePlacesRecyclerDataAdapter;
+import ru.geekbrains.gb_android_2.rvDataAdapters.PlacesRVOnItemClick;
 import ru.geekbrains.gb_android_2.rvDataAdapters.RVOnItemClick;
 
 import static android.content.Context.MODE_PRIVATE;
 
 
-public class ChooseCityFragment extends Fragment implements RVOnItemClick {
+public class ChooseCityFragment extends Fragment implements RVOnItemClick, PlacesRVOnItemClick {
 
+    private static final int AUTOCOMPLETE_REQUEST_CODE = 1111;
     private TextInputEditText enterCity;
     static String currentCity = "";
-    private RecyclerView recyclerView;
+    private RecyclerView recyclerView, placesRV;
     private CitiesRecyclerDataAdapter adapter;
+    private GooglePlacesRecyclerDataAdapter placesAdapter;
     private ArrayList<WeatherData> weekWeatherData = new ArrayList<>();
     private ArrayList<HourlyWeatherData> hourlyWeatherList = new ArrayList<>();
     final String myLog = "myLog";
@@ -60,6 +93,15 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
     // Паттерн для проверки, является ли введеное слово названием города.
     Pattern checkEnterCity = Pattern.compile("^[а-яА-ЯЁa-zA-Z]+(?:[\\s-][а-яА-ЯЁa-zA-Z]+)*$");
     private CitiesListSource citiesListSource;
+    private String apiKey = "AIzaSyD3YSJ6LJLFjr94lDYfclthZ-ROzfAhVOI";
+    private TextInputLayout textInputLayout;
+    PlacesClient placesClient;
+    private boolean doesPlacesRVExist = false;
+    private boolean isCityChosen;
+    private ConstraintLayout constraintLayout;
+    private ArrayList<String> placesIds;
+    private boolean coordinatesByIdGot;
+
 
     static ChooseCityFragment create(CurrentDataContainer container) {
         ChooseCityFragment fragment = new ChooseCityFragment();    // создание
@@ -121,13 +163,193 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
         checkEnterCityField();
         setupRecyclerView();// тут создается адаптер на основании citiesList из этого класса ChooseCityFragment (адаптер берет список городов из этого класса)
         if(CurrentDataContainer.isCitiesListSortedByName) adapter.sortByName();
+
+        // Добавляем google places API с подсказками при поиске города
+        // Initialize the SDK
+        Places.initialize(getActivity().getApplicationContext(), apiKey);
+
+        // Create a new PlacesClient instance
+        placesClient = Places.createClient(getContext());
+        setupPlacesRecyclerView(null);
+        addTextChangedListenerToEnterCityEditText();
         setOnEnterCityEnterKeyListener();
     }
 
     private void initViews(View view) {
-        enterCity = view.findViewById(R.id.enterCity);
+        enterCity = (TextInputEditText)view.findViewById(R.id.enterCity);
         recyclerView = view.findViewById(R.id.cities);
+        textInputLayout = view.findViewById(R.id.enterCityLayout);
+        placesRV = view.findViewById(R.id.places);
+        constraintLayout = view.findViewById(R.id.choose_city_constraint);
+
     }
+
+  private void getPlacesList(String query){
+                Log.d("places", "setOnEnterCityClickListener");
+      // Create a new token for the autocomplete session. Pass this to FindAutocompletePredictionsRequest,
+      // and once again when the user makes a selection (for example when calling fetchPlace()).
+      AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
+
+      // Create a RectangularBounds object.
+      RectangularBounds bounds = RectangularBounds.newInstance(
+              new LatLng(-33.880490, 151.184363),
+              new LatLng(-33.858754, 151.229596));
+      // Use the builder to create a FindAutocompletePredictionsRequest.
+      FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
+              // Call either setLocationBias() OR setLocationRestriction().
+//              .setLocationBias(bounds)
+              //.setLocationRestriction(bounds)
+//              .setOrigin(new LatLng(-33.8749937,151.2041382))
+//              .setCountries("AU", "NZ")
+              .setTypeFilter(TypeFilter.CITIES)
+              .setSessionToken(token)
+              .setQuery(query)
+              .build();
+
+      placesClient.findAutocompletePredictions(request).addOnSuccessListener((response) -> {
+          ArrayList<String> placesFullText = new ArrayList<>();
+          placesIds = new ArrayList<>();
+          for (AutocompletePrediction prediction : response.getAutocompletePredictions()) {
+              Log.d("places", prediction.getPrimaryText(null).toString());
+              Log.d("places", prediction.getPlaceTypes().toString());
+              Log.d("places", prediction.getPlaceId().toString());
+              placesFullText.add(prediction.getFullText(null).toString());
+              placesIds.add(prediction.getPlaceId().toString());
+          }
+          showPlacesLIst(placesFullText);
+          placesAdapter.updatePlacesList(placesFullText);
+      }).addOnFailureListener((exception) -> {
+          if (exception instanceof ApiException) {
+              ApiException apiException = (ApiException) exception;
+              Log.d("places", "Place not found: " + apiException.getStatusCode());
+          }
+      });
+    }
+
+    private void addTextChangedListenerToEnterCityEditText(){
+        enterCity.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                 String userQuery = enterCity.getText().toString();
+                 if(userQuery.length() >= 3 && !isCityChosen) {
+                     doesPlacesRVExist = true;
+                     getPlacesList(userQuery);
+                 }
+                 if(userQuery.length() >= 3 && isCityChosen) {
+                     doesPlacesRVExist = false;
+                     recyclerView.setVisibility(View.VISIBLE);
+                     placesRV.setVisibility(View.GONE);
+                 }
+                if(userQuery.length() < 3) {
+                    Log.d("places", "CATCH");
+                    placesAdapter.updatePlacesList(new ArrayList<>());
+                    recyclerView.setVisibility(View.VISIBLE);
+                    placesRV.setVisibility(View.GONE);
+                    isCityChosen = false;
+                }
+            }
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+    }
+
+    private void showPlacesLIst(ArrayList<String> places) {
+        if(places.size() > 0) {
+            Log.d("places", "showPlacesLIst - move places to place of cities");
+            placesRV.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+            ConstraintSet constraintSet = new ConstraintSet();
+            constraintSet.clone(constraintLayout);
+            constraintSet.connect(R.id.places, ConstraintSet.TOP, R.id.enterCityLayout, ConstraintSet.BOTTOM, 0);
+            doesPlacesRVExist = true;
+        } else {
+            placesRV.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+        }
+    }
+    private void setupPlacesRecyclerView(ArrayList<String> places){
+        LinearLayoutManager layoutManager = new LinearLayoutManager(requireActivity().getBaseContext());
+
+        if (placesRV.getItemDecorationCount() <= 0){
+            DividerItemDecoration itemDecoration = new DividerItemDecoration(requireActivity().getBaseContext(), LinearLayoutManager.VERTICAL);
+            placesRV.addItemDecoration(itemDecoration);
+        }
+        placesAdapter = new GooglePlacesRecyclerDataAdapter(places, this);
+        placesRV.setLayoutManager(layoutManager);
+        placesRV.setAdapter(placesAdapter);
+//        Log.d("places", "showPlacesLIst -> places: " +places.toString());
+    }
+
+    @Override
+    public void onPlaceItemClicked(View view, String itemText, int position) {
+        isCityChosen = true;
+        placesRV.setVisibility(View.GONE);
+        doesPlacesRVExist = false;
+        recyclerView.setVisibility(View.VISIBLE);
+        String place = itemText.split(",", 2)[0];
+        enterCity.setText(place);
+        String cityId = placesIds.get(position);
+        findCoordinatesById(cityId);
+    }
+
+    private void findCoordinatesById(String placeId) {
+        PlaceDetailsRequest.getPlaceDetails(placeId);
+        new Thread(()->{
+            try {
+            PlaceDetailsRequest.detailsResponseReceived.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+            GooglePlaceDetails googlePlaceDetails = GooglePlaceDetails.getInstance();
+            googlePlaceDetails.getCityCoordinates();
+            requireActivity().runOnUiThread(()-> {
+                if(googlePlaceDetails.getCityLatitude() != null) {
+                    CurrentDataContainer.cityLongitude = GooglePlaceDetails.getInstance().getCityLongitude();
+                    coordinatesByIdGot = true;
+                } else {
+                    CurrentDataContainer.cityLongitude = null;
+                    coordinatesByIdGot = false;
+                }
+                if(googlePlaceDetails.getCityLongitude() != null) {
+                    CurrentDataContainer.cityLatitude = GooglePlaceDetails.getInstance().getCityLatitude();
+                    coordinatesByIdGot = true;
+                } else {
+                    CurrentDataContainer.cityLatitude = null;
+                    coordinatesByIdGot = false;
+                }
+                Log.d("places", "coordinates: " + CurrentDataContainer.cityLatitude + " " + CurrentDataContainer.cityLongitude);
+
+            });
+        }).start();
+    }
+
+    private void findCoordinatesByCityName(String cityName){
+         // Create geocoder
+            final Geocoder geo = new Geocoder(getContext());
+            List<Address> list = null;
+
+            try {
+                list = geo.getFromLocationName(cityName, 1);
+            } catch (IOException e) {
+                e.printStackTrace();
+                //                return e.getLocalizedMessage();
+            }
+
+            if (list != null && !list.isEmpty()) {
+                // Get first element from List
+                Address address = list.get(0);
+                CurrentDataContainer.cityLatitude = address.getLatitude();
+                CurrentDataContainer.cityLongitude = address.getLongitude();
+            } else {
+                CurrentDataContainer.cityLatitude = null;
+                CurrentDataContainer.cityLongitude = null;
+            }
+        coordinatesByIdGot = false;
+            Log.d("geocoder", "GEOCODER: latitude = "+ CurrentDataContainer.cityLatitude + " logitude = "+CurrentDataContainer.cityLongitude );
+    }
+
 
     private void setOnEnterCityEnterKeyListener() {
         enterCity.setOnKeyListener((view, keyCode, keyEvent) -> {
@@ -158,7 +380,7 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
                                     // Ждем, пока не получим актуальный response code:
                                     ForecastRequest.getForecastResponseReceived().await();
 
-                                if (ForecastRequest.responseCode == 404) {
+                                if (ForecastRequest.responseCode == 404 || ForecastRequest.responseCode == 400) {
                                     Log.d(myLog, "RESPONSE COD = " + ForecastRequest.responseCode + " CURR CITY = " + currentCity);
                                     handler.post(()->{
                                         showAlertDialog(R.string.city_not_found);
@@ -323,7 +545,9 @@ public class ChooseCityFragment extends Fragment implements RVOnItemClick {
     }
 
     private void takeWeatherInfoForFiveDays(){
-        ForecastRequest.getForecastFromServer(currentCity);
+        if (!coordinatesByIdGot) findCoordinatesByCityName(currentCity);
+        coordinatesByIdGot = false;
+        ForecastRequest.getForecastFromServer(CurrentDataContainer.cityLatitude, CurrentDataContainer.cityLongitude);
         Log.d("retrofit", "ChooseCityFragment - countDownLatch = " + ForecastRequest.getForecastResponseReceived().getCount());
     }
 

@@ -3,12 +3,11 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/choose_city_gridlayout"
+    android:id="@+id/choose_city_constraint"
     android:paddingTop="20dp"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
     tools:context="ru.geekbrains.gb_android_2.ChooseCityFragment">
-
 
     <TextView
         android:id="@+id/chooseYourCity"
@@ -24,46 +23,40 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/enterCityLayout"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
         android:layout_marginTop="@dimen/enterCity_editText_marginTop"
         app:boxBackgroundColor="@color/choose_city_TextInputLayout"
         app:boxStrokeColor="@color/weather_status_snow"
         app:errorEnabled="true"
-        app:layout_constraintTop_toBottomOf="@+id/chooseYourCity" >
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/enterCity"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/enter_the_name_of_the_city"
-                android:inputType= "textFilter"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/okEnterCity"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/ok"
-        android:textSize="@dimen/okEnterCity_btn_textSize"
-       app:layout_constraintTop_toBottomOf="@id/cities"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chooseYourCity">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/enterCity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/enter_the_name_of_the_city"
+            android:inputType="textFilter" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/places"
+        android:layout_width="match_parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/citiesRV_marginTop_in_fragment_choose_city"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/enterCityLayout"
+        app:layout_constraintBottom_toBottomOf="parent"
         android:visibility="gone"/>
 
-    <TextView
-        android:id="@+id/orChooseFromList"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        style="@style/ChooseCityViewCenterLocationWithMargins"
-        android:text="@string/or_choose_from_list"
-        android:textSize="@dimen/orChooseFromList_textview"
-
-        app:layout_constraintTop_toBottomOf="@id/enterCityLayout"
-        tools:ignore="MissingConstraints" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/cities"
@@ -74,7 +67,7 @@
         android:layout_marginTop="@dimen/citiesRV_marginTop_in_fragment_choose_city"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/orChooseFromList" />
+        app:layout_constraintTop_toBottomOf="@+id/enterCityLayout"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
