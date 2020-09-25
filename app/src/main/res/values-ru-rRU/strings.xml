@@ -24,7 +24,7 @@
     <string name="pleaseChooseCotyFirst">Пожалуйста, сначала выберите город</string>
     <string name="about">О приложении</string>
     <string name="appName">Погода</string>
-    <string name="version">Версия 1.0 17.08.2020</string>
+    <string name="version">Версия 1.0 27.09.2020</string>
     <string name="delete_city">Удалить город?</string>
     <string name="delete">Удалить</string>
 
@@ -95,7 +95,7 @@
     <string name="menu_choose_city">Выберите город</string>
     <string name="menu_about">О приложении</string>
     <string name="read_wiki">Wikipedia</string>
-    <string name="elena_kurasheva_2020">© Елена Курашева, 2020</string>
+    <string name="elena_kurasheva_2020">© Елена Курашева</string>
     <string name="city_not_found">Город не найден, попробуйте еще раз.</string>
     <string name="connection_failed">Ошибка интернет соединения.</string>
     <string name="sorry_alert_dialog">Извините, я не могу найти прогноз.</string>

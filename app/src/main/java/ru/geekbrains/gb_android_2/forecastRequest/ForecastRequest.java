@@ -3,6 +3,7 @@ package ru.geekbrains.gb_android_2.forecastRequest;
 import android.util.Log;
 import androidx.annotation.NonNull;
 
+import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 
 import retrofit2.Call;
@@ -21,9 +22,14 @@ public class ForecastRequest {
     public static CountDownLatch getForecastResponseReceived(){return forecastResponseReceived;}
 
     public static void getForecastFromServer(Double lat, Double lon) {
+        Locale.getDefault().getDisplayLanguage();
+        Log.d("language", "lang = " + Locale.getDefault().getDisplayLanguage());
+        String lang = Locale.getDefault().getDisplayLanguage();
+        if(lang.equals("русский")) lang = "ru";
+        else lang = "en";
         forecastResponseReceived = new CountDownLatch(1);
         Log.d("retrofit", "countDounLatch = " + forecastResponseReceived.getCount());
-       OpenWeatherRepo.getInstance().getAPI().loadWeather(lat, lon,"metric",
+       OpenWeatherRepo.getInstance().getAPI().loadWeather(lat, lon,"metric", lang,
                 "2a72f5f940375d439b4598c5184c5e82").enqueue(new Callback<WeatherRequest>() {
             @Override
             public void onResponse(@NonNull Call<WeatherRequest> call,

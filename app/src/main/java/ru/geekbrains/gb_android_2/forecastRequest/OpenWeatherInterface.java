@@ -10,5 +10,6 @@ public interface OpenWeatherInterface {
     Call<WeatherRequest> loadWeather(@Query("lat") Double latitude,
                                      @Query("lon") Double longitude,
                                      @Query("units") String units,
+                                     @Query("lang") String lang,
                                      @Query("appid") String keyApi);
 }
